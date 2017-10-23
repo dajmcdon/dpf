@@ -136,6 +136,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
 }
 
 //Tested thoroughly already
+// [[Rcpp::export]]
 List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
              arma::mat ct, arma::mat Tt,
              arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
@@ -150,7 +151,8 @@ List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
 
   // KF
   arma::mat a1 = a0;
-  arma::mat vt = yt - ct - Zt * a0;
+  arma::mat pred = ct + Zt * a0;
+  arma::mat vt = yt - pred;
   arma::mat Ft = GGt + Zt * P0 * Zt.t();
   arma::mat Ftinv = arma::inv(Ft);
   arma::mat Kt = P0 * Zt.t() * Ftinv;
@@ -168,7 +170,8 @@ List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   P1.reshape(d*d, 1);
   return List::create(Named("a1") = a1,
                       Named("P1") = P1,
-                      Named("lik") = lik);
+                      Named("lik") = lik,
+                      Named("pred") = pred);
 }
 
 //[[Rcpp::export]]
@@ -327,6 +330,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
     // Rcout << "iter = " << iter << std::endl;
     // Rcout << "a0 size = " << a0.size() << std::endl;
     arma::uword s = path(iter);
+    // Rcout << "s = " << s << std::endl;
     if(iter==0 || Rtvar || Qtvar){ 
       R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
       Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
@@ -343,6 +347,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
     arma::mat aa0 = step["a1"];
     arma::mat PP0 = step["P1"];
     double liktmp = step["lik"];
+    //Rcout << "iter = " << iter << "lik = " << -log(liktmp) << std::endl;
     llik -= log(liktmp);
   }
   return llik;
@@ -353,9 +358,9 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //mus(0) = mu1, mus(1) = B section tempo, mus(2) = taot, mus(3) = phit
     
 // [[Rcpp::export]]
-List yupengMats(arma::vec lt, arma::vec temposwitch, double sig2eps, arma::vec mus,
-                arma::vec sig2eta, arma::vec transprobs){ //confirm that t's stay in same order for each matrix
-  // need to deal with the sections
+List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
+                arma::vec sig2eta, arma::vec transprobs){ 
+  //confirm that t's stay in same order for each matrix
   // in each section, we have:
   //   3 state means (tempo, accel, stress), 3 state variances (same), 1 obs variance
   //   4 transition matrix parameters
@@ -368,22 +373,22 @@ List yupengMats(arma::vec lt, arma::vec temposwitch, double sig2eps, arma::vec m
   int n = lt.n_elem;
   arma::mat a0(m, nstates, arma::fill::zeros);
   a0.row(0) += mus(0);
-  a0(1,4) += mus(2);
-  a0(1,6) += mus(2);
+  a0(1,4) += mus(1);
+  a0(1,6) += mus(1);
   arma::mat P0(mm, nstates, arma::fill::zeros);
   P0.row(0) += sig2eta(0);
   P0(3,4) += sig2eta(1);
   P0(3,6) += sig2eta(1);
   arma::cube dt(m, nstates, n, arma::fill::zeros);
-  dt.tube(0,1) = lt*mus(2);
-  dt.tube(0,4) = lt*mus(2);
-  dt.tube(1,1) += mus(2);
-  dt.tube(1,4) += mus(2);
-  dt.tube(1,2) += mus(3);
+  dt.tube(0,1) = lt*mus(1);
+  dt.tube(0,4) = lt*mus(1);
+  dt.tube(1,1) += mus(1);
+  dt.tube(1,4) += mus(1);
+  dt.tube(1,2) += mus(2);
   arma::vec tempo_mus(n, arma::fill::zeros);
-  tempo_mus.elem( find(temposwitch > 0) ) += mus(1);
-  tempo_mus.elem( find(temposwitch == 0) ) += mus(0);
-  dt.tube(0,5) = tempo_mus;
+  // tempo_mus.elem( find(temposwitch > 0) ) += mus(1);
+  //tempo_mus.elem( find(temposwitch == 0) ) += mus(0);
+  dt.tube(0,5) += mus(0);
   // Rcout << "dt done" << std::endl;
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
   // Rcout << "ct done" << std::endl;
@@ -416,24 +421,24 @@ List yupengMats(arma::vec lt, arma::vec temposwitch, double sig2eps, arma::vec m
   GGt *= sig2eps;
   // Rcout << "GGt done" << std::endl;
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
-  transMat(0,0) = transprobs(0);
-  transMat(0,1) = transprobs(1);
-  transMat(0,2) = 1-transprobs(0)-transprobs(1);
-  transMat(1,3) = transprobs(2);
-  transMat(1,4) = 1-transprobs(2);
-  transMat(2,7) = 1;
-  transMat(3,3) = transprobs(2);
-  transMat(3,4) = 1-transprobs(2);
-  transMat(4,5) = transprobs(3);
-  transMat(4,6) = 1-transprobs(3);
-  transMat(5,0) = transprobs(0);
-  transMat(5,1) = transprobs(1);
-  transMat(5,2) = 1-transprobs(0)-transprobs(1);
-  transMat(6,5) = transprobs(3);
-  transMat(6,6) = 1-transprobs(3);
-  transMat(7,0) = transprobs(0);
-  transMat(7,1) = transprobs(1);
-  transMat(7,2) = 1-transprobs(0)-transprobs(1);
+  transMat(0,0) = transprobs(0); // (1,1) -> (1,1)
+  transMat(0,1) = transprobs(1); // (1,1) -> (1,2)
+  transMat(0,2) = 1-transprobs(0)-transprobs(1); // (1,1) -> (1,4)
+  transMat(1,3) = transprobs(2); // (1,2) -> (2,2)
+  transMat(1,4) = 1-transprobs(2); // (1,2) -> (2,3)
+  transMat(2,7) = 1; // (1,4) -> (4,1)
+  transMat(3,3) = transprobs(2); // (2,2) -> (2,2)
+  transMat(3,4) = 1-transprobs(2); // (2,2) -> (2,3)
+  transMat(4,5) = transprobs(3); // (2,3) -> (3,1)
+  transMat(4,6) = 1-transprobs(3); // (2,3) -> (3,3)
+  transMat(5,0) = transprobs(0); // (3,1) -> (1,1)
+  transMat(5,1) = transprobs(1); // (3,1) -> (1,2)
+  transMat(5,2) = 1-transprobs(0)-transprobs(1); // (3,1) -> (1,4)
+  transMat(6,5) = transprobs(3); // (3,3) -> (3,1)
+  transMat(6,6) = 1-transprobs(3); // (3,3) -> (3,3)
+  transMat(7,0) = transprobs(0); // (4,1) -> (1,1)
+  transMat(7,1) = transprobs(1); // (4,1) -> (1,2)
+  transMat(7,2) = 1-transprobs(0)-transprobs(1); // (4,1) -> (1,4)
   // Rcout << "transMat done" << std::endl;
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
@@ -538,7 +543,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
 }
 
 // [[Rcpp::export]]
-arma::colvec pathStuff(List pmats, arma::uvec path, arma::mat y){
+List pathStuff(List pmats, arma::uvec path, arma::mat y){
     arma::mat a0 = pmats["a0"];
     arma::mat P0 = pmats["P0"];
     arma::cube dt = pmats["dt"];
@@ -570,9 +575,9 @@ arma::colvec pathStuff(List pmats, arma::uvec path, arma::mat y){
     arma::mat aa0 = a0.col(0);
     arma::mat PP0 = reshape(P0.col(0), m, m);
     
-    double llik = 0;
+    arma::colvec llik = arma::zeros(n);
     
-    arma::colvec means = arma::zeros<arma::colvec>(n);
+    arma::colvec means = arma::zeros(n);
     
     for(arma::uword iter=0; iter<n; iter++){
         // Rcout << "iter = " << iter << std::endl;
@@ -585,20 +590,22 @@ arma::colvec pathStuff(List pmats, arma::uvec path, arma::mat y){
             Q.reshape(m,m);
             HHt = R * Q * R.t();
         }
-        Rcout << dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)) << std::endl;
+        // Rcout << dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)) << std::endl;
+        
         List step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                             ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                             Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                             Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                             HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                             y.col(iter));
-        means(iter) = aa0(0,0);
+        means(iter) = step["pred"];
         arma::mat aa0 = step["a1"];
         arma::mat PP0 = step["P1"];
         double liktmp = step["lik"];
-        llik -= log(liktmp);
+        llik(iter) += log(liktmp);
     }
-    return means;
+    return List::create(Named("preds") = means,
+                        Named("llik") = llik);
 }
 
 // You can include R code blocks in C++ files processed with sourceCpp
