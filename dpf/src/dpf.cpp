@@ -141,7 +141,7 @@ List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
              arma::mat ct, arma::mat Tt,
              arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
   // Reshape matrices
-  int d = a0.size();                                         //number of elements.
+  int d = a0.size();//number of elements.
   int m = yt.size();
   P0.reshape(d,d);
   Tt.reshape(d,d);
@@ -157,7 +157,7 @@ List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   arma::mat Ftinv = arma::inv(Ft);
   arma::mat Kt = P0 * Zt.t() * Ftinv;
   a1 += Kt * vt;
-  arma::mat P1 = P0 - Kt * Zt * P0;
+  arma::mat P1 = P0 - P0 * Zt.t() * Kt.t();
   a1 = dt + Tt * a1;
   P1 = HHt + Tt * P1 * Tt.t();
 

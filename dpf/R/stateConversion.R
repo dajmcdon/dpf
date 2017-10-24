@@ -51,19 +51,21 @@ kf1wrap <- function(ssMod, y, a0=matrix(0,nrow=nrow(ssMod$dt)),
     n = ncol(y)
     m = nrow(P0)
     P0 = matrix(P0,ncol=1)
-    at = matrix(0, m, n)
-    Pt = matrix(0, m^2, n)
+    at = matrix(0, m, n+1)
+    Pt = matrix(0, m^2, n+1)
+    at[,1] = a0
+    Pt[,1] = P0
     lik = double(n)
-    print(a0)
-    print(P0)
+    # print(a0)
+    # print(P0)
     Tt = matrix(ssMod$Tt,ncol=1)
     Zt = matrix(ssMod$Zt,ncol=1)
     HHt = matrix(ssMod$HHt,ncol=1)
     GGt = matrix(ssMod$GGt,ncol=1)
     for(i in 1:n){
         step = kf1step(a0, P0, ssMod$dt, ssMod$ct, Tt, Zt, HHt, GGt, y[,i,drop=FALSE])
-        at[,i] = step$a1
-        Pt[,i] = step$P1
+        at[,i+1] = step$a1
+        Pt[,i+1] = step$P1
         lik[i] = step$lik
         a0 = step$a1
         P0 = step$P1
@@ -76,3 +78,36 @@ logtransitions <- function(path, transmat){
     tm1 = c(1,path[-n])
     return(log(transmat[cbind(tm1,path)]))
 }
+
+# kf1stepR(a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt) {
+#     d = nrow(a0)
+#     m = nrow(yt)
+#     dim(P0) = c(d,d)
+#     dim(Tt) = c(d,d)
+#     dim(Zt) = c(m,d)
+#     dim(HHt) = c(d,d)
+#     dim(GGt) = c(m,m)
+#     
+#     ## KF
+#     pred = ct + Zt %*% a0
+#     vt = yt - pred
+#     Ft = GGt + Zt %*% P0 %*% t(Zt.t)
+#     Ftinv = solve(Ft)
+#     Kt = P0 %*% t(Zt.t) %*% Ftinv
+#     a1 += Kt * vt;
+#     arma::mat P1 = P0 - Kt * Zt * P0;
+#     a1 = dt + Tt * a1;
+#     P1 = HHt + Tt * P1 * Tt.t();
+#     
+#     // Calculate likelihood
+#     double ftdet = arma::det(Ftinv);
+#     ftdet = 1 / std::abs(ftdet);
+#     double mahalanobis = arma::as_scalar(vt.t() * Ftinv * vt);
+#     mahalanobis += yt.size()* log(2*M_PI) + log(ftdet);
+#     double lik = exp(-1.0*mahalanobis/2);
+#     P1.reshape(d*d, 1);
+#     return List::create(Named("a1") = a1,
+#                         Named("P1") = P1,
+#                         Named("lik") = lik,
+#                         Named("pred") = pred);
+# }
