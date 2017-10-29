@@ -42,7 +42,7 @@ toOptimize <- function(pvec, lt, y, w0, Npart){
     best = S$paths[which.max(S$weights),]
     negllike = getloglike(pmats, best, y)
     return(negllike)
-} #a comment
+}
 
 w0[2:4] = 0 #Michael's line
 initParams = c(0, 25, 25, 1, 1, 1, 1, 1, 0.25, 0.25, 0.25, 0.25)
