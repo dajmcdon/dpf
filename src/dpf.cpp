@@ -296,6 +296,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::mat PP0 = reshape(P0.col(0), m, m);
   
   double llik = 0;
+  double liktmp;
   
   for(arma::uword iter=0; iter<n; iter++){
     arma::uword s = path(iter);
@@ -312,7 +313,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
                                     Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                                     HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                                     y.col(iter));
-    Rcout << step.a1 << std::endl;
+    Rcout << aa0 << std::endl;
     /*Rcout << "iter = " << iter << std::endl;
     Rcout << "s = " << s << std::endl;
     Rcout << "aa0 = " << aa0 << std::endl;
@@ -324,9 +325,9 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
     Rcout << "GGt = " << GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)) << std::endl;
     Rcout << "yt = " << y.col(iter) << std::endl;*/
     
-    arma::mat aa0 = step.a1;
-    arma::mat PP0 = step.P1;
-    double liktmp = step.lik;
+    aa0 = step.a1;
+    PP0 = step.P1;
+    liktmp = step.lik;
     llik -= log(liktmp);
   }
   return llik;
@@ -523,9 +524,12 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     arma::colvec llik = arma::zeros(n);
     
     arma::colvec means = arma::zeros(n);
+    double liktmp;
+    arma::uword s;
     
     for(arma::uword iter=0; iter<n; iter++){
-        arma::uword s = path(iter);
+        s = path(iter);
+        Rcout << aa0 << std::endl;
         if(iter==0 || Rtvar || Qtvar){ 
             R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
             Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
@@ -541,9 +545,9 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
                             HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                             y.col(iter));
         means(iter) = step.pred(0,0);
-        arma::mat aa0 = step.a1;
-        arma::mat PP0 = step.P1;
-        double liktmp = step.lik;
+        aa0 = step.a1;
+        PP0 = step.P1;
+        liktmp = step.lik;
         llik(iter) += log(liktmp);
     }
     return List::create(Named("preds") = means,
