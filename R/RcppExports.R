@@ -9,10 +9,6 @@ resampleOptimal <- function(w, N) {
     .Call('_dpf_resampleOptimal', PACKAGE = 'dpf', w, N)
 }
 
-kf1step <- function(a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt) {
-    .Call('_dpf_kf1step', PACKAGE = 'dpf', a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt)
-}
-
 HHcreate <- function(Rt, Qt, r, q) {
     .Call('_dpf_HHcreate', PACKAGE = 'dpf', Rt, Qt, r, q)
 }

@@ -119,9 +119,14 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   return NewW;
 }
 
-//Tested thoroughly already
-// [[Rcpp::export]]
-List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
+struct KFOUT{
+    arma::mat a1;
+    arma::mat P1;
+    double lik;
+    arma::mat pred;
+};
+
+KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
              arma::mat ct, arma::mat Tt,
              arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
   // Reshape matrices
@@ -135,14 +140,17 @@ List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
 
   // KF
   arma::mat a1 = a0;
+  //Rcout << "line 138:" << a1 << std::endl;
   arma::mat pred = ct + Zt * a0;
   arma::mat vt = yt - pred;
   arma::mat Ft = GGt + Zt * P0 * Zt.t();
   arma::mat Ftinv = arma::inv(Ft);
   arma::mat Kt = P0 * Zt.t() * Ftinv;
   a1 += Kt * vt;
+  //Rcout << "line 145:" << a1 << std::endl;
   arma::mat P1 = P0 - P0 * Zt.t() * Kt.t();
   a1 = dt + Tt * a1;
+  //Rcout << "line 148:" << a1 << std::endl;
   P1 = HHt + Tt * P1 * Tt.t();
 
   // Calculate likelihood
@@ -152,10 +160,12 @@ List kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   mahalanobis += yt.size()* log(2*M_PI) + log(ftdet);
   double lik = exp(-1.0*mahalanobis/2);
   P1.reshape(d*d, 1);
-  return List::create(Named("a1") = a1,
+  KFOUT output = {a1, P1, lik, pred};
+  return output;
+  /*return List::create(Named("a1") = a1,
                       Named("P1") = P1,
                       Named("lik") = lik,
-                      Named("pred") = pred);
+                      Named("pred") = pred);*/
 }
 
 //[[Rcpp::export]]
@@ -202,14 +212,14 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
   arma::mat P11(mm, K);
   for(int part=0; part < npart; part++){
     for(int k=0;  k < K; k++){   //both loops together have effect of for each particle
-      List kfout = kf1step(a0.col(part), P0.col(part), dt.col(k), ct.col(k),
+      KFOUT kfout = kf1step(a0.col(part), P0.col(part), dt.col(k), ct.col(k),
                                        Tt.col(k), Zt.col(k), HHt.col(k), GGt.col(k),
                                        yt);
-      arma::mat atmp = kfout["a1"];
-      arma::mat Ptmp = kfout["P1"];
+      arma::mat atmp = kfout.a1;
+      arma::mat Ptmp = kfout.P1;
       a11.col(k) = atmp;
       P11.col(k) = Ptmp;
-      lik(part,k) = kfout["lik"];
+      lik(part,k) = kfout.lik;
     }
     a1.slice(part) = a11;
     P1.slice(part) = P11;
@@ -296,15 +306,27 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
       Q.reshape(m,m);
       HHt = R * Q * R.t();
     }
-    List step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
+    KFOUT step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                                     ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                                     Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                                     Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                                     HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                                     y.col(iter));
-    arma::mat aa0 = step["a1"];
-    arma::mat PP0 = step["P1"];
-    double liktmp = step["lik"];
+    Rcout << step.a1 << std::endl;
+    /*Rcout << "iter = " << iter << std::endl;
+    Rcout << "s = " << s << std::endl;
+    Rcout << "aa0 = " << aa0 << std::endl;
+    Rcout << "PP0 = " << PP0 << std::endl;
+    Rcout << "ct = " << ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)) << std::endl;
+    Rcout << "Tt = " << Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)) << std::endl;
+    Rcout << "Zt = " << Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)) << std::endl;
+    Rcout << "HHt = " << HHt << std::endl;
+    Rcout << "GGt = " << GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)) << std::endl;
+    Rcout << "yt = " << y.col(iter) << std::endl;*/
+    
+    arma::mat aa0 = step.a1;
+    arma::mat PP0 = step.P1;
+    double liktmp = step.lik;
     llik -= log(liktmp);
   }
   return llik;
@@ -512,16 +534,16 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
             HHt = R * Q * R.t();
         }
         
-        List step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
+        KFOUT step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                             ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                             Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                             Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                             HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                             y.col(iter));
-        means(iter) = step["pred"];
-        arma::mat aa0 = step["a1"];
-        arma::mat PP0 = step["P1"];
-        double liktmp = step["lik"];
+        means(iter) = step.pred(0,0);
+        arma::mat aa0 = step.a1;
+        arma::mat PP0 = step.P1;
+        double liktmp = step.lik;
         llik(iter) += log(liktmp);
     }
     return List::create(Named("preds") = means,
