@@ -8,6 +8,7 @@ y = matrix(rnorm(n)+25,1)
 a0 = matrix(rnorm(2*npart),2)
 P0 = matrix(c(diag(.1,2)),4,npart)
 w0 = runif(npart)
+w0[2:4] = 0 
 w0 = w0/sum(w0)
 ct = array(0,c(3,2,1))
 dt = array(0,c(2,2,1))
@@ -44,9 +45,9 @@ sig2eps = 1
 sig2eta = c(2, .1, 1)
 transProbs = c(.8,.1,.5,.4)
 ptm = proc.time()
-out = yupengMats(lt, temposwitch, sig2eps, mus, sig2eta, transProbs)
-test = beamSearch(a0,P0,w0, out$dt, out$ct, out$Tt, out$Zt, out$Rt, 
-                 out$Qt, out$GGt, y, out$transMat, 50)
+out = yupengMats(lt, sig2eps, mus, sig2eta, transProbs)
+test = beamSearch(out$a0,out$P0, w0, out$dt, out$ct, out$Tt, out$Zt, out$Rt, 
+                 out$Qt, out$GGt, y, out$transMat, N)
 print(proc.time() - ptm)
 toab <- function(x, a, b) x*(b-a) + a # maps [0,1] to [a,b]
 logistic <- function(x) 1/(1+exp(-x)) # maps R to [0,1]
@@ -67,7 +68,6 @@ toOptimize <- function(pvec, lt, temposwitch, y, w0, Npart){
     return(negllike)
 }
 
-w0[2:4] = 0 #Michael's line
 testy = optim(c(0, 25, 25, 1, 1, 1, 1, 1, 0.25, 0.25, 0.25, 0.25), fn = toOptimize, lt = lt, 
               temposwitch = temposwitch, y = y, w0 = w0, Npart = npart, method = 'SANN')
 
