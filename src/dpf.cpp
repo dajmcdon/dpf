@@ -140,17 +140,14 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
 
   // KF
   arma::mat a1 = a0;
-  //Rcout << "line 138:" << a1 << std::endl;
   arma::mat pred = ct + Zt * a0;
   arma::mat vt = yt - pred;
   arma::mat Ft = GGt + Zt * P0 * Zt.t();
   arma::mat Ftinv = arma::inv(Ft);
   arma::mat Kt = P0 * Zt.t() * Ftinv;
   a1 += Kt * vt;
-  //Rcout << "line 145:" << a1 << std::endl;
   arma::mat P1 = P0 - P0 * Zt.t() * Kt.t();
   a1 = dt + Tt * a1;
-  //Rcout << "line 148:" << a1 << std::endl;
   P1 = HHt + Tt * P1 * Tt.t();
 
   // Calculate likelihood
@@ -313,17 +310,6 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
                                     Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                                     HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                                     y.col(iter));
-    Rcout << aa0 << std::endl;
-    /*Rcout << "iter = " << iter << std::endl;
-    Rcout << "s = " << s << std::endl;
-    Rcout << "aa0 = " << aa0 << std::endl;
-    Rcout << "PP0 = " << PP0 << std::endl;
-    Rcout << "ct = " << ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)) << std::endl;
-    Rcout << "Tt = " << Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)) << std::endl;
-    Rcout << "Zt = " << Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)) << std::endl;
-    Rcout << "HHt = " << HHt << std::endl;
-    Rcout << "GGt = " << GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)) << std::endl;
-    Rcout << "yt = " << y.col(iter) << std::endl;*/
     
     aa0 = step.a1;
     PP0 = step.P1;
@@ -527,9 +513,8 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     double liktmp;
     arma::uword s;
     
-    for(arma::uword iter=0; iter<n; iter++){
+    for(arma::uword iter=0; iter<n; iter++){ //issue only happens when variables are declared both in and before the loop
         s = path(iter);
-        Rcout << aa0 << std::endl;
         if(iter==0 || Rtvar || Qtvar){ 
             R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
             Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
