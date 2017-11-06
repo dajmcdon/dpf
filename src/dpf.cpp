@@ -130,13 +130,13 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
              arma::mat ct, arma::mat Tt,
              arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
   // Reshape matrices
-  int d = a0.size();//number of elements.
-  int m = yt.size();
-  P0.reshape(d,d);
-  Tt.reshape(d,d);
-  Zt.reshape(m,d);
-  HHt.reshape(d,d);
-  GGt.reshape(m,m);
+  int m = a0.size();//number of elements.
+  int d = yt.size();
+  P0.reshape(m,m);
+  Tt.reshape(m,m);
+  Zt.reshape(d,m);
+  HHt.reshape(m,m); // State var (see fkf vs Durbin)
+  GGt.reshape(d,d); // Obs var
 
   // KF
   arma::mat a1 = a0;
@@ -156,7 +156,7 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   double mahalanobis = arma::as_scalar(vt.t() * Ftinv * vt);
   mahalanobis += yt.size()* log(2*M_PI) + log(ftdet);
   double lik = exp(-1.0*mahalanobis/2);
-  P1.reshape(d*d, 1);
+  P1.reshape(m*m, 1);
   KFOUT output = {a1, P1, lik, pred};
   return output;
   /*return List::create(Named("a1") = a1,
@@ -164,6 +164,33 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
                       Named("lik") = lik,
                       Named("pred") = pred);*/
 }
+
+KFOUT ks1step(arma::mat r1, arma::mat N1, 
+              arma::mat at, arma::mat Pt, 
+              arma::mat ct, arma::mat Tt,
+              arma::mat Zt, arma::mat GGt, arma::mat yt) {
+    
+    // Reshape matrices
+    int m = at.size();//number of elements.
+    int d = yt.size();
+    Pt.reshape(m,m);
+    Tt.reshape(m,m);
+    Zt.reshape(d,m);
+    GGt.reshape(d,d); // Obs var
+    
+    // KS
+    arma::mat pred = ct + Zt * at;
+    arma::mat vt = yt - pred;
+    arma::mat Ft = GGt + Zt * Pt * Zt.t();
+    arma::mat Ftinv = arma::inv(Ft);
+    arma::mat Lt = Tt - Tt * Pt * Zt.t() * Ftinv * Zt;
+    arma::mat r0 = Zt.t() * Ftinv * vt + Lt * r1;
+    arma::mat N0 = Zt.t() * Ftinv * Zt + Lt.t() * N1 * Lt;
+    
+    KFOUT output = {r0, N0, 1, r0}; // Note: we don't need two of these
+    return output;
+}
+
 
 //[[Rcpp::export]]
 arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
@@ -474,8 +501,11 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                       Named("LastStep") = iter++);
 }
 
+
 // [[Rcpp::export]]
 List pathStuff(List pmats, arma::uvec path, arma::mat y){
+    // What if I want different initial state (instead of 0)?
+    
     arma::mat a0 = pmats["a0"];
     arma::mat P0 = pmats["P0"];
     arma::cube dt = pmats["dt"];
@@ -504,15 +534,28 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     arma::mat R(mm,1);
     arma::mat Q(mm,1);
     
-    arma::mat aa0 = a0.col(0);
-    arma::mat PP0 = reshape(P0.col(0), m, m);
     
+    // output storage
     arma::colvec llik = arma::zeros(n);
+    arma::mat at(m,n+1,arma::fill::zeros); // predicted mean E[a_t | y_1:t-1]
+    arma::cube Pt(m,m,n+1,arma::fill::zeros); // predicted variance
+    arma::mat preds(d,n+1,arma::fill::zeros); // predictions  
+    arma::mat ahat(m,n,arma::fill::zeros); // smoothed mean E[a_t | y_1:n]
+    arma::cube Phat(m,m,n,arma::fill::zeros); // smoothed variance
+    arma::mat ests(d,n,arma::fill::zeros); //smoothed estimates
+    double liktmp = 0.0;
     
-    arma::colvec means = arma::zeros(n);
-    double liktmp;
-    arma::uword s;
+    // initialization
+    arma::uword s = 0; // See comment above, replace 0 with appropriate initial s.
+    at.col(0) = a0.col(s);
+    Pt.slice(0) = reshape(P0.col(s), m, m);
+    arma::mat Z0 = Zt.subcube(0,s,0,arma::size(dm,1,1));
+    Z0.reshape(d,m);
+    arma::colvec c0 = ct.subcube(0,s,0,arma::size(d,1,1)); // does this work??
+    preds.col(0) = c0 + Z0 * at.col(0);
+        
     
+    // Kalman filtering
     for(arma::uword iter=0; iter<n; iter++){ //issue only happens when variables are declared both in and before the loop
         s = path(iter);
         if(iter==0 || Rtvar || Qtvar){ 
@@ -523,20 +566,43 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
             HHt = R * Q * R.t();
         }
         
-        KFOUT step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
+        KFOUT step = kf1step(at.col(iter), Pt.slice(iter), 
+                            dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                             ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                             Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                             Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                             HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                             y.col(iter));
-        means(iter) = step.pred(0,0);
-        aa0 = step.a1;
-        PP0 = step.P1;
+        at.col(iter+1) = step.a1;
+        Pt.slice(iter+1) = step.P1;
+        preds.col(iter+1) = step.pred;
         liktmp = step.lik;
         llik(iter) += log(liktmp);
     }
-    return List::create(Named("preds") = means,
-                        Named("llik") = llik);
+    
+    // Kalman smoothing. Recalculation is inefficient, but likely doesn't matter.
+    arma::mat r1(m,1,arma::fill::zeros);
+    arma::mat N1(m,m,arma::fill::zeros);
+    arma::uword iter = n;
+    while(iter > 0){
+        iter--;
+        s = path(iter);
+        arma::mat PP = Pt.slice(iter); // for ease
+        arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
+        arma::mat ZZ = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
+        KFOUT step = ks1step(r1, N1, at.col(iter), PP, 
+                             cc, Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
+                             ZZ, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
+                             y.col(iter));
+        r1 = step.a1;
+        N1 = step.P1;
+        ahat.col(iter) = at.col(iter) + PP * r1;
+        Phat.slice(iter) = PP - PP * N1 * PP;
+        ests.col(iter) = cc + ZZ * ahat.col(iter);
+    }
+    return List::create(Named("at") = at, Named("Pt") = Pt, Named("preds") = preds,
+                              Named("ahat") = ahat, Named("Phat") = Phat,
+                              Named("ests") = ests, Named("llik") = llik);
 }
 
 // You can include R code blocks in C++ files processed with sourceCpp
