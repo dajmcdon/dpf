@@ -598,7 +598,7 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
         N1 = step.P1;
         ahat.col(iter) = at.col(iter) + PP * r1;
         Phat.slice(iter) = PP - PP * N1 * PP;
-        ests.col(iter) = cc + ZZ * ahat.col(iter);
+        ests.col(iter) = cc + arma::reshape(ZZ, d, m) * ahat.col(iter);
     }
     return List::create(Named("at") = at, Named("Pt") = Pt, Named("preds") = preds,
                               Named("ahat") = ahat, Named("Phat") = Phat,

@@ -102,7 +102,7 @@ paths = getPath(testy$par, lt, y, w0, npart)
 plot(as.vector(y) ~ c(1:n), pch = 19, 
      main = "the dots are values of y, the line is the first parameter of the continuous state",
      ylab = 'tempo', xlab = 'time')
-lines(as.vector(paths$xpath) ~ c(1:n))
+lines(as.vector(paths$xpath) ~ c(1:(n + 1)))
 plot(as.vector(paths$spath) ~ c(1:n),
      main = 'discrete states over time',
      xlab = 'time', ylab = 'state', pch = 19)
@@ -116,7 +116,7 @@ mats = getPmats(testy$par, lt, y, w0, npart)
 plot(as.vector(y) ~ c(1:n), pch = 19, 
      main = "the dots are values of y, the line is the first parameter of the continuous state",
      ylab = 'tempo', xlab = 'time')
-lines(as.vector(paths$xpath) ~ c(1:n))
+lines(as.vector(paths$xpath) ~ c(1:(n + 1)))
 plot(as.vector(paths$spath) ~ c(1:n),
      main = 'discrete states over time',
      xlab = 'time', ylab = 'state', pch = 19)
