@@ -574,7 +574,7 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
                             HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                             y.col(iter));
         at.col(iter+1) = step.a1;
-        Pt.slice(iter+1) = step.P1;
+        Pt.slice(iter+1) = arma::reshape(step.P1, m, m);
         preds.col(iter+1) = step.pred;
         liktmp = step.lik;
         llik(iter) += log(liktmp);
