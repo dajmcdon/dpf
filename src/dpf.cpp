@@ -316,8 +316,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::mat R(mm,1);
   arma::mat Q(mm,1);
   
-  arma::mat aa0 = a0.col(0);
-  arma::mat PP0 = reshape(P0.col(0), m, m);
+  arma::mat aa0 = a0.col(path(0));
+  arma::mat PP0 = reshape(P0.col(path(0)), m, m);
   
   double llik = 0;
   double liktmp;
@@ -546,7 +546,7 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     double liktmp = 0.0;
     
     // initialization
-    arma::uword s = 0; // See comment above, replace 0 with appropriate initial s.
+    arma::uword s = path(0); // See comment above, replace 0 with appropriate initial s.
     at.col(0) = a0.col(s);
     Pt.slice(0) = reshape(P0.col(s), m, m);
     arma::mat Z0 = Zt.subcube(0,s,0,arma::size(dm,1,1));
