@@ -126,6 +126,8 @@ struct KFOUT{
     arma::mat pred;
 };
 
+    
+
 KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
              arma::mat ct, arma::mat Tt,
              arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
@@ -164,6 +166,19 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
                       Named("lik") = lik,
                       Named("pred") = pred);*/
 }
+
+// [[Rcpp::export]]
+List kf1stepR(arma::mat a0, arma::mat P0, arma::mat dt,
+              arma::mat ct, arma::mat Tt,
+              arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
+    KFOUT output = kf1step(a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt);
+    
+    return List::create(Named("a1") = output.a1,
+                        Named("P1") = output.P1,
+                        Named("lik") = output.lik,
+                        Named("pred") = output.pred);
+}
+
 
 KFOUT ks1step(arma::mat r1, arma::mat N1, 
               arma::mat at, arma::mat Pt, 
@@ -249,6 +264,7 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
     P1.slice(part) = P11;
   }
   // arma::mat blah = transProbs.rows(currentStates);
+  arma::mat testLik = lik;
   lik %= transProbs.rows(currentStates);
   lik.each_col() %= w;
   w = arma::vectorise(lik);
@@ -281,7 +297,8 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
                       Named("P1") = Pout,
                       Named("oldstates") = oldstates,
                       Named("newstates") = newstates,
-                      Named("newW") = newW);
+                      Named("newW") = newW,
+                      Named("testLik") = testLik);
 }
 
 
@@ -374,9 +391,9 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   P0(3,6) += sig2eta(1);
   arma::cube dt(m, nstates, n, arma::fill::zeros);
   dt.tube(0,1) = lt*mus(1);
-  dt.tube(0,4) = lt*mus(1);
+  dt.tube(0,4) = -lt*mus(1);
   dt.tube(1,1) += mus(1);
-  dt.tube(1,4) += mus(1);
+  dt.tube(1,4) -= mus(1);
   dt.tube(1,2) += mus(2);
   arma::vec tempo_mus(n, arma::fill::zeros);
   // tempo_mus.elem( find(temposwitch > 0) ) += mus(1);
@@ -394,7 +411,9 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   Zt.tube(0,0,0,7) += 1;
   Zt(1,2,0) += 1;
   arma::cube Rt(mm, nstates, n, arma::fill::zeros);
-  Rt.tube(0,5) += 1;
+  // Rt.tube(0,0) += 1;
+  Rt.tube(0,0,0,7) += 1;
+  // Rt.tube(0,5) += 1;
   Rt.tube(3,1,3,2) += 1;
   Rt.tube(3,4) += 1;
   Rt.tube(2,1) = lt;
@@ -403,6 +422,7 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   Qt.tube(0,0,0,7) += sig2eta(0);
   Qt.tube(3,0,3,7) += sig2eta(1);
   Qt.tube(3,2) -= sig2eta(1) - sig2eta(2);
+  Qt.tube(0,5) = sig2eta(3);
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
   arma::mat transMat(nstates, nstates, arma::fill::zeros);

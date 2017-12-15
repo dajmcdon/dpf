@@ -25,14 +25,16 @@ beamSearchWrap <- function(pmats, w0, y, Npart){
     return(test)
 }
 
-kf11 <- function(pmats, y, iter, s){
+kf11 <- function(pmats, y, iter, s, a0=NULL, P0=NULL){
     if(!is.matrix(y)) dim(y) = c(1,length(y))
-    if(dim(pmats$a0)[2] !=1){
-        a0 = pmats$a0[,s,drop=FALSE]
-        P0 = pmats$P0[,s,drop=FALSE]
-    }else{
-        a0 = pmats$a0
-        P0 = pmats$P0
+    if(is.null(a0) & is.null(P0)){
+        if(dim(pmats$a0)[2] !=1){
+            a0 = pmats$a0[,s,drop=FALSE]
+            P0 = pmats$P0[,s,drop=FALSE]
+        }else{
+            a0 = pmats$a0
+            P0 = pmats$P0
+        }
     }
     dt = matrix(pmats$dt[,s,iter],ncol=1)
     ct = matrix(pmats$ct[,s,],ncol=1)
@@ -42,9 +44,57 @@ kf11 <- function(pmats, y, iter, s){
     Qt = matrix(pmats$Qt[,s,],ncol=1)
     HHt = HHcreate(Rt, Qt, sqrt(nrow(Rt)), sqrt(nrow(Qt)))
     GGt = matrix(pmats$GGt[,s,],ncol=1)
-    out = kf1step(a0, P0, dt, ct, Tt, Zt, HHt, GGt, matrix(y[,iter],ncol=1))
+    out = kf1stepR(a0, P0, dt, ct, Tt, Zt, HHt, GGt, matrix(y[,iter],ncol=1))
     return(out)
 }
+
+predictiveDensities <- function(timepoint, pmats, path, y){
+    if(!is.matrix(y)) dim(y) = c(1,length(y))
+    n = length(y)
+    d = 1 # nrow(y)
+    m = nrow(pmats$a0)
+    K = ncol(pmats$a0)
+    if(timepoint>n+1) stop("Can't examine predictive densities after last obs.")
+    pathout = pathStuff(pmats, path[1:(timepoint-1)], 
+                        y[,1:(timepoint-1),drop=FALSE])
+    cs = path[timepoint-1]
+    HHt = HHcreate(pmats$Rt[,,timepoint-1], pmats$Qt[,,,drop=TRUE], m, 
+                   sqrt(nrow(pmats$Qt)))
+    dim(pmats$ct) = c(d,K)
+    dim(pmats$Zt) = c(m,K)
+    dim(pmats$GGt) = c(d,K)
+    stepahead = dpf(cs, matrix(1, 1,1), K+1, pmats$transMat, 
+                    a0 = pathout$at[,timepoint-1,drop=FALSE],
+                    P0 = pathout$Pt[,,timepoint-1],
+                    dt = pmats$dt[,,timepoint-1],
+                    ct = pmats$ct, Tt=pmats$Tt[,,timepoint-1],
+                    Zt = pmats$Zt, GGt=pmats$GGt, HHt=HHt, y[,timepoint-1])
+    pos = stepahead$newstates+1
+    ss = c(1,2,4,2,3,1,3,1)
+    preds = double(length(pos)) # depends on d, assumed 1
+    predsd = double(length(pos))
+    for(i in 1:length(pos)){
+        cti = pmats$ct[,pos[i]]
+        Zti = pmats$Zt[,pos[i]]
+        GGti = pmats$GGt[,pos[i]]
+        preds[i] = cti + Zti %*% stepahead$a1[,i]
+        predsd[i] = sqrt(t(Zti) %*% matrix(stepahead$P1[,i], m, m) %*% Zti + GGti)
+    }
+    ## Prepare for plotting
+    xlims = c(0,max(y,preds+3*predsd))
+    ylims = c(0, max(dnorm(0,0,predsd)*stepahead$newW))
+    par(mar=c(4,3,1,1))
+    plot(NA,NA, xlim = xlims, ylim = ylims,
+         main = paste0('timepoint = ',timepoint),ylab='',xlab='')
+    for(i in 1:length(pos)){
+        curve(dnorm(x,preds[i],predsd[i])*stepahead$newW[i], 
+              from=min(xlims), to=max(xlims), add = TRUE, col=ss[pos[i]])
+    }
+    abline(v=y[,timepoint],col=ss[path[timepoint]+1])
+}
+    
+        
+        
 
 kf1wrap <- function(ssMod, y, a0=matrix(0,nrow=nrow(ssMod$dt)), 
                     P0=diag(nrow(ssMod$dt))){

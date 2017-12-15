@@ -22,13 +22,13 @@ I tried doing the following:
 
 # pull recent mtmcbride/dpf/dpf
 # devtools::install_github('mtmcbride/dpf/dpf')
-# library(dpf)
+library(dpf)
 ```
 
 which had some problems that I'm not quite sure of. I managed to download it, open the file structure and build using `devtools::load_all()`. 
 
 ```{r workaround}
-devtools::load_all('../dpf')
+##devtools::load_all('../dpf')
 ## Note that this is my forked version.
 ```
 
@@ -72,18 +72,19 @@ Finally, I removed the `temposwitch` argument from `yupengMats` and reduced the 
 At this point, I get the same issues that you had (all the predictions are the same).
 
 ```{r replicate-problems-1,results='hide',fig.keep='all'}
-source('../../code/Beam_Search.R') ## Yupeng's original beam search on some music data
+source('../Beam_Search.R') ## Yupeng's original beam search on some music data
 ```
 
 This plots our discrete states and his.
 ```{r discrete-states}
 lt = ioi
-out = yupengMats(lt, sd_l^2, c(mean(y),-40,-40), c(30,20,10)^2, c(.8,.1,.8,.4))
+out = yupengMats(lt, sd_l^2, c(mean(y),-40,-40), c(.01,20,10,30)^2, c(.8,.1,.8,.4))
 test = beamSearch(out$a0,out$P0,c(1,0,0,0,0,0,0,0), out$dt, out$ct, out$Tt, out$Zt,
-out$Rt, out$Qt, out$GGt, matrix(y,nrow = 1), out$transMat, 50)
-source('../dpf/R/stateConversion.R')
+out$Rt, out$Qt, out$GGt, matrix(y,nrow = 1), out$transMat, 200)
+source('../../R/stateConversion.R')
 nn = length(y)
 bestpath = test$paths[which.max(test$weights),]
+par(mfrow=c(1,1))
 par(mar=c(0,0,0,0),family='serif')
 plot(1:nn,rep(1,nn),col=convert8to4(bestpath),
      pch=19,ylim=c(-1,2),bty='n',xlab='',ylab='',yaxt='n',xaxt='n')
@@ -96,7 +97,7 @@ This plots our continuous states.
 ```{r continuous-states}
 filt = pathStuff(out, bestpath, matrix(y,nrow=1))
 par(mar=c(5,4,0,0),family='serif')
-plot(1:nn,filt$preds,col=convert8to4(bestpath),
+plot(1:nn,filt$preds[1:nn],col=convert8to4(bestpath),
      pch=19,bty='n',xlab='note #',ylab='bpm')
 ```
 
@@ -106,7 +107,7 @@ set.seed(12345)
 rands = sample(0:7, nn, replace=TRUE)
 randfilt = pathStuff(out, rands, matrix(y,nrow=1))
 par(mar=c(5,4,0,0),family='serif')
-plot(1:nn,filt$preds,col=convert8to4(bestpath),
+plot(1:nn,randfilt$preds[1:nn],col=convert8to4(rands),
      pch=19,bty='n',xlab='note #',ylab='bpm')
 ```
 
@@ -134,3 +135,4 @@ So we need to know why are the predicted values not changing in `pathStuff`? (I 
 ```
 arma::mat P1 = P0 - P0 * Zt.t() * Kt.t();
 ```
+
