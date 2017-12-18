@@ -1,5 +1,5 @@
 library(MASS)
-a = load('~/Desktop/music.Rdata')
+#a = load('~/Desktop/music.Rdata')
 
 multi = function(a,b,n){
 	h1 = a[1]

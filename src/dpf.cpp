@@ -283,7 +283,7 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
     for(int part=0; part < npart; part++){
       if(w(part + k*npart)>0){
         newstates(i) = k;
-        oldstates(i) = part;                                    //Shouldn't this be 'currentStates(part)'
+        oldstates(i) = part;
         arma::mat a1tmp = a1.subcube(0,k,part,m-1,k,part);
         arma::mat P1tmp = P1.subcube(0,k,part,mm-1,k,part);
         aout.col(i) = a1tmp;
@@ -509,7 +509,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
     particles.head(CurrentPartNum) = newS;
     arma::uvec old = step["oldstates"];
     arma::umat tmp = paths.rows(old);
-    paths.head_rows(CurrentPartNum) = tmp;
+    paths.head_rows(CurrentPartNum) = tmp;   //could create issues if CurrentPartNum decreases over time?
     paths(arma::span(0,CurrentPartNum-1), iter) = newS;
     iter++;
   }
