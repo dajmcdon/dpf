@@ -365,7 +365,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
     
 
     
-//mus(0) = mu1, mus(1) = B section tempo, mus(2) = taot, mus(3) = phit
+//mus(0) = mu1, mus(1) = taot, mus(2) = phit
     
 // [[Rcpp::export]]
 List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
