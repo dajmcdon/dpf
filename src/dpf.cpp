@@ -477,15 +477,16 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   arma::uword q = sqrtf(Qt.n_rows);
   arma::uvec particles(maxpart, arma::fill::zeros);
   arma::uvec filler = arma::regspace<arma::uvec>(0,K-1);
-  particles.head(K) = filler;
   arma::umat paths(maxpart, n, arma::fill::zeros);
-  paths(arma::span(0,K-1),0) = filler;
   arma::colvec weights(maxpart,arma::fill::zeros);
-  for(arma::uword iter=0; iter<K; iter++) weights(iter) += w0(iter);
   // weights.resize(maxpart);
-  arma::uword CurrentPartNum = arma::accu(weights != 0);
+  arma::uword CurrentPartNum = arma::accu(w0 != 0);
+  arma::uvec nz = arma::find(w0 != 0);
+  particles.head(CurrentPartNum) = filler(nz);
+  weights.head(CurrentPartNum) = w0(nz);
+  paths(arma::span(0,CurrentPartNum - 1), 0) = filler(nz);
   arma::mat HHt(m*m, K);
-  arma::uword iter = 0;
+  arma::uword iter = 0; //starting at zero overwrites the initial state. Starting at 1 ignores the first observation.
   while(iter < n){
     if(iter==0 || Rtvar || Qtvar){ 
       HHt = HHcreate(Rt.slice(iter * Rtvar), Qt.slice(iter * Qtvar), m, q);
