@@ -452,6 +452,42 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
                       Named("transMat") = transMat);
 }
 
+List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
+                arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt,
+                arma::mat HHt, arma::mat GGt, arma::vec yt){
+    arma::uvec particles = arma::find(w0);
+    int npart = particles.n_elem;
+    if(npart == 0){return List::create(Named("BadPars") = 1);}
+    arma::vec weights = w0(particles);
+    arma::mat a11(a0.n_rows, npart);
+    arma::mat P11(P0.n_rows, npart);
+    arma::vec lik(npart);
+    for(int i = 0; i < npart; i++){
+        int p = particles(i);
+        KFOUT kfout = kf1step(a0.col(p), P0.col(p), dt.col(p), ct.col(p),
+                              Tt.col(p), Zt.col(p), HHt.col(p), GGt.col(p), yt);
+        arma::mat atmp = kfout.a1;
+        arma::mat Ptmp = kfout.P1;
+        a11.col(i) = atmp;
+        P11.col(i) = Ptmp;
+        lik(i) = kfout.lik;
+    }
+    lik %= weights;
+    arma::vec w = arma::normalise(lik, 1);
+    w = resampleSubOptimal(w, N);
+    if( !arma::any(w)) return List::create(Named("BadPars") = 1);
+    arma::uvec nz = arma::find(w);
+    arma::vec newW = w(nz);
+    arma::uvec newstates = particles(nz);
+    arma::mat aout = a11.cols(nz);
+    arma::mat Pout = P11.cols(nz);
+    return List::create(Named("BadPars") = 0,
+                        Named("a1") = aout,
+                        Named("P1") = Pout,
+                        Named("newstates") = newstates,
+                        Named("newW") = newW);
+}
+
 
 // [[Rcpp::export]]
 List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
@@ -479,24 +515,33 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   arma::uvec filler = arma::regspace<arma::uvec>(0,K-1);
   arma::umat paths(maxpart, n, arma::fill::zeros);
   arma::colvec weights(maxpart,arma::fill::zeros);
-  // weights.resize(maxpart);
-  arma::uword CurrentPartNum = arma::accu(w0 != 0);
-  arma::uvec nz = arma::find(w0 != 0);
-  particles.head(CurrentPartNum) = filler(nz);
-  weights.head(CurrentPartNum) = w0(nz);
-  paths(arma::span(0,CurrentPartNum - 1), 0) = filler(nz);
   arma::mat HHt(m*m, K);
-  arma::uword iter = 0; //starting at zero overwrites the initial state. Starting at 1 ignores the first observation.
+  HHt = HHcreate(Rt.slice(0), Qt.slice(0), m, q);
+  List step = initializeParticles(w0, N, a0, P0, dt.slice(0), ct.slice(0),
+                                  Tt.slice(0), Zt.slice(0), HHt, GGt.slice(0), yt.col(0));
+  int BP = step["BadPars"];
+  if(BP) return List::create(Named("LastStep") = 1);
+  arma::vec newW = step["newW"];
+  arma::uword CurrentPartNum = newW.n_elem;
+  weights.head(CurrentPartNum) = newW;
+  arma::mat a1tmp = step["a1"];
+  a0.head_cols(CurrentPartNum) = a1tmp;
+  arma::mat P1tmp = step["P1"];
+  P0.head_cols(CurrentPartNum) = P1tmp;
+  arma::uvec newS = step["newstates"];
+  particles.head(CurrentPartNum) = newS;
+  paths(arma::span(0, CurrentPartNum - 1), 0) = newS;
+  arma::uword iter = 1;
   while(iter < n){
-    if(iter==0 || Rtvar || Qtvar){ 
+    if(Rtvar || Qtvar){ 
       HHt = HHcreate(Rt.slice(iter * Rtvar), Qt.slice(iter * Qtvar), m, q);
     }
-    List step = dpf(particles.head(CurrentPartNum), weights.head(CurrentPartNum), 
-                                maxpart, transProbs, 
-                                a0.head_cols(CurrentPartNum), P0.head_cols(CurrentPartNum),
-                                dt.slice(iter * dtvar), ct.slice(iter * ctvar), 
-                                Tt.slice(iter * Ttvar), Zt.slice(iter * Ztvar), 
-                                HHt, GGt.slice(iter * GGtvar), yt.col(iter));
+    step = dpf(particles.head(CurrentPartNum), weights.head(CurrentPartNum), 
+                              maxpart, transProbs, 
+                              a0.head_cols(CurrentPartNum), P0.head_cols(CurrentPartNum),
+                              dt.slice(iter * dtvar), ct.slice(iter * ctvar), 
+                              Tt.slice(iter * Ttvar), Zt.slice(iter * Ztvar), 
+                              HHt, GGt.slice(iter * GGtvar), yt.col(iter));
     int BP = step["BadPars"];
     if(BP) break;
     arma::vec newW = step["newW"];
