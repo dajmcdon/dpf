@@ -120,10 +120,13 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
 }
 
 struct KFOUT{
-    arma::mat a1;
-    arma::mat P1;
-    double lik;
-    arma::mat pred;
+  arma::mat att; // a_t|t
+  arma::mat at;  // a_t+1 (but this is done at the beginning of the KF
+                 // instead of the end)
+  arma::mat Ptt; // same deal
+  arma::mat Pt;
+  double lik;
+  arma::mat pred; // f(at) to estimate yt
 };
 
     
@@ -139,18 +142,26 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   Zt.reshape(d,m);
   HHt.reshape(m,m); // State var (see fkf vs Durbin)
   GGt.reshape(d,d); // Obs var
+  arma::mat Ptemp(m,m);
+  arma::mat atemp(m,1);
 
   // KF
-  arma::mat a1 = a0;
-  arma::mat pred = ct + Zt * a0;
+  // Update a_t-1|t-1 to a_t using CURRENT state
+  atemp = dt + Tt * a0;
+  Ptemp = HHt + Tt * P0 * Tt.t();
+  
+  // Make predictions using a_t
+  arma::mat pred = ct + Zt * atemp;
   arma::mat vt = yt - pred;
-  arma::mat Ft = GGt + Zt * P0 * Zt.t();
+  arma::mat Ft = GGt + Zt * Ptemp * Zt.t();
   arma::mat Ftinv = arma::inv(Ft);
-  arma::mat Kt = P0 * Zt.t() * Ftinv;
-  a1 += Kt * vt;
-  arma::mat P1 = P0 - P0 * Zt.t() * Kt.t();
-  a1 = dt + Tt * a1;
-  P1 = HHt + Tt * P1 * Tt.t();
+  arma::mat Kt = Ptemp * Zt.t() * Ftinv;
+  
+  // Incorporate current information into a_t|t
+  arma::mat a1 = atemp + Kt * vt;
+  arma::mat P1 = Ptemp - Ptemp * Zt.t() * Kt.t();
+  // a1 = dt + Tt * a1;
+  // P1 = HHt + Tt * P1 * Tt.t();
 
   // Calculate likelihood
   double ftdet = arma::det(Ftinv);
@@ -159,7 +170,7 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   mahalanobis += yt.size()* log(2*M_PI) + log(ftdet);
   double lik = exp(-1.0*mahalanobis/2);
   P1.reshape(m*m, 1);
-  KFOUT output = {a1, P1, lik, pred};
+  KFOUT output = {a1, atemp, P1, Ptemp, lik, pred};
   return output;
   /*return List::create(Named("a1") = a1,
                       Named("P1") = P1,
@@ -173,8 +184,10 @@ List kf1stepR(arma::mat a0, arma::mat P0, arma::mat dt,
               arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
     KFOUT output = kf1step(a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt);
     
-    return List::create(Named("a1") = output.a1,
-                        Named("P1") = output.P1,
+    return List::create(Named("att") = output.att,
+                        Named("at") = output.at,
+                        Named("Ptt") = output.Ptt,
+                        Named("Pt") = output.Pt,
                         Named("lik") = output.lik,
                         Named("pred") = output.pred);
 }
@@ -202,7 +215,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
     arma::mat r0 = Zt.t() * Ftinv * vt + Lt * r1;
     arma::mat N0 = Zt.t() * Ftinv * Zt + Lt.t() * N1 * Lt;
     
-    KFOUT output = {r0, N0, 1, r0}; // Note: we don't need two of these
+    KFOUT output = {r0, r0, N0, N0, 1, r0}; // Note: we don't need anything but r0 and N0
     return output;
 }
 
@@ -254,8 +267,8 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
       KFOUT kfout = kf1step(a0.col(part), P0.col(part), dt.col(k), ct.col(k),
                                        Tt.col(k), Zt.col(k), HHt.col(k), GGt.col(k),
                                        yt);
-      arma::mat atmp = kfout.a1;
-      arma::mat Ptmp = kfout.P1;
+      arma::mat atmp = kfout.att;
+      arma::mat Ptmp = kfout.Ptt;
       a11.col(k) = atmp;
       P11.col(k) = Ptmp;
       lik(part,k) = kfout.lik;
@@ -355,8 +368,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
                                     HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                                     y.col(iter));
     
-    aa0 = step.a1;
-    PP0 = step.P1;
+    aa0 = step.att;
+    PP0 = step.Ptt;
     liktmp = step.lik;
     llik -= log(liktmp);
   }
@@ -466,8 +479,8 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
         int p = particles(i);
         KFOUT kfout = kf1step(a0.col(p), P0.col(p), dt.col(p), ct.col(p),
                               Tt.col(p), Zt.col(p), HHt.col(p), GGt.col(p), yt);
-        arma::mat atmp = kfout.a1;
-        arma::mat Ptmp = kfout.P1;
+        arma::mat atmp = kfout.att;
+        arma::mat Ptmp = kfout.Ptt;
         a11.col(i) = atmp;
         P11.col(i) = Ptmp;
         lik(i) = kfout.lik;
@@ -602,9 +615,9 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     
     // output storage
     arma::colvec llik = arma::zeros(n);
-    arma::mat at(m,n+1,arma::fill::zeros); // predicted mean E[a_t | y_1:t-1]
-    arma::cube Pt(m,m,n+1,arma::fill::zeros); // predicted variance
-    arma::mat preds(d,n+1,arma::fill::zeros); // predictions  
+    arma::mat at(m,n,arma::fill::zeros); // predicted mean E[a_t | y_1:t-1]
+    arma::cube Pt(m,m,n,arma::fill::zeros); // predicted variance
+    arma::mat preds(d,n,arma::fill::zeros); // predictions  
     arma::mat ahat(m,n,arma::fill::zeros); // smoothed mean E[a_t | y_1:n]
     arma::cube Phat(m,m,n,arma::fill::zeros); // smoothed variance
     arma::mat ests(d,n,arma::fill::zeros); //smoothed estimates
@@ -612,12 +625,12 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     
     // initialization
     arma::uword s = path(0); // See comment above, replace 0 with appropriate initial s.
-    at.col(0) = a0.col(s);
-    Pt.slice(0) = reshape(P0.col(s), m, m);
-    arma::mat Z0 = Zt.subcube(0,s,0,arma::size(dm,1,1));
-    Z0.reshape(d,m);
-    arma::colvec c0 = ct.subcube(0,s,0,arma::size(d,1,1)); // does this work??
-    preds.col(0) = c0 + Z0 * at.col(0);
+    arma::mat a00 =  a0.col(s);
+    arma::mat P00 = reshape(P0.col(s), m, m);
+    // arma::mat Z0 = Zt.subcube(0,s,0,arma::size(dm,1,1));
+    // Z0.reshape(d,m);
+    // arma::colvec c0 = ct.subcube(0,s,0,arma::size(d,1,1)); // does this work??
+    // preds.col(0) = c0 + Z0 * at.col(0);
         
     
     // Kalman filtering
@@ -631,16 +644,18 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
             HHt = R * Q * R.t();
         }
         
-        KFOUT step = kf1step(at.col(iter), Pt.slice(iter), 
+        KFOUT step = kf1step(a00, P00, 
                             dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                             ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                             Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                             Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
                             HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                             y.col(iter));
-        at.col(iter+1) = step.a1;
-        Pt.slice(iter+1) = arma::reshape(step.P1, m, m);
-        preds.col(iter+1) = step.pred;
+        at.col(iter) = step.at;
+        Pt.slice(iter) = arma::reshape(step.Pt, m, m);
+        preds.col(iter) = step.pred;
+        a00 = step.att;
+        P00 = arma::reshape(step.Ptt, m, m);
         liktmp = step.lik;
         llik(iter) += log(liktmp);
     }
@@ -659,8 +674,8 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
                              cc, Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                              ZZ, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                              y.col(iter));
-        r1 = step.a1;
-        N1 = step.P1;
+        r1 = step.at;
+        N1 = step.Pt;
         ahat.col(iter) = at.col(iter) + PP * r1;
         Phat.slice(iter) = PP - PP * N1 * PP;
         ests.col(iter) = cc + arma::reshape(ZZ, d, m) * ahat.col(iter);
