@@ -17,10 +17,6 @@ HHcreate <- function(Rt, Qt, r, q) {
     .Call('_dpf_HHcreate', PACKAGE = 'dpf', Rt, Qt, r, q)
 }
 
-dpf <- function(currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt) {
-    .Call('_dpf_dpf', PACKAGE = 'dpf', currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt)
-}
-
 getloglike <- function(pmats, path, y) {
     .Call('_dpf_getloglike', PACKAGE = 'dpf', pmats, path, y)
 }

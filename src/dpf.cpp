@@ -193,13 +193,15 @@ List kf1stepR(arma::mat a0, arma::mat P0, arma::mat dt,
 }
 
 
+  
+
 KFOUT ks1step(arma::mat r1, arma::mat N1, 
-              arma::mat at, arma::mat Pt, 
+              arma::mat pred, arma::mat Pt, 
               arma::mat ct, arma::mat Tt,
               arma::mat Zt, arma::mat GGt, arma::mat yt) {
     
     // Reshape matrices
-    int m = at.size();//number of elements.
+    int m = r1.size();//number of elements.
     int d = yt.size();
     Pt.reshape(m,m);
     Tt.reshape(m,m);
@@ -207,12 +209,12 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
     GGt.reshape(d,d); // Obs var
     
     // KS
-    arma::mat pred = ct + Zt * at;
+    // arma::mat pred = ct + Zt * at;
     arma::mat vt = yt - pred;
     arma::mat Ft = GGt + Zt * Pt * Zt.t();
     arma::mat Ftinv = arma::inv(Ft);
     arma::mat Lt = Tt - Tt * Pt * Zt.t() * Ftinv * Zt;
-    arma::mat r0 = Zt.t() * Ftinv * vt + Lt * r1;
+    arma::mat r0 = Zt.t() * Ftinv * vt + Lt.t() * r1;
     arma::mat N0 = Zt.t() * Ftinv * Zt + Lt.t() * N1 * Lt;
     
     KFOUT output = {r0, r0, N0, N0, 1, r0}; // Note: we don't need anything but r0 and N0
@@ -247,7 +249,6 @@ arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
 //HHt: variance of the predicted mean of the continuous state
 //GGt: variance of the observation
 //yt: observation
-//[[Rcpp::export]]
 List dpf(arma::uvec currentStates, arma::colvec w, int N,                      //MICHAEL: What are these?
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
@@ -580,8 +581,8 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
 }
 
 
-// [[Rcpp::export]]
-List pathStuff(List pmats, arma::uvec path, arma::mat y){
+List pathStuffold(List pmats, arma::uvec path, arma::mat y){
+    // Note: this function's smoother isn't quite right, see below
     // What if I want different initial state (instead of 0)?
     
     arma::mat a0 = pmats["a0"];
@@ -683,6 +684,116 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
     return List::create(Named("at") = at, Named("Pt") = Pt, Named("preds") = preds,
                               Named("ahat") = ahat, Named("Phat") = Phat,
                               Named("ests") = ests, Named("llik") = llik);
+}
+
+// [[Rcpp::export]]
+List pathStuff(List pmats, arma::uvec path, arma::mat y){
+  // What if I want different initial state (instead of 0)?
+  
+  arma::mat a0 = pmats["a0"];
+  arma::mat P0 = pmats["P0"];
+  arma::cube dt = pmats["dt"];
+  arma::cube ct = pmats["ct"];
+  arma::cube Tt = pmats["Tt"];
+  arma::cube Zt = pmats["Zt"];
+  arma::cube Rt = pmats["Rt"];
+  arma::cube Qt = pmats["Qt"];
+  arma::cube GGt = pmats["GGt"];
+  
+  arma::uword n = y.n_cols;
+  arma::uword m = a0.n_rows;
+  arma::uword mm = m*m;
+  arma::uword d = y.n_rows;
+  arma::uword dm = d*m;
+  arma::uword dd = d*d;
+  
+  arma::uword dtvar = dt.n_slices > 1;
+  arma::uword ctvar = ct.n_slices > 1;
+  arma::uword Ttvar = Tt.n_slices > 1;
+  arma::uword Ztvar = Zt.n_slices > 1;
+  arma::uword Rtvar = Rt.n_slices > 1;
+  arma::uword Qtvar = Qt.n_slices > 1;
+  arma::uword GGtvar = GGt.n_slices > 1;
+  arma::mat HHt(m,m);
+  arma::mat R(mm,1);
+  arma::mat Q(mm,1);
+  
+  
+  // output storage
+  arma::colvec llik = arma::zeros(n);
+  arma::mat at(m,n,arma::fill::zeros); // predicted mean E[a_t | y_1:t-1]
+  arma::mat att(m,n,arma::fill::zeros); // updated mean E[a_t | y_1:t]
+  arma::cube Pt(m,m,n,arma::fill::zeros); // predicted variance
+  arma::cube Ptt(m,m,n,arma::fill::zeros); // predicted variance
+  arma::mat preds(d,n,arma::fill::zeros); // predictions  
+  arma::mat ahat(m,n,arma::fill::zeros); // smoothed mean E[a_t | y_1:n]
+  arma::mat ests(d,n,arma::fill::zeros); //smoothed estimates
+  double liktmp = 0.0;
+  
+  // initialization
+  arma::uword s = path(0); // See comment above, replace 0 with appropriate initial s.
+  arma::mat a00 =  a0.col(s);
+  arma::mat P00 = reshape(P0.col(s), m, m);
+  
+  
+  // Kalman filtering
+  arma::uword iter=0;
+  while(iter < n){ //issue only happens when variables are declared both in and before the loop
+    s = path(iter);
+    if(iter==0 || Rtvar || Qtvar){ 
+      R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
+      Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
+      R.reshape(m,m);
+      Q.reshape(m,m);
+      HHt = R * Q * R.t();
+    }
+    
+    KFOUT step = kf1step(a00, P00, 
+                         dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
+                         ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
+                         Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
+                         Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
+                         HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
+                         y.col(iter));
+    at.col(iter) = step.at;
+    att.col(iter) = step.att;
+    Pt.slice(iter) = arma::reshape(step.Pt, m, m);
+    Ptt.slice(iter) = arma::reshape(step.Ptt, m, m);
+    preds.col(iter) = step.pred;
+    a00 = step.att;
+    P00 = arma::reshape(step.Ptt, m, m);
+    liktmp = step.lik;
+    llik(iter) += log(liktmp);
+    iter++;
+  }
+  
+  // Kalman smoothing. Based on Durbin and Koopman (4.70)
+  iter--;
+  ahat.col(iter) = att.col(iter);
+  while(iter > 0){
+    arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
+    arma::mat zz = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
+    zz.reshape(d,m);
+    ests.col(iter) = cc + zz * ahat.col(iter);
+    P00 = arma::pinv(Pt.slice(iter));
+    a00 = ahat.col(iter) - at.col(iter);
+    
+    iter--; // This is important, need T after the increment rather than before.
+    arma::mat Tmat = Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1));
+    s = path(iter);
+    Tmat.reshape(m,m);
+    ahat.col(iter) = att.col(iter) + Ptt.slice(iter) * Tmat * P00 * a00;
+  }
+  // iter = 0, need the estimates
+  arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
+  arma::mat zz = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
+  zz.reshape(d,m);
+  ests.col(iter) = cc + zz * ahat.col(iter);
+    
+  return List::create(Named("at") = at, Named("Pt") = Pt, Named("preds") = preds,
+                            Named("ahat") = ahat,
+                            Named("att") = att, Named("Ptt") = Ptt,
+                            Named("ests") = ests, Named("llik") = llik);
 }
 
 // You can include R code blocks in C++ files processed with sourceCpp
