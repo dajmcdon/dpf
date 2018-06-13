@@ -7,5 +7,6 @@ dpf.Rproj
 /src/RcppExports.*
 /src/dpf.o
 /src/dpf.so
-/extras/djm_testing_cache/
-/extras/djm_testing_files/
+*_cache/
+*_files/
+*.pdfsync
