@@ -114,16 +114,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// pathStuff
-List pathStuff(List pmats, arma::uvec path, arma::mat y);
-RcppExport SEXP _dpf_pathStuff(SEXP pmatsSEXP, SEXP pathSEXP, SEXP ySEXP) {
+// kalman
+List kalman(List pmats, arma::uvec path, arma::mat y);
+RcppExport SEXP _dpf_kalman(SEXP pmatsSEXP, SEXP pathSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type pmats(pmatsSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type path(pathSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(pathStuff(pmats, path, y));
+    rcpp_result_gen = Rcpp::wrap(kalman(pmats, path, y));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -136,7 +136,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 5},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 13},
-    {"_dpf_pathStuff", (DL_FUNC) &_dpf_pathStuff, 3},
+    {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
     {NULL, NULL, 0}
 };
 

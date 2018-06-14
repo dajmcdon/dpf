@@ -22,7 +22,7 @@ arma::uvec SampleNoReplace(arma::uvec x, int size) {
   return(ret);
 }
 
-//[[Rcpp::export]]
+ //[[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
   int M = w.size();
   double tol = 1e-10;
@@ -59,7 +59,7 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   return ws;
 }
 
-//[[Rcpp::export]]
+ //[[Rcpp::export]]
 arma::colvec resampleOptimal(arma::colvec w, int N){
   // no zeros no dups?? unused, doesn't seem to work
   int M = w.size();
@@ -178,7 +178,7 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
                       Named("pred") = pred);*/
 }
 
-// [[Rcpp::export]]
+ // [[Rcpp::export]]
 List kf1stepR(arma::mat a0, arma::mat P0, arma::mat dt,
               arma::mat ct, arma::mat Tt,
               arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
@@ -222,7 +222,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 }
 
 
-//[[Rcpp::export]]
+ //[[Rcpp::export]]
 arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
   arma::uword K = Rt.n_cols;
   arma::mat Rtmp(r,q);
@@ -392,8 +392,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' @param lt durations between successive notes in the score
 //' @param sig2eps variance of the observation noise
 //' @param mus vector of 4 mean parameters
-//' @param vector of 4 state variance parameters
-//' @param vector of 4 transition probabilities
+//' @param sig2eta vector of 4 state variance parameters
+//' @param transprobs vector of 4 transition probabilities
 //' 
 //' @return List with components as appropriate for Kalman filtering or Beam Search
 //' 
@@ -723,7 +723,7 @@ List pathStuffold(List pmats, arma::uvec path, arma::mat y){
 //' 
 //' @export 
 // [[Rcpp::export]]
-List pathStuff(List pmats, arma::uvec path, arma::mat y){
+List kalman(List pmats, arma::uvec path, arma::mat y){
   // What if I want different initial state (instead of 0)?
   
   arma::mat a0 = pmats["a0"];

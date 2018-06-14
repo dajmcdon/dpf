@@ -35,8 +35,8 @@ getloglike <- function(pmats, path, y) {
 #' @param lt durations between successive notes in the score
 #' @param sig2eps variance of the observation noise
 #' @param mus vector of 4 mean parameters
-#' @param vector of 4 state variance parameters
-#' @param vector of 4 transition probabilities
+#' @param sig2eta vector of 4 state variance parameters
+#' @param transprobs vector of 4 transition probabilities
 #' 
 #' @return List with components as appropriate for Kalman filtering or Beam Search
 #' 
@@ -67,7 +67,7 @@ beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, 
 #' @return List with components from Kalman filter and Smoother
 #' 
 #' @export 
-pathStuff <- function(pmats, path, y) {
-    .Call('_dpf_pathStuff', PACKAGE = 'dpf', pmats, path, y)
+kalman <- function(pmats, path, y) {
+    .Call('_dpf_kalman', PACKAGE = 'dpf', pmats, path, y)
 }
 

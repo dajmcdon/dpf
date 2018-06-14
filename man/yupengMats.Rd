@@ -13,9 +13,9 @@ yupengMats(lt, sig2eps, mus, sig2eta, transprobs)
 
 \item{mus}{vector of 4 mean parameters}
 
-\item{vector}{of 4 state variance parameters}
+\item{sig2eta}{vector of 4 state variance parameters}
 
-\item{vector}{of 4 transition probabilities}
+\item{transprobs}{vector of 4 transition probabilities}
 }
 \value{
 List with components as appropriate for Kalman filtering or Beam Search
