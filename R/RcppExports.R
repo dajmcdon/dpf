@@ -17,18 +17,56 @@ HHcreate <- function(Rt, Qt, r, q) {
     .Call('_dpf_HHcreate', PACKAGE = 'dpf', Rt, Qt, r, q)
 }
 
+#' Evaluate the likelihood given parameters and discrete states
+#' 
+#' @param pmats a list of parameter matrices for the kalman filter
+#' @param path the desired path for hidden discrete states
+#' @param y observations, each time point in a column
+#' 
+#' @return the negative log-likelihood
+#' 
+#' @export 
 getloglike <- function(pmats, path, y) {
     .Call('_dpf_getloglike', PACKAGE = 'dpf', pmats, path, y)
 }
 
+#' Create parameter matrices as in Gu (2017)
+#' 
+#' @param lt durations between successive notes in the score
+#' @param sig2eps variance of the observation noise
+#' @param mus vector of 4 mean parameters
+#' @param vector of 4 state variance parameters
+#' @param vector of 4 transition probabilities
+#' 
+#' @return List with components as appropriate for Kalman filtering or Beam Search
+#' 
+#' @export    
 yupengMats <- function(lt, sig2eps, mus, sig2eta, transprobs) {
     .Call('_dpf_yupengMats', PACKAGE = 'dpf', lt, sig2eps, mus, sig2eta, transprobs)
 }
 
+#' Greedy HMM estimation given continuous hidden states
+#' 
+#' @param a0 a px1 matrix of state prior means
+#' @param P0 a pxp matrix of state
+#' @param dt dx1 or dxn matrix of 
+#' 
+#' @return List with components "paths", "weights", and "LastStep" 
+#' 
+#' @export 
 beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, N) {
     .Call('_dpf_beamSearch', PACKAGE = 'dpf', a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, N)
 }
 
+#' Estimate continuous states given parameters and discrete hidden states
+#' 
+#' @param pmats e.g., as output from yupengMats
+#' @param path path of discrete hidden states
+#' @param y observations
+#' 
+#' @return List with components from Kalman filter and Smoother
+#' 
+#' @export 
 pathStuff <- function(pmats, path, y) {
     .Call('_dpf_pathStuff', PACKAGE = 'dpf', pmats, path, y)
 }

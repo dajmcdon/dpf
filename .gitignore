@@ -2,11 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
-dpf_1.0.tar.gz
-dpf.Rproj
-/src/RcppExports.*
-/src/dpf.o
-/src/dpf.so
+*.tar.gz
+*.Rproj
+*.o
+*.so
 *_cache/
 *_files/
 *.pdfsync
