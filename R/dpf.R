@@ -14,6 +14,11 @@
 #' @name dpf
 NULL
 
+#' @useDynLib dpf
+#' @importFrom Rcpp sourceCpp
+#' @importFrom Rcpp evalCpp
+NULL
+
 #' Dynamics of 46 Chopin piano recordings
 #'
 #' A dataset containing the dynamics of 46 recordings of Chopin's Mazurka
