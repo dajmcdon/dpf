@@ -119,9 +119,11 @@ logStatesGivenParams <- function(states,transProbs){
   return(sum(log(transProbs[ind])))
 }
 
-viewPath <- function(lt, y, note.onset, samp){
+viewPath <- function(lt, y, note.onset, samp, 
+                     summarizer = function(x) 
+                       x$params[which.max(x$logProbs),]){
   print(paste('Acceptance = ', samp$acceptance))
-  p = apply(samp$params, 2, median)
+  p = summarizer(samp)
   print(p)
   pmats = yupengMats(lt, p[1], p[2:4], p[5:8], p[9:12])
   beam = beamSearch(pmats$a0, pmats$P0, w0, pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
