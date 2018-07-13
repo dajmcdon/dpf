@@ -127,7 +127,7 @@ viewPath <- function(lt, y, note.onset, samp,
   print(p)
   pmats = yupengMats(lt, p[1], p[2:4], p[5:8], p[9:12])
   beam = beamSearch(pmats$a0, pmats$P0, w0, pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
-                    + pmats$Rt, pmats$Qt, pmats$GGt, y, pmats$transMat, 200)
+                    pmats$Rt, pmats$Qt, pmats$GGt, y, pmats$transMat, 200)
   ss = beam$paths[which.max(beam$weights),]
   path = kalman(pmats, ss, y)
   plot(tempos$note_onset, y,ty='b')
