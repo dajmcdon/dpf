@@ -3,8 +3,8 @@ logprior <- function(pvec, samp_mean){
   p1s = c(theta[9:10], 1-sum(theta[9:10]))
   sig2eps = dnorm(theta[1], 400.0, sd=100.0, log = TRUE)
   #mu1 = dnorm(theta[2], samp_mean, sd=20.0, log = TRUE)
-  mu2 = dnorm(theta[3], -20.0, sd=20.0, log = TRUE)
-  mu3 = dnorm(theta[4], -30.0, sd=20.0, log=TRUE)
+  mu2 = dnorm(theta[3], -40.0, sd=20.0, log = TRUE)
+  mu3 = dnorm(theta[4], -40.0, sd=20.0, log=TRUE)
   #sig2obs = dnorm(theta[5], 0.0001, sd=0.1, log=TRUE)
   sig2acc = dnorm(theta[6], 400, sd=100, log=TRUE)
   sig2dec = dnorm(theta[7], 400, sd=100, log=TRUE)
@@ -21,7 +21,7 @@ logprior <- function(pvec, samp_mean){
 ddirichlet <- function(theta, alpha) sum(alpha*log(theta)) # on the log scale, no constant
 
 init <- function(samp_mean, noise = 0){
-  means = c(400, samp_mean, -40, -40, .0001, 400, 400, 900, .7, .2, .6, .5)
+  means = c(400, samp_mean, -40, -40, .0001, 400, 400, 900, 2/3, 5/30, 9/15, 1/2)
   m = ContoR(means)
   ini = rnorm(length(m), m, sd = noise)
   ini = ini[-c(2,5)]
@@ -65,6 +65,25 @@ toOptimize <- function(theta, yt, lt, Npart){
   obj
 }
 
-## Fix the prior on p1
 ## add transition from 2->1??
+
 ## Code to run on cluster
+
+
+
+# Cluster funs ------------------------------------------------------------
+
+optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=1){
+  yt = matrix(perf, nrow=1)
+  samp_mean = mean(yt)
+  randos = NULL
+  if(ntries > 1) randos = t(replicate(ntries-1, init(samp_mean, spread_init)))
+  init_vals = rbind(init(samp_mean,0), randos)
+  out = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, method='Nelder-Mead',
+                   control=list(trace=0, maxit=5000))
+  if(!any(out$convergence==0)) return(rep(NA,12))
+  theta = out[which.min(out$value), 1:10]
+  theta = c(theta[1], samp_mean, theta[2:3], nonneg(.0001), theta[4:10])
+  pvec = RtoCon(theta)
+  pvec
+}
