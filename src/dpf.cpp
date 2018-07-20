@@ -221,7 +221,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
     return output;
 }
 
-
+ //' @export 
  //[[Rcpp::export]]
 arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
   arma::uword K = Rt.n_cols;
@@ -249,6 +249,8 @@ arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
 //HHt: variance of the predicted mean of the continuous state
 //GGt: variance of the observation
 //yt: observation
+ //' @export 
+ // [[Rcpp::export]]
 List dpf(arma::uvec currentStates, arma::colvec w, int N,                      //MICHAEL: What are these?
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
@@ -586,6 +588,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
     arma::vec newW = step["newW"];
     CurrentPartNum = newW.n_elem;
     weights.head(CurrentPartNum) = newW;
+    if(CurrentPartNum < maxpart) weights.tail(maxpart-CurrentPartNum) *= 0; // fix decreasing CurrentPartNum
     arma::mat a1tmp = step["a1"];
     a0.head_cols(CurrentPartNum) = a1tmp;
     arma::mat P1tmp = step["P1"];

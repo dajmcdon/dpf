@@ -63,6 +63,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dpf
+List dpf(arma::uvec currentStates, arma::colvec w, int N, arma::mat transProbs, arma::mat a0, arma::mat P0, arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::vec yt);
+RcppExport SEXP _dpf_dpf(SEXP currentStatesSEXP, SEXP wSEXP, SEXP NSEXP, SEXP transProbsSEXP, SEXP a0SEXP, SEXP P0SEXP, SEXP dtSEXP, SEXP ctSEXP, SEXP TtSEXP, SEXP ZtSEXP, SEXP HHtSEXP, SEXP GGtSEXP, SEXP ytSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::uvec >::type currentStates(currentStatesSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type transProbs(transProbsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type P0(P0SEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type dt(dtSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type ct(ctSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Tt(TtSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Zt(ZtSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type HHt(HHtSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type GGt(GGtSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type yt(ytSEXP);
+    rcpp_result_gen = Rcpp::wrap(dpf(currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getloglike
 double getloglike(List pmats, arma::uvec path, arma::mat y);
 RcppExport SEXP _dpf_getloglike(SEXP pmatsSEXP, SEXP pathSEXP, SEXP ySEXP) {
@@ -133,6 +156,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_resampleOptimal", (DL_FUNC) &_dpf_resampleOptimal, 2},
     {"_dpf_kf1stepR", (DL_FUNC) &_dpf_kf1stepR, 9},
     {"_dpf_HHcreate", (DL_FUNC) &_dpf_HHcreate, 4},
+    {"_dpf_dpf", (DL_FUNC) &_dpf_dpf, 13},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 5},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 13},
