@@ -12,17 +12,33 @@ logistic <- function(x) 1/(1+exp(-x)) # maps R to [0,1]
 invlogistic <- function(x) log(x/(1-x))
 RtoCon <- function(p){
   tp = logistic(p[9:12])
-  tp[2] = toab(tp[2], 0, 1-tp[1])
+  tp[1] = toab(tp[1], 0.5, .8)
+  tp[2] = toab(tp[2], 0.1, 1-tp[1])
   return(c(exp(p[1]), p[2:4], exp(p[5:8]), tp))
 }
 ContoR <- function(p){
-  tp2 = toabInv(p[10], 0, 1 - p[9])
-  return(c(log(p[1]), p[2:4], log(p[5:8]), invlogistic(p[9]), invlogistic(tp2), invlogistic(p[11:12])))
+  tp1 = toabInv(p[9], 0.5, .8)
+  tp2 = toabInv(p[10], 0.1, 1 - p[9])
+  return(c(log(p[1]), p[2:4], log(p[5:8]), invlogistic(tp1),
+           invlogistic(tp2), invlogistic(p[11:12])))
+}
+Jacob <- function(p){
+  j1 = 1/p[1]
+  # no transformation for 2:4
+  j58 = 1/p[5:8]
+  invlogj <- function(p) exp(-p) / (1+exp(-p))^2
+  j9 = invlogj(p[9]) / (.8 - .5)
+  j10 = invlogj(p[10]) / (1 - p[9] - .1)
+  cross910 = (logistic(p[10]) - .1) / (1 - p[9]-.1)^2
+  j11 = invlogj(p[11])
+  j12 = invlogj(p[12])
+  det = j1*prod(j58)*(j9*j10-cross910)*j11*j12
+  return(log(abs(det)))
 }
 
 #prior distributions
-sig2epsMean = log(25)
-sig2epsSd = log(25)/2 #(log(25) - log(1))/2 
+sig2epsMean = log(20^2)
+sig2epsSd = (log(400) - log(225))/2 #(log(25) - log(1))/2 
 mu1Mean = 116
 mu1Sd = 20
 mu2Mean = -40
@@ -33,32 +49,68 @@ sig1Mean = log(.01^2) #log(1)
 sig1Sd = .1 #log(4)/2
 sig2Mean = log(400)
 sig2Sd = (log(400) - log(225))/2
-sig4Mean = log(20)
+sig4Mean = log(100)
 sig4Sd = (log(400) - log(225))/2
-sig3Mean = log(25)
-sig3Sd = log(25)/2
-p1Mean = invlogistic(0.85)
+sig3Mean = log(900)
+sig3Sd = (log(400) - log(225))/2 #log(25)/2
+p1Mean = invlogistic(0.7)
 p1Sd = (invlogistic(0.95) - invlogistic(0.85))/2
-p2Mean = invlogistic(0.1)
+p2Mean = invlogistic(0.2)
 p2Sd = (invlogistic(0.2) - invlogistic(0.1))/2
-p3Mean = invlogistic(0.8)
+p3Mean = invlogistic(0.6)
 p3Sd = (invlogistic(0.2) - invlogistic(0.1))/2
-p4Mean = invlogistic(0.4)
+p4Mean = invlogistic(0.5)
 p4Sd = (invlogistic(0.2) - invlogistic(0.1))/2
-means = c(sig2epsMean, mu1Mean, mu2Mean, mu3Mean, sig1Mean, sig2Mean, sig4Mean, sig3Mean, p1Mean, p2Mean, p3Mean, p4Mean)
+means = c(sig2epsMean, mu1Mean, mu2Mean, mu3Mean, sig1Mean, 
+          sig2Mean, sig4Mean, sig3Mean, p1Mean, p2Mean, p3Mean, p4Mean)
+names(means) = c("sig2epsMean", "mu1Mean", "mu2Mean", "mu3Mean", 
+                 "sig1Mean", "sig2Mean", "sig4Mean", "sig3Mean", "p1Mean", 
+                 "p2Mean", "p3Mean", "p4Mean")
 sds = c(sig2epsSd, mu1Sd, mu2Sd, mu3Sd, sig1Sd, sig2Sd, sig4Sd, sig3Sd, p1Sd, p2Sd, p3Sd, p4Sd)
 
-propSample <- function(old, propsd){
+plotPrior <- function(n, means, sds){
+  library(tidyverse)
+  p = length(means)
+  realvalued = matrix(rnorm(n*p, means, sds), nrow=p)
+  constrained = data.frame(t(apply(realvalued, 2, RtoCon)))
+  names(constrained) = names(means)
+  gather(constrained) %>% ggplot(aes(x=value,color=key,fill=key)) +
+    geom_density() + facet_wrap(~key,scales='free')
+}
+
+plotPosteriorDist <- function(params, pnames){
+  library(tidyverse)
+  p = ncol(params)
+  df = data.frame(params)
+  names(df) = pnames
+  gather(df) %>% ggplot(aes(x=value,color=key,fill=key)) +
+    geom_density() + facet_wrap(~key,scales='free')
+}
+
+plotPosteriorPath <- function(params, pnames){
+  library(tidyverse)
+  p = ncol(params)
+  df = data.frame(params)
+  names(df) = pnames
+  df$iter = 1:nrow(df)
+  gather(df, key='key',value='value',-iter) %>% ggplot(aes(x=iter,y=value,color=key)) +
+    geom_line() + facet_wrap(~key,scales='free')
+}
+
+
+propSample <- function(old, propsd, nosamp = rep(FALSE,length(old))){
   o = ContoR(old)
   out = rnorm(length(old), o, propsd)
-  out[5] = o[5] # don't sample this one
+  if(any(nosamp)) out[nosamp] = o[nosamp] # don't sample these
   return(RtoCon(out))
 }
 
-logprior <- function(params, means, sds){
+logprior <- function(params, means, sds, nosamp = rep(FALSE,length(params))){
+  # This doesn't quite work, we also need the jacobians of the inverse 
+  # for any transformations
   p = ContoR(params)
-  out = dnorm(p, means, sds, log=TRUE)
-  out = out[-5] # not sampling this one
+  out = dnorm(p, means, sds, log=TRUE) + Jacob(p)
+  if(any(nosamp)) out = out[!nosamp] # not sampling this one
   return(sum(out))
 }
 
@@ -67,13 +119,35 @@ logStatesGivenParams <- function(states,transProbs){
   return(sum(log(transProbs[ind])))
 }
 
+viewPath <- function(lt, y, note.onset, samp, 
+                     summarizer = function(x) 
+                       x$params[which.max(x$logProbs),]){
+  print(paste('Acceptance = ', samp$acceptance))
+  p = summarizer(samp)
+  print(p)
+  pmats = yupengMats(lt, p[1], p[2:4], p[5:8], p[9:12])
+  beam = beamSearch(pmats$a0, pmats$P0, w0, pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
+                    pmats$Rt, pmats$Qt, pmats$GGt, y, pmats$transMat, 200)
+  ss = beam$paths[which.max(beam$weights),]
+  path = kalman(pmats, ss, y)
+  plot(tempos$note_onset, y,ty='b')
+  points(tempos$note_onset, path$ests, col=convert8to4(ss),pch=19)
+}
+
 posteriorSample <- function(y,lt,propsd, priormeans, priorsds, initParams = RtoCon(priormeans),
-                            n=10000, Npart = 100){
+                            n=10000, Npart = 100, nosamp = rep(FALSE, length(priormeans)),
+                            verbosity = FALSE){
   stopifnot((p <- length(initParams)) == 12, length(priormeans) == p, p ==length(priorsds),
             (Yn <- ncol(y))==length(lt)
-            )
+  )
+  if(length(nosamp)<p){
+    ns = rep(FALSE, p)
+    ns[nosamp] = TRUE
+    nosamp = ns
+  }
   Params = array(dim = c(n,p))
   States = array(dim = c(n,Yn))
+  logProbs = double(n)
   sig2eps = initParams[1]
   mus = initParams[2:4]
   sig2etas = initParams[5:8]
@@ -85,12 +159,13 @@ posteriorSample <- function(y,lt,propsd, priormeans, priorsds, initParams = RtoC
   States[1,] = beam$paths[sample(1:nrow(beam$paths), size = 1, prob = beam$weights),]
   LogLik = -1*getloglike(pmats, States[1,], y)#log(P(y|params, states))
   sgp = logStatesGivenParams(States[1,],pmats$transMat)
-  pri = logprior(Params[1,], priormeans, priorsds)
+  pri = logprior(Params[1,], priormeans, priorsds, nosamp)
   oldLogProb = LogLik + sgp + pri
+  logProbs[1] = oldLogProb
   accept = 0
   for(i in 2:n){
     #print(i)
-    proposal = propSample(Params[i-1,], propsd)
+    proposal = propSample(Params[i-1,], propsd, nosamp)
     sig2eps = proposal[1]
     mus = proposal[2:4]
     sig2etas = proposal[5:8]
@@ -99,7 +174,7 @@ posteriorSample <- function(y,lt,propsd, priormeans, priorsds, initParams = RtoC
     ## P(params|y,states) = P(y|params,states)P(states|params)p(params)  this is what I want. Will log for computation
     LogLik = -1*getloglike(pmats, States[i-1,], y)#log(P(y|params, states))
     sgp = logStatesGivenParams(States[i-1,], pmats$transMat)
-    pri = logprior(proposal, priormeans, priorsds)
+    pri = logprior(proposal, priormeans, priorsds, nosamp)
     p = min(c(1, exp(LogLik + sgp + pri - oldLogProb)))
     if(rbinom(1, 1, p)){
       Params[i,] = proposal
@@ -116,21 +191,23 @@ posteriorSample <- function(y,lt,propsd, priormeans, priorsds, initParams = RtoC
       #P(params|y,states) = P(y|params,states)P(states|params)p(params)  this is what I want. Will log for computation
       LogLik = -1*getloglike(pmats, States[i-1,], y)#log(P(y|params, states))
       sgp = logStatesGivenParams(States[i-1,], pmats$transMat)
-      pri = logprior(proposal, priormeans, priorsds)
+      pri = logprior(proposal, priormeans, priorsds, nosamp)
       oldLogProb = LogLik + sgp + pri
     }
+    logProbs[i] = oldLogProb
     beam = beamSearch(pmats$a0, pmats$P0, w0, pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
                       pmats$Rt, pmats$Qt, pmats$GGt, y, pmats$transMat, Npart)
     States[i,] = beam$paths[sample(1:nrow(beam$paths), size = 1, prob = beam$weights),]
+    if ((verbosity > 0) && (i %% verbosity == 0)) print(paste("iter = ",i," of ",n))
   }
-  return(list(params = Params, states = States, acceptance = accept/n))
+  return(list(params = Params, states = States, acceptance = accept/n, logProbs = logProbs))
 }
 
 targetb = 0.28
 targets = 0.22
-propstep = 0.5
+propstep = 1
 print(paste('trying ', propstep, sep = ''))
-out = posteriorSample(y, lt, propstep, means, sds, n=1000)
+out = posteriorSample(y, lt, propstep, means, sds, n=1000, nosamp=c(1,5))
 oldRatio = out$acceptance
 newRatio = oldRatio
 ntries = 10
@@ -142,10 +219,10 @@ tryCatch({
     oldRatio = newRatio
     oldstep = propstep
     if(oldRatio > targetb){
-      propstep = 1.1*propstep
+      propstep = 2*propstep
     }
     else{
-      propstep = 0.9*propstep
+      propstep = 0.5*propstep
     }
     print(paste('trying ', propstep, sep = ''))
     out = posteriorSample(y,lt,propstep, means, sds,n=1000)

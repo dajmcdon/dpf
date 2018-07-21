@@ -22,7 +22,7 @@ arma::uvec SampleNoReplace(arma::uvec x, int size) {
   return(ret);
 }
 
-//[[Rcpp::export]]
+ //[[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
   int M = w.size();
   double tol = 1e-10;
@@ -59,7 +59,7 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   return ws;
 }
 
-//[[Rcpp::export]]
+ //[[Rcpp::export]]
 arma::colvec resampleOptimal(arma::colvec w, int N){
   // no zeros no dups?? unused, doesn't seem to work
   int M = w.size();
@@ -178,7 +178,7 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
                       Named("pred") = pred);*/
 }
 
-// [[Rcpp::export]]
+ // [[Rcpp::export]]
 List kf1stepR(arma::mat a0, arma::mat P0, arma::mat dt,
               arma::mat ct, arma::mat Tt,
               arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
@@ -221,8 +221,8 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
     return output;
 }
 
-
-//[[Rcpp::export]]
+ //' @export 
+ //[[Rcpp::export]]
 arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
   arma::uword K = Rt.n_cols;
   arma::mat Rtmp(r,q);
@@ -249,6 +249,8 @@ arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
 //HHt: variance of the predicted mean of the continuous state
 //GGt: variance of the observation
 //yt: observation
+ //' @export 
+ // [[Rcpp::export]]
 List dpf(arma::uvec currentStates, arma::colvec w, int N,                      //MICHAEL: What are these?
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
@@ -316,7 +318,15 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
 }
 
 
-
+//' Evaluate the likelihood given parameters and discrete states
+//' 
+//' @param pmats a list of parameter matrices for the kalman filter
+//' @param path the desired path for hidden discrete states
+//' @param y observations, each time point in a column
+//' 
+//' @return the negative log-likelihood
+//' 
+//' @export 
 // [[Rcpp::export]]
 double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::mat a0 = pmats["a0"];
@@ -378,9 +388,18 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 }
     
 
-    
-//mus(0) = mu1, mus(1) = taot, mus(2) = phit
-    
+ 
+//' Create parameter matrices as in Gu (2017)
+//' 
+//' @param lt durations between successive notes in the score
+//' @param sig2eps variance of the observation noise
+//' @param mus vector of 4 mean parameters
+//' @param sig2eta vector of 4 state variance parameters
+//' @param transprobs vector of 4 transition probabilities
+//' 
+//' @return List with components as appropriate for Kalman filtering or Beam Search
+//' 
+//' @export    
 // [[Rcpp::export]]
 List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
                 arma::vec sig2eta, arma::vec transprobs){ 
@@ -502,7 +521,15 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
                         Named("newW") = newW);
 }
 
-
+//' Greedy HMM estimation given continuous hidden states
+//' 
+//' @param a0 a px1 matrix of state prior means
+//' @param P0 a pxp matrix of state
+//' @param dt dx1 or dxn matrix of 
+//' 
+//' @return List with components "paths", "weights", and "LastStep" 
+//' 
+//' @export 
 // [[Rcpp::export]]
 List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                 arma::cube dt, arma::cube ct, arma::cube Tt, arma::cube Zt,
@@ -561,6 +588,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
     arma::vec newW = step["newW"];
     CurrentPartNum = newW.n_elem;
     weights.head(CurrentPartNum) = newW;
+    if(CurrentPartNum < maxpart) weights.tail(maxpart-CurrentPartNum) *= 0; // fix decreasing CurrentPartNum
     arma::mat a1tmp = step["a1"];
     a0.head_cols(CurrentPartNum) = a1tmp;
     arma::mat P1tmp = step["P1"];
@@ -686,8 +714,19 @@ List pathStuffold(List pmats, arma::uvec path, arma::mat y){
                               Named("ests") = ests, Named("llik") = llik);
 }
 
+
+
+//' Estimate continuous states given parameters and discrete hidden states
+//' 
+//' @param pmats e.g., as output from yupengMats
+//' @param path path of discrete hidden states
+//' @param y observations
+//' 
+//' @return List with components from Kalman filter and Smoother
+//' 
+//' @export 
 // [[Rcpp::export]]
-List pathStuff(List pmats, arma::uvec path, arma::mat y){
+List kalman(List pmats, arma::uvec path, arma::mat y){
   // What if I want different initial state (instead of 0)?
   
   arma::mat a0 = pmats["a0"];
@@ -795,70 +834,3 @@ List pathStuff(List pmats, arma::uvec path, arma::mat y){
                             Named("att") = att, Named("Ptt") = Ptt,
                             Named("ests") = ests, Named("llik") = llik);
 }
-
-// You can include R code blocks in C++ files processed with sourceCpp
-// (useful for testing and development). The R code will be automatically
-// run after the compilation.
-//
-
-/***R
-# nstates = 2
-#npart = 8
-# N = 35
-# n = 100
-# y = matrix(1:3/10)
-# y = matrix(rnorm(3*n),3)
-# y = matrix(rnorm(n)+25,1)
-# a0 = matrix(rnorm(2*npart),2)
-# P0 = matrix(c(diag(.1,2)),4,npart)
-# w0 = runif(npart)
-# w0 = w0/sum(w0)
-# ct = array(0,c(3,2,1))
-# dt = array(0,c(2,2,1))
-# Zt = array(c(.1,.1,.1,.2,.3,.1),c(6,2,1))
-# Tt = array(c(diag(.9,2),diag(.8,2)),c(4,2,1))
-# Rt = array(c(diag(1,2)),c(4,2,1))
-# Qt = array(c(diag(1,2)),c(4,2,1))
-# GGt = array(c(diag(.1,3)),c(9,2,1))
-# currentStates = rbinom(npart,size = nstates-1,.5)
-# w = runif(npart)
-# w[2] = npart
-#w = w/sum(w)
-# currentStates[2] = 0
-# transProbs = matrix(c(.1,.9,.4,.6),2,byrow=TRUE)
-# out1 = dpf(currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GGt, y)
-# ptm = proc.time()
-# out = beamSearch(a0, P0, dt, ct, Tt, Zt, Rt, Qt, GGt, y, transProbs, N)
-# print(proc.time() - ptm)
-# lt = runif(n)
-# temposwitch = double(n)
-# temposwitch[floor(n/2):floor(3*n/4)] = 1
-mus = c(60, 100, 2, 1)
-# sig2eps = 1
-# sig2eta = c(2, .1, 1)
-# transProbs = c(.8,.1,.5,.4)
-# ptm = proc.time()
-# out = yupengMats(lt, temposwitch, sig2eps, mus, sig2eta, transProbs)
-# test = beamSearch(a0,P0,w0, out$dt, out$ct, out$Tt, out$Zt, out$Rt, 
-#                  out$Qt, out$GGt, y, out$transMat, 50)
-# print(proc.time() - ptm)
-toab <- function(x, a, b) x*(b-a) + a # maps [0,1] to [a,b]
-logistic <- function(x) 1/(1+exp(-x)) # maps R to [0,1]
-
-
-toOptimize <- function(pvec, lt, temposwitch, y, w0, Npart){
-  sig2eps = exp(pvec[1])
-  mus = pvec[2:5]
-  sig2etas = exp(pvec[6:8])
-  transprobs = logistic(pvec[9:12])
-  transprobs[2] = toab(transprobs[2], 0, 1-transprobs[1])
-  pmats = yupengMats(lt, temposwitch, sig2eps, mus, sig2etas, transprobs)
-  S = beamSearch(pmats$a0, pmats$P0, w0, pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
-                 pmats$Rt, pmats$Qt, pmats$GGt, y, pmats$transMat, Npart)
-  if(S$LastStep < ncol(y)) return(Inf)
-  best = S$paths[which.max(S$weights),]
-  negllike = getloglike(pmats, best, y)
-  return(negllike)
-}
-*/
-

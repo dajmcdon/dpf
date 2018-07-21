@@ -194,31 +194,31 @@ diagram given by \autoref{fig:transmat}.
                                                 \tikzstyle{switch}=[rectangle,
   thick, minimum size=1cm, draw=black]
 
-\begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
+\begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex,ampersand replacement=\&]
     % "text height" and "text depth" are required to vertically
     % align the labels with and without indices.
   
   % The various elements are conveniently placed using a matrix:
   \matrix[row sep=1cm,column sep=1cm] {
     % First line: Switch state
-    \node (s_k-2)  {$\cdots$}; &
-    \node (s_k-1) [switch]{$s_{k-1}$}; &
-    \node (s_k)   [switch]{$s_k$};     &
-    \node (s_k+1) [switch]{$s_{k+1}$}; &
+    \node (s_k-2)  {$\cdots$}; \&
+    \node (s_k-1) [switch]{$s_{k-1}$}; \&
+    \node (s_k)   [switch]{$s_k$};     \&
+    \node (s_k+1) [switch]{$s_{k+1}$}; \&
     \node (s_k+2) {$\cdots$};
     \\
     % Second line: hidden continuous state
-   \node (x_k-2) {$\cdots$}; &
-   \node (x_k-1) [state] {$\mathbf{x}_{k-1}$}; &
-   \node (x_k)   [state] {$\mathbf{x}_k$};     &
-   \node (x_k+1) [state] {$\mathbf{x}_{k+1}$}; &
+   \node (x_k-2) {$\cdots$}; \&
+   \node (x_k-1) [state] {$\mathbf{x}_{k-1}$}; \&
+   \node (x_k)   [state] {$\mathbf{x}_k$};     \&
+   \node (x_k+1) [state] {$\mathbf{x}_{k+1}$}; \&
    \node (x_k+2) {$\cdots$};
    \\
    % Third line: Measurement
-   \node (y_k-2) {$\cdots$}; &        
-   \node (y_k-1) [measurement] {$\mathbf{y}_{k-1}$}; &
-   \node (y_k)   [measurement] {$\mathbf{y}_k$};     &
-   \node (y_k+1) [measurement] {$\mathbf{y}_{k+1}$}; &
+   \node (y_k-2) {$\cdots$}; \&        
+   \node (y_k-1) [measurement] {$\mathbf{y}_{k-1}$}; \&
+   \node (y_k)   [measurement] {$\mathbf{y}_k$};     \&
+   \node (y_k+1) [measurement] {$\mathbf{y}_{k+1}$}; \&
    \node (y_k+2) {$\cdots$};
    \\
   };
