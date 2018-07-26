@@ -1,7 +1,7 @@
 Package: dpf
 Type: Package
 Title: Discrete particle filtering
-Version: 0.0.0100
+Version: 0.1
 Date: 2018-06-15
 Authors@R: c(
     person("McBride", "Michael", email = "michmcbr@iu.edu", role = "cre"),
