@@ -9,7 +9,7 @@ plotStates <- function(performance, performer, onset, params, particleNumber = 2
     bestpath = bs$paths[which.max(bs$weights),]
     kal = kalman(mats, bestpath, y)
     df = data.frame(measure = tempos$note_onset, tempo = performance, 
-                    inferred = c(kal$ests), state = as.factor(convert8to4(bestpath)))
+                    inferred = c(kal$ests), state = convert8to4(bestpath))
     ggplot(df, aes(x=measure, y=tempo)) + ylim(0,max(df$tempo)) +
         geom_rect(aes(xmin = 33, xmax = 45, ymin = 0, ymax = max(df$tempo),
                       fill = 'gray90', color = 'gray90'))+
