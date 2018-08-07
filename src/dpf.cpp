@@ -814,7 +814,12 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
     arma::mat zz = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
     zz.reshape(d,m);
     ests.col(iter) = cc + zz * ahat.col(iter);
-    P00 = arma::pinv(Pt.slice(iter));
+    if(arma::any(arma::any(Pt.slice(iter)))){
+        P00 = arma::pinv(Pt.slice(iter));
+    }
+    else{
+        P00 = Pt.slice(iter);
+    }
     a00 = ahat.col(iter) - at.col(iter);
     
     iter--; // This is important, need T after the increment rather than before.

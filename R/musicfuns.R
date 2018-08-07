@@ -34,6 +34,33 @@ convert8to4 <- function(path){
 }
 
 
+#' @export
+beamSearchWrap <- function(pvec, y, onset, Npart, w0 = c(1,0,0,0,0,0,0,0), npaths = 1){
+    if(!is.matrix(y)) dim(y) = c(1,length(y))
+    if(is.list(pvec)) pvec = unlist(pvec)
+    lt = lt = diff(c(onset, 61))
+    mats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12])
+    bs = beamSearch(mats$a0, mats$P0, c(1,0,0,0,0,0,0,0), mats$dt, mats$ct, mats$Tt, mats$Zt,
+                    mats$Rt, mats$Qt, mats$GGt, y, mats$transMat, Npart)
+    if(npaths == 1){
+        bestpath = bs$paths[which.max(bs$weights),]
+        kal = kalman(mats, bestpath, y)
+        return(list(paths = convert8to4(bestpath), weight = max(bs$weights),
+                    ests = kal$ests, llik = sum(kal$llik)))
+    }
+    else{
+        rank = order(bs$weights, decreasing = TRUE)[1:npaths]
+        out = vector("list", npaths)
+        for(i in 1:npaths){
+            path = bs$paths[rank[i],]
+            kal = kalman(mats, path, y)
+            out[[i]] = list(paths = convert8to4(path), weight = max(bs$weights),
+                            ests = kal$ests, llik = sum(kal$llik))
+        }
+        return(out)
+    }
+}
+
 
 # Deprecated --------------------------------------------------------------
 
