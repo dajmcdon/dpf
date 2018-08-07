@@ -25,4 +25,4 @@ ggsave("extras/different_performances.pdf", marrangeGrob(differentPlots, nrow = 
 library(heatmaply)
 mat = t(tempos[,-c(1:3)])
 heatmaply(as.matrix(dist(mat)),k_row=8,k_col=8,symm=TRUE,
-          labCol=rep(NA,nrow(mat)), file='extras/raw_tempo_heatmap.pdf')
+          labCol=rep(NA,nrow(mat)), file='extras/raw_tempo_heatmap.pdf', height = 800, width = 1280)
