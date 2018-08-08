@@ -4,7 +4,7 @@ plotStates <- function(performance, performer, onset, params, particleNumber = 2
     if(is.list(params)) params = unlist(params)
     lt = diff(c(onset, 61))
     y = matrix(performance, nrow = 1)
-    mats = yupengMats(lt, params[1], params[2:4], params[5:8], params[9:12])
+    mats = yupengMats(lt, params[1], params[2:4], params[5:8], params[9:12], c(10,10))
     bs = beamSearch(mats$a0, mats$P0, c(1,0,0,0,0,0,0,0), mats$dt, mats$ct, mats$Tt, mats$Zt,
                     mats$Rt, mats$Qt, mats$GGt, y, mats$transMat, particleNumber)
     bestpath = bs$paths[which.max(bs$weights),]

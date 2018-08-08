@@ -39,7 +39,7 @@ beamSearchWrap <- function(pvec, y, onset, Npart, w0 = c(1,0,0,0,0,0,0,0), npath
     if(!is.matrix(y)) dim(y) = c(1,length(y))
     if(is.list(pvec)) pvec = unlist(pvec)
     lt = lt = diff(c(onset, 61))
-    mats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12])
+    mats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12], c(10,10))
     bs = beamSearch(mats$a0, mats$P0, c(1,0,0,0,0,0,0,0), mats$dt, mats$ct, mats$Tt, mats$Zt,
                     mats$Rt, mats$Qt, mats$GGt, y, mats$transMat, Npart)
     if(npaths == 1){

@@ -7,4 +7,4 @@ Rmat = t(Rmat)
 Rmat = Rmat[,-5]
 Rmatsc = scale(Rmat)
 heatmaply(as.matrix(dist(Rmatsc)),k_row=8,k_col=8,symm=TRUE,
-          labCol=rep(NA,nrow(Rmat)), file='extras/dirty_heatmap.pdf', width = 1280, height = 800)
+          labCol=rep(NA,nrow(Rmat)), file='extras/dirty_heatmap.pdf', width = 1280, height = 800)#can also change the font size if this fix doesn't work

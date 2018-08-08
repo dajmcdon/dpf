@@ -100,8 +100,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // yupengMats
-List yupengMats(arma::vec lt, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs);
-RcppExport SEXP _dpf_yupengMats(SEXP ltSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP) {
+List yupengMats(arma::vec lt, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs, arma::vec initialVariance);
+RcppExport SEXP _dpf_yupengMats(SEXP ltSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP, SEXP initialVarianceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -110,7 +110,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type transprobs(transprobsSEXP);
-    rcpp_result_gen = Rcpp::wrap(yupengMats(lt, sig2eps, mus, sig2eta, transprobs));
+    Rcpp::traits::input_parameter< arma::vec >::type initialVariance(initialVarianceSEXP);
+    rcpp_result_gen = Rcpp::wrap(yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialVariance));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -158,7 +159,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_HHcreate", (DL_FUNC) &_dpf_HHcreate, 4},
     {"_dpf_dpf", (DL_FUNC) &_dpf_dpf, 13},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
-    {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 5},
+    {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 6},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 13},
     {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
     {NULL, NULL, 0}

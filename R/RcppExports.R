@@ -45,8 +45,8 @@ getloglike <- function(pmats, path, y) {
 #' @return List with components as appropriate for Kalman filtering or Beam Search
 #' 
 #' @export    
-yupengMats <- function(lt, sig2eps, mus, sig2eta, transprobs) {
-    .Call('_dpf_yupengMats', PACKAGE = 'dpf', lt, sig2eps, mus, sig2eta, transprobs)
+yupengMats <- function(lt, sig2eps, mus, sig2eta, transprobs, initialVariance) {
+    .Call('_dpf_yupengMats', PACKAGE = 'dpf', lt, sig2eps, mus, sig2eta, transprobs, initialVariance)
 }
 
 #' Greedy HMM estimation given continuous hidden states
