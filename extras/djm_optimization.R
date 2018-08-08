@@ -21,7 +21,7 @@ logprior <- function(pvec, samp_mean){
 ddirichlet <- function(theta, alpha) sum(alpha*log(theta)) # on the log scale, no constant
 
 init <- function(samp_mean, noise = 0){
-  means = c(400, samp_mean, -10, -30, .0001, 400, 400, 900, 2/3, 5/30, 9/15, 1/2)
+  means = c(400, samp_mean, -10, -30, .0001, 400, 400, 900, .85, .1, 9/15, 1/2)
   m = ContoR(means)
   ini = rnorm(length(m), m, sd = noise)
   ini = ini[-c(2,5)]
@@ -42,7 +42,8 @@ RtoCon <- function(p){
 ContoR <- function(p){
   #deal with the simplex
   p[10] = toabInv(p[10], 0, 1-p[9])
-  return(c(nonneg(p[1]), p[2], nonneg(-p[3:4]), nonneg(p[5:8]), invlogistic(p[9:12])))
+  return(c(nonneg(p[1]), p[2], nonneg(-p[3:4]), nonneg(p[5:8]), 
+           invlogistic(p[9:12])))
 }
 
 logStatesGivenParams <- function(states,transProbs){
@@ -50,20 +51,21 @@ logStatesGivenParams <- function(states,transProbs){
   return(sum(log(transProbs[ind])))
 }
 
-toOptimize <- function(theta, yt, lt, Npart){
+toOptimize <- function(theta, yt, lt, Npart, badvals=Inf){
   samp_mean = mean(yt)
   theta = c(theta[1], samp_mean, theta[2:3], nonneg(.0001), theta[4:10])
   pvec = RtoCon(theta)
   pmats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12])
-  beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0), pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
+  beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0), 
+                    pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
                     pmats$Rt, pmats$Qt, pmats$GGt, yt, pmats$transMat, Npart)
   if(beam$LastStep < length(lt)){
-    cat('beam$LastStep < length(lt)')
-    return(Inf)
+    cat('beam$LastStep < length(lt)\n')
+    return(badvals)
   }
   if(all(is.na(beam$weights))){
-    cat('all weights are NA')
-    return(Inf)
+    cat('all weights are NA\n')
+    return(badvals)
   }
   states = beam$paths[which.max(beam$weights),]
   negllike = getloglike(pmats, states, yt)# -log(P(y|params, states))
@@ -81,15 +83,22 @@ toOptimize <- function(theta, yt, lt, Npart){
 
 # Cluster funs ------------------------------------------------------------
 
-optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=1){
+optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=1,
+                      badvals=1e8){
   yt = matrix(perf, nrow=1)
   samp_mean = mean(yt)
   randos = NULL
   if(ntries > 1) randos = t(replicate(ntries-1, init(samp_mean, spread_init)))
   init_vals = rbind(init(samp_mean,0), randos)
-  out = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, method='Nelder-Mead',
+  out1 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
+                   badvals=badvals,
+                   method='Nelder-Mead',
                    control=list(trace=0, maxit=5000))
-  #if(!any(out$convergence==0)) return(rep(NA,12))
+  out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
+                    badvals=badvals,
+                    method='SANN',
+                    control=list(trace=0, maxit=5000))
+  out = rbind.data.frame(out1, out2)
   theta = unlist(out[which.min(out$value), 1:10])
   theta = c(theta[1], samp_mean, theta[2:3], nonneg(.0001), theta[4:10])
   pvec = RtoCon(theta)
