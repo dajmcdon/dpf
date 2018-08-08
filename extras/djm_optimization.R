@@ -37,12 +37,12 @@ invnonneg <- function(x) exp(x)
 RtoCon <- function(p){
   tp = logistic(p[9:12])
   tp[2] = toab(tp[2], 0, 1-tp[1])
-  return(c(invnonneg(p[1]), p[2], -invnonneg(p[3:4]), invnonneg(p[5:8]), tp))
+  return(c(invnonneg(p[1]), p[2], -invnonneg(p[3:4]), 0, invnonneg(p[6:8]), tp))
 }
 ContoR <- function(p){
   #deal with the simplex
   p[10] = toabInv(p[10], 0, 1-p[9])
-  return(c(nonneg(p[1]), p[2], nonneg(-p[3:4]), nonneg(p[5:8]), 
+  return(c(nonneg(p[1]), p[2], nonneg(-p[3:4]), 0, nonneg(p[6:8]), 
            invlogistic(p[9:12])))
 }
 
@@ -53,9 +53,11 @@ logStatesGivenParams <- function(states,transProbs){
 
 toOptimize <- function(theta, yt, lt, Npart, badvals=Inf){
   samp_mean = mean(yt)
-  theta = c(theta[1], samp_mean, theta[2:3], nonneg(.0001), theta[4:10])
+  theta = c(theta[1], samp_mean, theta[2:3], 0, theta[4:10])
   pvec = RtoCon(theta)
-  pmats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12])
+  pmats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12],
+                     initialMean = c(132,0), # 132 is marked tempo, 0 is unused
+                     initialVariance = c(400,10)) # sd of 20, 10 is unused
   beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0), 
                     pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
                     pmats$Rt, pmats$Qt, pmats$GGt, yt, pmats$transMat, Npart)
