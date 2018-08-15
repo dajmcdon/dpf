@@ -85,7 +85,7 @@ toOptimize <- function(theta, yt, lt, Npart, badvals=Inf){
 
 # Cluster funs ------------------------------------------------------------
 
-optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=1,
+optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=3,
                       badvals=1e8){
   yt = matrix(perf, nrow=1)
   samp_mean = mean(yt)
@@ -95,14 +95,15 @@ optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=1,
   out1 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
                    badvals=badvals,
                    method='Nelder-Mead',
-                   control=list(trace=0, maxit=5000))
+                   control=list(trace=0, maxit=5000,badval=badvals))
   out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
                     badvals=badvals,
                     method='SANN',
-                    control=list(trace=0, maxit=5000))
+                    control=list(trace=0, maxit=5000,badval=badvals))
   out = rbind.data.frame(out1, out2)
+  if(all(is.na(out$value))) return(rep(NA, 12))
   theta = unlist(out[which.min(out$value), 1:10])
-  theta = c(theta[1], samp_mean, theta[2:3], nonneg(.0001), theta[4:10])
+  theta = c(theta[1], samp_mean, theta[2:3], 0, theta[4:10])
   pvec = RtoCon(theta)
   pvec
 }
