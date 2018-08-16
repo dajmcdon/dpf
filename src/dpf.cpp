@@ -402,7 +402,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' @export    
 // [[Rcpp::export]]
 List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
-                arma::vec sig2eta, arma::vec transprobs, arma::vec initialVariance){ 
+                arma::vec sig2eta, arma::vec transprobs,
+                arma::vec initialMean, arma::vec initialVariance){ 
   //confirm that t's stay in same order for each matrix
   // in each section, we have:
   //   3 state means (tempo, accel, stress), 3 state variances (same), 1 obs variance
@@ -415,9 +416,9 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   int mm = m*m;
   int n = lt.n_elem;
   arma::mat a0(m, nstates, arma::fill::zeros);
-  a0.row(0) += mus(0);
-  a0(1,4) += mus(1);
-  a0(1,6) += mus(1);
+  a0.row(0) += initialMean(0);
+  a0(1,4) += initialMean(1);
+  a0(1,6) += initialMean(1);
   arma::mat P0(mm, nstates, arma::fill::zeros);
   P0.row(0) += initialVariance(0);
   P0(3,4) += initialVariance(1);

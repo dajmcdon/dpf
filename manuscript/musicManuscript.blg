@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: musicManuscript.aux
+The style file: agsm.bst
+Database file #1: AllReferences.bib
+Warning--entry type for "CookSapp2009" isn't style-file defined
+--line 2721 of file AllReferences.bib
+You've used 6 entries,
+            2909 wiz_defined-function locations,
+            683 strings with 5676 characters,
+and the built_in function-call counts, 19219 in all, are:
+= -- 3069
+> -- 257
+< -- 0
++ -- 1425
+- -- 77
+* -- 1601
+:= -- 3971
+add.period$ -- 6
+call.type$ -- 6
+change.case$ -- 83
+chr.to.int$ -- 6
+cite$ -- 6
+duplicate$ -- 91
+empty$ -- 195
+format.name$ -- 98
+if$ -- 3435
+int.to.chr$ -- 5
+int.to.str$ -- 0
+missing$ -- 5
+newline$ -- 21
+num.names$ -- 61
+pop$ -- 38
+preamble$ -- 1
+purify$ -- 90
+quote$ -- 0
+skip$ -- 76
+stack$ -- 0
+substring$ -- 4266
+swap$ -- 14
+text.length$ -- 84
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 22
+warning$ -- 0
+while$ -- 133
+width$ -- 0
+write$ -- 77
+(There was 1 warning)

@@ -1,0 +1,30 @@
+\begin{thebibliography}{xx}
+
+\harvarditem{Bernstein}{2005}{Bernstein2005}
+Bernstein, L.  \harvardyearleft 2005\harvardyearright , {\em Young People's
+  Concerts}, Amadeus Press, Pompton Plains, NJ.
+
+\harvarditem{Cook \harvardand\ Sapp}{2009}{CookSapp2009}
+Cook, N. \harvardand\ Sapp, C.  \harvardyearleft 2009\harvardyearright ,
+  `Purely coincidental? {J}oyce {H}atto and {Chopin's Mazurkas}'.
+
+\harvarditem[Dror et~al.]{Dror, Koenigstein, Koren \harvardand\
+  Weimer}{2012}{DrorKoenigstein2012}
+Dror, G., Koenigstein, N., Koren, Y. \harvardand\ Weimer, M.  \harvardyearleft
+  2012\harvardyearright , The {Yahoo!} music dataset and {KDD-Cup'11}, {\em in}
+  `KDD Cup', pp.~8--18.
+
+\harvarditem{Ghahramani \harvardand\ Hinton}{2000}{GhahramaniHinton2000}
+Ghahramani, Z. \harvardand\ Hinton, G.~E.  \harvardyearleft
+  2000\harvardyearright , `Variational learning for switching state-space
+  models', {\em Neural computation} {\bf 12}(4),~831--864.
+
+\harvarditem{McDonald}{2016}{McDonald2016}
+McDonald, D.~J.  \harvardyearleft 2016\harvardyearright , `Clustering classical
+  music performances', in preparation.
+
+\harvarditem{Raphael}{2002}{Raphael2002}
+Raphael, C.  \harvardyearleft 2002\harvardyearright , `A hybrid graphical model
+  for rhythmic parsing', {\em Artificial Intelligence} {\bf 137}(1),~217--238.
+
+\end{thebibliography}
