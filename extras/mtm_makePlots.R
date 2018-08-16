@@ -26,3 +26,9 @@ library(heatmaply)
 mat = t(tempos[,-c(1:3)])
 heatmaply(as.matrix(dist(mat)),k_row=8,k_col=8,symm=TRUE,
           labCol=rep(NA,nrow(mat)), file='extras/raw_tempo_heatmap.pdf', height = 800, width = 1280)
+#every performane plot
+plots = vector("list", 4)
+for(i in 1:nrow(pvec_ml)){
+    plots[[i]] = plotStates(tempos[,i+3], rownames(pvec_ml)[i], tempos$note_onset, unlist(pvec_ml[i,]))
+}
+ggsave("extras/all_performances.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
