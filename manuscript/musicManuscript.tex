@@ -2,7 +2,7 @@
 
 % JASA necessities --------
 % NOTE: To produce blinded version, replace "1" with "0" below.
-\newcommand{\blind}{0}
+\newcommand{\blind}{1}
 \pdfminorversion=4
 % DON'T change margins - should be 1 inch all around.
 % Daniel: This stuff seems not to have that effect despite the JASA
@@ -46,14 +46,6 @@
 \renewcommand*{\subsubsectionautorefname}{Section}% 
 
 
-
-% \usepackage[margin=1in]{geometry}
-
-% \setlength{\parindent}{0in}
-% \setlength{\parskip}{5px}
-
-
-
 %\graphicspath{{../PLS/plsPlotsv2/}}
 %\renewcommand{\includegraphics}[2][]{}
 
@@ -74,9 +66,9 @@
     support from the National Science Foundation (grants DMS-1407439
     and DMS-1753171).}\hspace{.2cm}\\ 
     Department of Statistics, Indiana University\\
-  and\\
-  Michael McBride\\
-  Department of Statistics, Indiana University}
+    and\\
+    Michael McBride\\
+    Department of Statistics, Indiana University}
 \maketitle
 } \fi
 
@@ -107,15 +99,14 @@ of the performer, subject to the whims of the moment, technical
 fluency, and taste. In this
 research, we use data from the CHARM Mazurka Project---forty-six professional
 recordings of Chopin's Mazurka Op.\ 63 No.\ 3 by consumate artists---with the goal of
-discovering what makes different performances more or less
-appealing. Using information on both the
-tempo and dynamics of the recordings, we apply functional data
+elucidating musically interpretable performance decisions. Using information on the
+tempo the recordings, we apply functional data
 analysis techniques enriched with prior information gained from music
 theory to discover relevant features and perform hierarchical
 clustering. The resulting clusters suggest methods for informing music
 instruction, discovering listening preferences, and analyzing performances.
 
-%The text of your abstract. 200 or fewer words. At 180 currently
+%The text of your abstract. 200 or fewer words. At 172 currently
 \end{abstract}
 
 \noindent%
@@ -145,8 +136,8 @@ instruction, discovering listening preferences, and analyzing performances.
   \href{https://www.tandfonline.com/action/authorSubmission?journalCode=uasa20&page=instructions}{here}
   for the author instructions.}
 
-Over the last few years, statistical analysis of recorded music has
-become more and more important to academics and in industry. Online
+In recent years, statistical analysis of recorded music has
+become more and more important to academics and industry. Online
 music services like Pandora, Last.fm, Spotify, and others rely on
 recommendation systems to suggest potentially interesting or related
 songs to listeners. In 2011, the KDD Cup challenged academic computer
@@ -205,11 +196,7 @@ recording of Beethoven's Fifth Symphony or Herbert von Karajan's and
 to articulate why.
 
 
-
-\section{Background}
-
-Musical recordings
-are complex data files that describe the intensity and onset time
+Musical recordings are complex data files that describe the intensity and onset time
 for every keystroke made by the performer. Matching this data to a
 musical score, removing incorrect notes, anticipating note onsets for
 automated accompaniment, comparing diverse performances, and
@@ -253,31 +240,19 @@ performances---it was discovered in 2006 that this
 particular recording was actually made in 1988 by Eugen
 Indjic~\citep{CookSapp2009}. 
 
-This application is especially fascinating since
-it allows for visual, numerical, and aural exploration of the
-effects of tuning parameter selection on inference. Working with
-Prof.\ Chris Raphael on a
-B\"{o}sendorfer CEUS reproducing piano in the IU Jacobs School
-of Music, we can capture detailed 
-measurements of key and pedal trajectories over time.  The
-information is precise enough to reproduce an accurate replica by
-artificially ``playing'' the piano just as was done during the
-original performance. The piano can also create and respond to MIDI
-data. However, statistical inferences for these data are difficult. Current
-procedures are ill-suited for parameter estimation in a 
-computationally efficient manner, as it amounts to Gaussian mixture
-learning with $K^n$ components. Existing optimization
-algorithms~\citep{Raphael2002,GhahramaniHinton2000} thus only
-approximate the global solution. 
-
-
-\section{The main idea}
 
 \begin{itemize}
 \item We want to model tempo and dynamic decisions.
 \item We want a musician to understand what the parameters mean.
 \end{itemize}
 
+
+
+\section{Materials and methods}
+
+\subsection{Data and preprocessing}
+
+\subsection{Switching state-space models}
 
 We will use a switching state-space model as shown in
 \autoref{fig:switchss}. For now, we assume $s$ is a hidden Markov model on
@@ -398,6 +373,10 @@ general form is:
 In other words, the hidden markov (switch) state determines which parameter
 matrices govern the evolution of the system. 
 
+
+\subsection{A model for tempo decisions}
+
+
 The 4 switch states correspond to 4 different behaviors for the
 performer: (1) constant tempo, (2) speeding up, (3) slowing down, and
 (4) single note stress. The hidden continuous variable ($x_t$) is
@@ -479,11 +458,9 @@ N\left( \begin{pmatrix}\mu_1\\\tau_1\end{pmatrix}
 Importantly, this is just one way to write this
 model.
 
-The \texttt{R} function
-\texttt{yupengMats} creates all of these different parameter matrices.
+\subsection{Penalized likelihood maximization}
 
-
-\section{R documentation}
+\subsection{Computational issues}
 
 The problem with estimating a model like this is that, because the
 switch states and the continuous states are both hidden, this becomes
@@ -529,6 +506,10 @@ previous state. For this reason, the code uses 16 states rather than
 \end{algorithmic}
 \end{algorithm}
 
+
+\section{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}
+
+\section{Discussion}
 
 
 
