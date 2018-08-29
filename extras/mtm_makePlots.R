@@ -2,7 +2,7 @@ library(ggplot2)
 library(dpf)
 library(gridExtra)
 data("tempos")
-load("extras/mazurka2results.Rdata")
+load("extras/mazurka1results.Rdata")
 #similar and different plots
 performances = rownames(pvec_ml)
 similarPerformances = c("Hatto_1988","Chiu_1999",
@@ -32,3 +32,23 @@ for(i in 1:nrow(pvec_ml)){
     plots[[i]] = plotStates(tempos[,i+3], rownames(pvec_ml)[i], tempos$note_onset, unlist(pvec_ml[i,]))
 }
 ggsave("extras/all_performances.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
+#density plots
+library(ggplot2)
+library(dpf)
+library(gridExtra)
+load("extras/mazurka1results.Rdata")
+load('extras/ClusterLabels.Rdata')
+pvec = pvec_ml[-14,]#bad_perf which was removed before clustering
+pvec$clust = as.factor(clusts)
+plots = vector("list", ncol(pvec)-1)
+i = 1
+for(p in colnames(pvec)){
+    if(p != "clust"){
+        local({
+            p <- p
+            plots[[i]] <<- ggplot(pvec, aes(x = eval(parse(text = p)), fill = clust))+geom_density(alpha = 0.5)+xlab(p)
+        })
+        i = i + 1
+    }
+}
+ggsave("extras/cluster_density.pdf", marrangeGrob(plots, nrow = 2, ncol = 2, newpage = FALSE))
