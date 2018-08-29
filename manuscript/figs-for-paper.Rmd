@@ -88,6 +88,8 @@ heatmap.2(as.matrix(percentize(dist(pvec_ml[-bad_perf,]))),
           offsetCol = 0, offsetRow = 0,
           key=FALSE
 )
+clusts = cutree(as.hclust(dend_parm), k = 4)
+save(clusts, file = '../extras/ClusterLabels.Rdata')
 ```
 
 ```{r raw-data-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
