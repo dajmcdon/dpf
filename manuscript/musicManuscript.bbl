@@ -1,12 +1,27 @@
 \begin{thebibliography}{xx}
 
+\harvarditem{Anderson \harvardand\ Moore}{1979}{AndersonMoore1979}
+Anderson, B.~D. \harvardand\ Moore, J.~B.  \harvardyearleft
+  1979\harvardyearright , {\em Optimal filtering}, Prentice-Hall, Englewood
+  Cliffs, NJ.
+
+\harvarditem[Andrieu et~al.]{Andrieu, Doucet \harvardand\
+  Holenstein}{2010}{AndrieuDoucet2010}
+Andrieu, C., Doucet, A. \harvardand\ Holenstein, R.  \harvardyearleft
+  2010\harvardyearright , `Particle {M}arkov chain {Monte C}arlo methods', {\em
+  Journal of the Royal Statistical Society. Series B, Statistical Methodology}
+  {\bf 72}(2),~1--33.
+
 \harvarditem{Bernstein}{2005}{Bernstein2005}
 Bernstein, L.  \harvardyearleft 2005\harvardyearright , {\em Young People's
   Concerts}, Amadeus Press, Pompton Plains, NJ.
 
-\harvarditem{Cook \harvardand\ Sapp}{2009}{CookSapp2009}
-Cook, N. \harvardand\ Sapp, C.  \harvardyearleft 2009\harvardyearright ,
-  `Purely coincidental? {J}oyce {H}atto and {Chopin's Mazurkas}'.
+\harvarditem[Block et~al.]{Block, Jonsen, Jorgensen, Winship, Shaffer, Bograd,
+  Hazen, Foley, Breed, Harrison et~al.}{2011}{BlockJonsen2011}
+Block, B.~A., Jonsen, I.~D., Jorgensen, S.~J., Winship, A.~J., Shaffer, S.~A.,
+  Bograd, S.~J., Hazen, E.~L., Foley, D.~G., Breed, G., Harrison, A.-L. et~al.
+  \harvardyearleft 2011\harvardyearright , `Tracking apex marine predator
+  movements in a dynamic ocean', {\em Nature} {\bf 475}(7354),~86.
 
 \harvarditem[Dror et~al.]{Dror, Koenigstein, Koren \harvardand\
   Weimer}{2012}{DrorKoenigstein2012}
@@ -14,17 +29,89 @@ Dror, G., Koenigstein, N., Koren, Y. \harvardand\ Weimer, M.  \harvardyearleft
   2012\harvardyearright , The {Yahoo!} music dataset and {KDD-Cup'11}, {\em in}
   `KDD Cup', pp.~8--18.
 
+\harvarditem{Durbin \harvardand\ Koopman}{2001}{DurbinKoopman2001}
+Durbin, J. \harvardand\ Koopman, S.  \harvardyearleft 2001\harvardyearright ,
+  {\em Time Series Analysis by State Space Methods}, Oxford Univ Press, Oxford.
+
+\harvarditem{Durbin \harvardand\ Koopman}{1997}{DurbinKoopman1997}
+Durbin, J. \harvardand\ Koopman, S.~J.  \harvardyearleft 1997\harvardyearright
+  , `{Monte Carlo} maximum likelihood extimation for non-{G}aussian state space
+  models', {\em Biometrika} {\bf 84}(3),~669--684.
+
+\harvarditem[Fox et~al.]{Fox, Sudderth, Jordan \harvardand\
+  Willsky}{2011}{FoxSudderth2011}
+Fox, E.~B., Sudderth, E.~B., Jordan, M.~I. \harvardand\ Willsky, A.~S.
+  \harvardyearleft 2011\harvardyearright , `A sticky {HDP-HMM} with application
+  to speaker diarization', {\em The Annals of Applied Statistics} {\bf
+  5}(2A),~1020--1056.
+
+\harvarditem{Fuh}{2006}{Fuh2006}
+Fuh, C.-D.  \harvardyearleft 2006\harvardyearright , `Efficient likelihood
+  estimation in state space models', {\em Annals of Statistics} {\bf
+  34}(4),~2026--2068.
+\newline\harvardurl{http://arxiv.org/abs/math/0611376}
+
 \harvarditem{Ghahramani \harvardand\ Hinton}{2000}{GhahramaniHinton2000}
 Ghahramani, Z. \harvardand\ Hinton, G.~E.  \harvardyearleft
   2000\harvardyearright , `Variational learning for switching state-space
   models', {\em Neural computation} {\bf 12}(4),~831--864.
 
+\harvarditem{Hamilton}{2011}{Hamilton2011}
+Hamilton, J.  \harvardyearleft 2011\harvardyearright , `Calling recessions in
+  real time', {\em International Journal of Forecasting} {\bf 27},~1006--126.
+
+\harvarditem{Harvey}{1990}{Harvey1990}
+Harvey, A.~C.  \harvardyearleft 1990\harvardyearright , {\em Forecasting,
+  structural time series models and the Kalman filter}, Cambridge University
+  Press.
+
+\harvarditem{Kalman}{1960}{Kalman1960}
+Kalman, R.~E.  \harvardyearleft 1960\harvardyearright , `A new approach to
+  linear filtering and prediction problems', {\em Journal of Basic Engineering}
+  {\bf 82}(1),~35--45.
+
+\harvarditem{Kim}{1994}{Kim1994}
+Kim, C.-J.  \harvardyearleft 1994\harvardyearright , `Dynamic linear models
+  with markov-switching', {\em Journal of Econometrics} {\bf 60}(1-2),~1--22.
+
+\harvarditem{Kim \harvardand\ Nelson}{1998}{KimNelson1998}
+Kim, C. \harvardand\ Nelson, C.  \harvardyearleft 1998\harvardyearright ,
+  `Business cycle turning points, a new coincident index, and tests of duration
+  dependence based on a dynamic factor model with regime switching', {\em
+  Review of Economics and Statistics} {\bf 80}(2),~188--201.
+
+\harvarditem{Kitagawa}{1987}{Kitagawa1987}
+Kitagawa, G.  \harvardyearleft 1987\harvardyearright , `Non-{G}aussian
+  state-space modeling of nonstationary time series', {\em Journal of the
+  American Statistical Association} pp.~1032--1041.
+
+\harvarditem{Kitagawa}{1996}{Kitagawa1996}
+Kitagawa, G.  \harvardyearleft 1996\harvardyearright , `{Monte C}arlo filter
+  and smoother for non-{G}aussian nonlinear state space models', {\em Journal
+  of Computational and Graphical Statistics} pp.~1--25.
+
+\harvarditem[Koyama et~al.]{Koyama, P{\'e}rez-Bolde, Shalizi \harvardand\
+  Kass}{2010}{KoyamaPerez-Bolde2010}
+Koyama, S., P{\'e}rez-Bolde, L.~C., Shalizi, C.~R. \harvardand\ Kass, R.~E.
+  \harvardyearleft 2010\harvardyearright , `Approximate methods for state-space
+  models', {\em Journal of the American Statistical Association} {\bf
+  105}(489),~170--180.
+
 \harvarditem{McDonald}{2016}{McDonald2016}
 McDonald, D.~J.  \harvardyearleft 2016\harvardyearright , `Clustering classical
   music performances', in preparation.
 
-\harvarditem{Raphael}{2002}{Raphael2002}
-Raphael, C.  \harvardyearleft 2002\harvardyearright , `A hybrid graphical model
-  for rhythmic parsing', {\em Artificial Intelligence} {\bf 137}(1),~217--238.
+\harvarditem[Patterson et~al.]{Patterson, Thomas, Wilcox, Ovaskainen
+  \harvardand\ Matthiopoulos}{2008}{PattersonThomas2008}
+Patterson, T.~A., Thomas, L., Wilcox, C., Ovaskainen, O. \harvardand\
+  Matthiopoulos, J.  \harvardyearleft 2008\harvardyearright , `State--space
+  models of individual animal movement', {\em Trends in ecology \& evolution}
+  {\bf 23}(2),~87--94.
+
+\harvarditem[Rauch et~al.]{Rauch, Striebel \harvardand\
+  Tung}{1965}{RauchStriebel1965}
+Rauch, H.~E., Striebel, C. \harvardand\ Tung, F.  \harvardyearleft
+  1965\harvardyearright , `Maximum likelihood estimates of linear dynamic
+  systems', {\em AIAA journal} {\bf 3}(8),~1445--1450.
 
 \end{thebibliography}
