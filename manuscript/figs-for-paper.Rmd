@@ -35,6 +35,16 @@ library(dendextend)
 4. Similar performances (Rubinstein)
 5. Model issues
 
+# Short tempo
+
+```{r small-rubinstein-1961,out.width="5in", out.height="2in", fig.width=7.5,fig.height=3}
+ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
+  geom_line() + ylab('tempo (bpm)') + xlab('measure') +
+  scale_x_continuous(breaks=1:4*2, limits = c(1,9)) +
+  theme_minimal(base_family = 'Times') +
+  geom_hline(yintercept = 132, linetype='dashed')
+```
+
 # Comparing clusters
 
 ```{r clustering-processing}
@@ -147,7 +157,7 @@ plotStates <- function(performers, pars, tempos,
     facet_wrap(~performer, labeller = as_labeller(function(x) gsub('_',' ', x))) +
     theme(legend.position = 'none', legend.title = element_blank())+
     ylab('tempo (beats/minute)') + xlab('measure number') +
-    theme(strip.text = element_text(size=12, hjust=0,color = fivecolors[1]))
+    theme(strip.text = element_text(size=12, hjust=0,color = 'black'))
           #strip.background = element_rect(fill='grey90',linetype = 'blank'))
 }
 

@@ -51,7 +51,7 @@ fill=gray!25]
 % Bibliography
 
 
-\graphicspath{{gfx/}}
+\graphicspath{{gfx/},{figs-for-paper_files/figure-latex/}}
 %\renewcommand{\includegraphics}[2][]{}
 
 % Number only ref'ed equations
@@ -755,10 +755,24 @@ metronome, although they may try quite hard to do so. The actual
 tempo is therefore best viewed as stochastic, the sum of an
 intentional, constant component, plus noise representing inaccuracy
 or, perhaps more charitably, unintentional variation which the
-listener fails to perceive as ``wrong''. For instance, the example in figure 5.3 is an
-excerpt with a single tempo marking, the solid lines represent a
-possible set of intended tempi, and the dotted lines are the actual
-tempi.
+listener fails to perceive as ``wrong''. For instance, the example in
+\autoref{fig:short-perf} shows the beginning of the piece as performed
+by Arthur Rubinstein in a 1961 recording. 
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
+  \caption{The solid line shows the observed note-by-note tempo for
+    the beginning of the Mazurka as performed by Arthur Rubinstein in
+    1961. The dashed line indicates 132 bpm.}
+  \label{fig:short-perf}
+\end{figure}
+The solid line shows the
+actual, performed tempo, while the dashed horizontal line is placed at
+the indicated tempo of 132 bpm. The figure has three important
+lessons: (1) actual tempo varies around intended tempo; (2) 132 bpm is
+not necessarily the tempo a performer will choose despite the
+indication; and (3) performers have other tempo intentions which are
+not marked, like the pronounced slow-down in measures 
 
 Estimating intended tempi does not seem to be very difficult at the
 first glance. If the boundaries of the tempo changes are known, then
