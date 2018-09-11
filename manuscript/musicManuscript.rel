@@ -19,21 +19,21 @@
 
 (bof "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex")
 
-(toc "toc" "    1 Introduction" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "1" "\\section{Introduction}" 4776)
+(toc "toc" "    1 Introduction" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "1" "\\section{Introduction}" 4798)
 
 ("sec:introduction" "s" "\\attn{See \\href {http://amstat.tfjournals.com/asa-style-guide/}{here} for the style guide (detailed)" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
 ("fig:music" "f" "The tempo (beats/minute) of a 2003 recording attributed to Joyce Hatto." "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
-(toc "toc" "      1.1 Related work" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "1.1" "\\subsection{Related work}" 10695)
+(toc "toc" "      1.1 Related work" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "1.1" "\\subsection{Related work}" 10717)
 
-(toc "toc" "    2 Materials and methods" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "2" "\\section{Materials and methods}" 20180)
+(toc "toc" "    2 Materials and methods" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "2" "\\section{Materials and methods}" 20202)
 
-(toc "toc" "      2.1 Data and preprocessing" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.1" "\\subsection{Data and preprocessing}" 20216)
+(toc "toc" "      2.1 Data and preprocessing" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.1" "\\subsection{Data and preprocessing}" 20238)
 
-(toc "toc" "      2.2 Switching state-space models" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.2" "\\subsection{Switching state-space models}" 20253)
+(toc "toc" "      2.2 Switching state-space models" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.2" "\\subsection{Switching state-space models}" 20275)
 
-("eq:ssmod" "e" "y_t &= f_\\theta(x_t,\\epsilon_t) & x_{t+1} &= g_\\theta(x_{t},\\eta_t) & x_1 &\\sim F, " "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
+("eq:ssmod" "e" "\\begin{aligned} y_t &= f_\\theta(x_t,\\epsilon_t) & x_{t+1} &= g_\\theta(x_{t},\\eta_t) & x_1 &\\sim F, " "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
 ("fig:ssmod" "f" "State-space model. Filled objects are observed, circles indicate that both hidden and observed state" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
@@ -45,7 +45,7 @@
 
 ("fig:switchss" "f" "Switching state space model. Filled objects are observed, rectangles are discrete, and circles are c" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
-(toc "toc" "      2.3 A model for tempo decisions" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.3" "\\subsection{A model for tempo decisions}" 31771)
+(toc "toc" "      2.3 A model for tempo decisions" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.3" "\\subsection{A model for tempo decisions}" 31665)
 
 ("fig:tempo-markings" "f" "The beginning of two Chopin piano compositions: the Mazurka we analyze is on the left while the Ball" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
@@ -55,15 +55,23 @@
 
 ("tab:parmats" "t" "Parameter matrices of the switching state space model." "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
-(toc "toc" "      2.4 Penalized likelihood maximization" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.4" "\\subsection{Penalized likelihood maximization}" 39803)
+(toc "toc" "      2.4 Penalized likelihood maximization" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.4" "\\subsection{Penalized likelihood maximization}" 41804)
 
-(toc "toc" "      2.5 Computational issues" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.5" "\\subsection{Computational issues}" 39851)
+("sec:penal-likel-maxim" "s" "\\subsection{Computational issues} The problem with estimating a model like this is that, because the" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
+
+(toc "toc" "      2.5 Computational issues" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 3 "2.5" "\\subsection{Computational issues}" 41882)
+
+("sec:computational-issues" "s" "The problem with estimating a model like this is that, because the switch states and the continuous " "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil "")
 
 ("alg:beamsearch" "s" "\\begin{algorithmic}[1] \\STATE {\\bfseries Input:} Initial parameters of the matrices. Integer beam wi" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil)
 
-(toc "toc" "    3 Analysis of Chopin's Mazurka Op.\\ 68 No.\\ 3" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "3" "\\section{Analysis of Chopin's Mazurka Op.\\ 68 No.\\ 3}" 42014)
+(toc "toc" "    3 Analysis of Chopin's Mazurka Op.\\ 68 No.\\ 3" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "3" "\\section{Analysis of Chopin's Mazurka Op.\\ 68 No.\\ 3}" 44078)
 
-(toc "toc" "    4 Discussion" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "4" "\\section{Discussion}" 42069)
+("sec:analys-chop-mazurka" "s" "\\section{Discussion}  \\bigskip \\begin{center} {\\large\\bf SUPPLEMENTARY MATERIAL} " "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil "")
+
+(toc "toc" "    4 Discussion" "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil 2 "4" "\\section{Discussion}" 44165)
+
+("sec:discussion" "s" "\\bigskip \\begin{center} {\\large\\bf SUPPLEMENTARY MATERIAL} " "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex" nil "")
 
 (eof "/Users/danielmcdonald/Documents/Work/Manuscripts/Chopin Mazurka/dpf/manuscript/musicManuscript.tex")
 ))

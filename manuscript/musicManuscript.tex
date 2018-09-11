@@ -47,6 +47,8 @@
 fill=gray!25]  
 \tikzstyle{switch}=[rectangle,thick, minimum size=1cm, draw=black]
 
+\usepackage{wasysym}
+
 
 % Bibliography
 
@@ -447,19 +449,22 @@ observation equation (the conditional probability of observations
 given the states),
 the state transition equation (specifying the nature of Markovian
 dynamics), and an initial distribution for the state: 
-\begin{align}
-  y_t &= f_\theta(x_t,\epsilon_t) &
-  x_{t+1} &= g_\theta(x_{t},\eta_t) &
-  x_1 &\sim F,\label{eq:ssmod}
-\end{align}
-where $\epsilon_t$ are $\eta_t$ are marginally independent and
+\begin{equation}
+\begin{aligned}
+  y_i &= f_\theta(x_i,\epsilon_i) &
+  x_{i+1} &= g_\theta(x_i,\eta_i) &
+  x_1 &\sim F,
+\end{aligned}
+\label{eq:ssmod}
+\end{equation}
+where $\epsilon_i$ are $\eta_i$ are marginally independent and
 identically distributed (IID) as well as mutually independent. Both
-$y_t$ and $x_t$ can be (generally) vector-valued, though in our
-application, $y_t$ will be univariate. The
-vector $\{y_t\}_{t=1}^n$ is observed, and the goal is to make
-inferences for the unobserved states $\{x_t\}_{t=1}^T$ as well as any
+$y_i$ and $x_i$ can be (generally) vector-valued, though in our
+application, $y_i$ will be univariate. The
+vector $\{y_i\}_{i=1}^n$ is observed, and the goal is to make
+inferences for the unobserved states $\{x_i\}_{i=1}^n$ as well as any
 unknown parameters $\theta$ characterizing $f_\theta$, $g_\theta$, and
-the distributions of $\epsilon_t$ and $\eta_t$.  \autoref{fig:ssmod}
+the distributions of $\epsilon_i$ and $\eta_i$.  \autoref{fig:ssmod}
 shows a directed acyclic graph for the dependence structure in the
 typical state-space model.
 
@@ -473,16 +478,16 @@ typical state-space model.
     \matrix[row sep=1cm,column sep=1cm] {
       % first line: hidden continuous state
       \node (x_k-2) {$\cdots$}; \&
-      \node (x_k-1) [state] {$\mathbf{x}_{t-1}$}; \&
-      \node (x_k)   [state] {$\mathbf{x}_t$};     \&
-      \node (x_k+1) [state] {$\mathbf{x}_{t+1}$}; \&
+      \node (x_k-1) [state] {$\mathbf{x}_{i-1}$}; \&
+      \node (x_k)   [state] {$\mathbf{x}_i$};     \&
+      \node (x_k+1) [state] {$\mathbf{x}_{i+1}$}; \&
       \node (x_k+2) {$\cdots$};
       \\
       % Second line: Measurement
       \node (y_k-2) {$\cdots$}; \&        
-      \node (y_k-1) [measurement] {$\mathbf{y}_{t-1}$}; \&
-      \node (y_k)   [measurement] {$\mathbf{y}_t$};     \&
-      \node (y_k+1) [measurement] {$\mathbf{y}_{t+1}$}; \&
+      \node (y_k-1) [measurement] {$\mathbf{y}_{i-1}$}; \&
+      \node (y_k)   [measurement] {$\mathbf{y}_i$};     \&
+      \node (y_k+1) [measurement] {$\mathbf{y}_{i+1}$}; \&
       \node (y_k+2) {$\cdots$};
       \\
     };
@@ -501,20 +506,20 @@ typical state-space model.
     continuous.\label{fig:ssmod}} 
 \end{figure}
 
-In the case where $f_\theta$ and $g_\theta$ are linear with $\epsilon_t$ and
-$\eta_t$ normally distributed, \eqref{eq:ssmod} specializes to
+In the case where $f_\theta$ and $g_\theta$ are linear with $\epsilon_i$ and
+$\eta_i$ normally distributed, \eqref{eq:ssmod} specializes to
 \begin{equation}
   \begin{aligned}
-    x_{t}&= d+T x_t + R\eta_{t}, 
-    & \eta_t &\sim N(0,\ Q),     
+    x_{i}&= d+T x_i + R\eta_{i}, 
+    & \eta_i &\sim N(0,\ Q),     
     &x_1 &\sim N(x_0,\ P_0).\\
-    y_t&= c + Z x_t + \epsilon_t,     
-    & \epsilon_t &\sim N(0,\ G) \\
+    y_i&= c + Z x_i + \epsilon_i,     
+    & \epsilon_i &\sim N(0,\ G) \\
   \end{aligned}
   \label{eq:lgmod}
 \end{equation}
 where the matrices $d,\ T,\ R,\ c,\ Z,$ and $G$ are allowed to depend
-on $\theta$ and can potentially vary (deterministically) with $t$. In this case,
+on $\theta$ and can potentially vary (deterministically) with $i$. In this case,
 the Kalman filter, \autoref{alg:kalman} \citep[see e.g.][]{Kalman1960,Harvey1990},
 can be used to derive closed form 
 solutions for the conditional
@@ -522,31 +527,31 @@ distributions of the states and to calculate the likelihood of $\theta$
 given data. 
 \begin{algorithm}[t!]
   \begin{singlespace}
-  \caption{Kalman filter: estimate $x_t$ conditional on
-    $\{y_j\}_{j=1}^t$, for all $t=1,\ldots,n$ and calculate the log likelihood
+  \caption{Kalman filter: estimate $x_i$ conditional on
+    $\{y_j\}_{j=1}^i$, for all $i=1,\ldots,n$ and calculate the log likelihood
     for $\theta$\label{alg:kalman}}
   \begin{algorithmic}
     \STATE {\bf Input:} $Y$, $x_0$, $P_0$, $d,\ T,\ R,\ c,\ Z,$ and $G$
     \STATE $\ell(\theta) \leftarrow 0$ \COMMENT{Initialize the log-likelihood}
-    \FOR{$t=1$ to  $n$}
+    \FOR{$i=1$ to  $n$}
     \STATE $H = RQR'$ \COMMENT{Effective state variance}
-    \STATE $\begin{aligned}\varx_{t}
-      &\leftarrow d + T x_{t-1|t-1}, & P_{t} &\leftarrow H + T P_{t-1|t-1}
+    \STATE $\begin{aligned}\varx_{i}
+      &\leftarrow d + T x_{i-1|i-1}, & P_i &\leftarrow H + T P_{i-1|i-1}
       T'\end{aligned}$ \COMMENT{Predict current state}
-    \STATE $\begin{aligned}\widetilde{y}_{t}
-      &\leftarrow c + Z \varx_{t}, & F_{t} &\leftarrow G + Z P_{t}
+    \STATE $\begin{aligned}\widetilde{y}_i
+      &\leftarrow c + Z \varx_i, & F_i &\leftarrow G + Z P_i
       Z'\end{aligned}$ \COMMENT{Predict current observation}
-    \STATE $\begin{aligned}v_{t}&\leftarrow y_t-\widetilde{y}_t& K_t&
-      \leftarrow P_t Z' F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
+    \STATE $\begin{aligned}v_i&\leftarrow y_i-\widetilde{y}_i& K_i&
+      \leftarrow P_i Z' F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
     Kalman gain}
-    \STATE $\begin{aligned} x_{t|t}
-      &\leftarrow \varx_t + K_t v_t, & P_{t|t} &\leftarrow P_t - P_tZ'
-      K_t\end{aligned}$ \COMMENT{Update}
-    \STATE $\ell(\theta) = \ell(\theta) -v_t'F^{-1}v_t - \log(|F_t|)$
+    \STATE $\begin{aligned} x_{i|i}
+      &\leftarrow \varx_i + K_i v_i, & P_{i|i} &\leftarrow P_i - P_iZ'
+      K_i\end{aligned}$ \COMMENT{Update}
+    \STATE $\ell(\theta) = \ell(\theta) -v_i'F^{-1}v_i - \log(|F_i|)$
     \ENDFOR
-    \RETURN $\widetilde{Y}=\{\widetilde{y}_t\}_{t=1}^n,\ \varx=\{\varx_t\}_{t=1}^n,\
-    \widetilde{X}=\{x_{t|t}\}_{t=1}^n,\ P=\{P_t\}_{t=1}^n,\
-    \widetilde{P}=\{P_{t|t}\}_{t=1}^n,\ \ell(\theta)$
+    \RETURN $\widetilde{Y}=\{\widetilde{y}_i\}_{i=1}^n,\ \varx=\{\varx_i\}_{i=1}^n,\
+    \widetilde{X}=\{x_{i|i}\}_{i=1}^n,\ P=\{P_i\}_{i=1}^n,\
+    \widetilde{P}=\{P_{i|i}\}_{i=1}^n,\ \ell(\theta)$
   \end{algorithmic}
 \end{singlespace}
 \end{algorithm}
@@ -560,10 +565,10 @@ given data.
 % and~\citet{DejongDharmarajan2009a} for improvements).
 
 While \autoref{alg:kalman} returns the likelihood for $\theta$, 
-$\varx_t$ and $P_t$ represent the mean and variance of the conditional distribution
+$\varx_i$ and $P_i$ represent the mean and variance of the conditional distribution
 of the unobserved component given only the observations
-$\{y_j\}_{j=1}^t$: $\varx_t=\Expect{x_t\given y_1\ldots,y_t}$ and
-$P_t=\Var{x_t\given y_1,\ldots,y_t}$. To
+$\{y_j\}_{j=1}^i$: $\varx_i=\Expect{x_i\given y_1\ldots,y_i}$ and
+$P_i=\Var{x_i\given y_1,\ldots,y_i}$. To
 incorporate all future observations into these estimates, the Kalman
 smoother is required.
 \begin{algorithm}[t!]
@@ -576,14 +581,14 @@ smoother is required.
     \STATE $t=n$,
     \STATE $\hat{x}_{n}\leftarrow \widetilde{x}_n$, 
     \WHILE{$t>1$}
-    \STATE $\hat{y}_{t} \leftarrow c + Z\hat{x}_t,$
+    \STATE $\hat{y}_i \leftarrow c + Z\hat{x}_i,$
     \COMMENT{Predict observation vector}
-    \STATE $\begin{aligned} e &\leftarrow \hat{x}_t -
-      \varx_t, & V &\leftarrow P_t^{-1}\end{aligned}$,
-    \STATE $t\leftarrow t-1$, \COMMENT{Increment}
-    \STATE $\hat{x}_t = \widetilde{x}_t + \widetilde{P}_t T Ve $ 
+    \STATE $\begin{aligned} e &\leftarrow \hat{x}_i -
+      \varx_i, & V &\leftarrow P_i^{-1}\end{aligned}$,
+    \STATE $t\leftarrow i-1$, \COMMENT{Increment}
+    \STATE $\hat{x}_i = \widetilde{x}_i + \widetilde{P}_i T Ve $ 
     \ENDWHILE
-    \RETURN $\widehat{Y}=\{\hat{y}_t\}_{t=1}^n, \hat{X}=\{\hat{x}_t\}_{t=1}^n$
+    \RETURN $\widehat{Y}=\{\hat{y}_i\}_{i=1}^n, \hat{X}=\{\hat{x}_i\}_{i=1}^n$
   \end{algorithmic}
 \end{singlespace}
 \end{algorithm}
@@ -592,7 +597,7 @@ applications. \autoref{alg:kalman-smoother}, due
 to~\citet{RauchStriebel1965}, is often referred to as the classical
 fixed-interval smoother~\citep{AndersonMoore1979}. It produces only
 the unconditional expectations of the hidden state
-$\hat{x}_t=\Expect{x_t\given y_1,\ldots,y_n}$ for the sake of
+$\hat{x}_i=\Expect{x_i\given y_1,\ldots,y_n}$ for the sake of
 computational speed. This version is more appropriate for inference in
 the type of switching models we discuss below.
 
@@ -615,39 +620,36 @@ when the times of discontinuity are unknown.
 To remedy this deficiency, one can use a switching state-space
 model as shown in \autoref{fig:switchss}. Here, we assume $S$ is a
 hidden, discrete process with Markovian dynamics. Then, the value of
-the hidden state at time $t$, $s_t=k$ say, can determine the evolution of
+the hidden state at time $t$, $s_i=k$ say, can determine the evolution of
 the continuous model at time $t$. The graphical model in
 \autoref{fig:switchss} gives the conditional independence properties
 we will use in our model for musical interpretation, but this
 represents just one of many possibilities. Switching state-space models have a long
-history with many applications in 
+history with many applications from
 economics~\citep{KimNelson1998,Kim1994,Hamilton2011} to speech
 processing~\citep{FoxSudderth2011} to animal
 movement~\citep{PattersonThomas2008,BlockJonsen2011}. An excellent
 overview of the history, typography, and algorithmic developments can
 be found in~\citep{GhahramaniHinton2000}. In \eqref{eq:lgmod}, the
 parameter matrices were not time varying. In our switching model, we
-allow the switch states $s_t, s_{t-1}$, along with the parameter
+allow the switch states $s_i, s_{i-1}$, along with the parameter
 vector $\theta$, to determine the specific dynamics at time $t$:
 \begin{equation}
   \begin{aligned}
     x_1 &\sim N(x_0,\ P_0),\\
-    x_{t+1}&= d(s_{t},s_{t-1})+T(s_{t},s_{t-1}) x_t +
-    R(s_{t},s_{t-1})\eta_{t}, 
-    & \eta_t &\sim N(0,Q(s_{t},s_{t-1})),\\
-    y_t&= c(s_t) + Z(s_t) x_t + \epsilon_t, & \epsilon_t &\sim N(0, G(s_t)).
+    x_{i+1}&= d(s_i,s_{i-1})+T(s_i,s_{i-1}) x_i +
+    R(s_i,s_{i-1})\eta_i, 
+    & \eta_i &\sim N(0,Q(s_i,s_{i-1})),\\
+    y_i&= c(s_i) + Z(s_i) x_i + \epsilon_i, & \epsilon_i &\sim N(0, G(s_i)).
   \end{aligned}
 \end{equation}
-In other words, the hidden markov (switch) state determines which parameter
+In other words, the hidden Markov (switch) state determines which parameter
 matrices govern the evolution of the system. 
 
 
 
 
 
-follows a hidden Markov model on
-four states, denoted $S_1,\ldots,S_4$ with transition probability
-diagram given by \autoref{fig:transmat}.
 
 \begin{figure}
   \centering
@@ -656,23 +658,23 @@ diagram given by \autoref{fig:transmat}.
     \matrix[row sep=1cm,column sep=1cm] {
       % First line: Switch state
       \node (s_k-2)  {$\cdots$}; \&
-      \node (s_k-1) [switch]{$s_{t-1}$}; \&
-      \node (s_k)   [switch]{$s_t$};     \&
-      \node (s_k+1) [switch]{$s_{t+1}$}; \&
+      \node (s_k-1) [switch]{$s_{i-1}$}; \&
+      \node (s_k)   [switch]{$s_i$};     \&
+      \node (s_k+1) [switch]{$s_{i+1}$}; \&
       \node (s_k+2) {$\cdots$};
       \\
       % Second line: hidden continuous state
       \node (x_k-2) {$\cdots$}; \&
-      \node (x_k-1) [state] {$\mathbf{x}_{t-1}$}; \&
-      \node (x_k)   [state] {$\mathbf{x}_t$};     \&
-      \node (x_k+1) [state] {$\mathbf{x}_{t+1}$}; \&
+      \node (x_k-1) [state] {$\mathbf{x}_{i-1}$}; \&
+      \node (x_k)   [state] {$\mathbf{x}_i$};     \&
+      \node (x_k+1) [state] {$\mathbf{x}_{i+1}$}; \&
       \node (x_k+2) {$\cdots$};
       \\
       % Third line: Measurement
       \node (y_k-2) {$\cdots$}; \&        
-      \node (y_k-1) [measurement] {$\mathbf{y}_{t-1}$}; \&
-      \node (y_k)   [measurement] {$\mathbf{y}_t$};     \&
-      \node (y_k+1) [measurement] {$\mathbf{y}_{t+1}$}; \&
+      \node (y_k-1) [measurement] {$\mathbf{y}_{i-1}$}; \&
+      \node (y_k)   [measurement] {$\mathbf{y}_i$};     \&
+      \node (y_k+1) [measurement] {$\mathbf{y}_{i+1}$}; \&
       \node (y_k+2) {$\cdots$};
       \\
     };
@@ -738,14 +740,15 @@ marking as well as the Italian phrase {\em Allegro ma non troppo}
 (``cheerful, but not too much''). The beginning of the Ballade is simply
 marked {\em Largo}, which translates literally as ``broad'' or
 ``wide''. Obviously, the metronome markings are much more exact,
-though even these are often viewed as approximations rather than
+though even these are often viewed as suggestions rather than
 commandments. The metronome markings in most of Beethoven's
 compositions, for example, are notoriously fast, and some scholars
 believe that his metronome (one of the first ever made) was
 inaccurate. Often, compositions will have numerous such markings later
 in the piece of music, but these are only some of the ways that tempo
-is indicated. Composers will also indicate periods of speeding-up or
-slowing-down.
+is indicated. Composers will also indicate periods of speeding-up
+(\emph{accelerando}) or
+slowing-down (\emph{ritardando}).
 
 Absent instructions from the composer, performers generally maintain
 (or try to maintain) a steady tempo, and this assumption plays a major
@@ -772,26 +775,27 @@ the indicated tempo of 132 bpm. The figure has three important
 lessons: (1) actual tempo varies around intended tempo; (2) 132 bpm is
 not necessarily the tempo a performer will choose despite the
 indication; and (3) performers have other tempo intentions which are
-not marked, like the pronounced slow-down in measures 
+not marked, like the pronounced slow-down in measures 7--8.
 
-Estimating intended tempi does not seem to be very difficult at the
-first glance. If the boundaries of the tempo changes are known, then
-the average of tempi between boundaries would be a good estimate as
-could the “slope” derived though linear regression. But when the
-boundaries of the tempo changes are unknown, the problem becomes much
-more complicated than something solvable by regression. So we would
-like to use a switching model.
+Estimating intended {\em tempi} would be reasonably simple, perhaps, 
+if the locations of the tempo changes were known. In such a case,
+the average of tempi between changes may be a good estimate as
+could the slope of known speed-ups or slow-downs. However, performers
+take liberties with these decisions, exactly the liberties we would
+like to discover. This suggests employing a switching model with a
+small number of discrete states.
 
-
-
-\begin{figure}[h!]
+We use a model for $S$ on four states
+with transition probability
+diagram given by \autoref{fig:transmat}.
+\begin{figure}[tb!]
   \centering
   \tikzstyle{switch}=[rectangle,
   thick, minimum size=1cm, draw=black]
   \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
      \matrix[row sep=0.5cm,column sep=0.5cm] {
-       \node (S1) [switch] {$S_1$}; & \node (S2) [switch] {$S_2$}; \\
-       \node (S4) [switch] {$S_4$}; & \node (S3) [switch] {$S_3$}; \\
+       \node (S1) [switch] {$1$}; & \node (S2) [switch] {$2$}; \\
+       \node (S4) [switch] {$4$}; & \node (S3) [switch] {$3$}; \\
      };
      \path[->]
      (S1) edge [bend right] (S4)
@@ -805,17 +809,46 @@ like to use a switching model.
   \end{tikzpicture}
   \caption{Transition diagram. \label{fig:transmat}}
 \end{figure}
-
-
-
 The 4 switch states correspond to 4 different behaviors for the
 performer: (1) constant tempo, (2) speeding up, (3) slowing down, and
-(4) single note stress. The hidden continuous variable ($x_t$) is
+(4) single note stress. As shown in the diagram, we only allow certain
+transitions for musical reasons and for estimability. The fourth
+state, stress, corresponds to {\em tenuto}, a common feature of
+musical performance. Such stresses may be marked with a line over the
+note in question, but are more often a feature of the performer taste,
+corresponding to a longer-than-written duration of a particular
+note. Such emphases occur for a variety of musical purposes---emphasis
+of the beat in running notes\footnote{\attn{should the amount mean of stress be
+  proportional to prevailing tempo, notated duration?}}, the top of a
+phrase, a ``landing point'' where a phrase ends, etc.---but are always
+within the frame of constant tempo. Thus we allow stress to occur only
+after and before notes in state 1. Furthermore, we cannot allow
+state 2 to return immediately to state 1, or else ``stress'' could
+happen through this pathway. Thus, the entire transition diagram is
+fully determined. We discuss some potential improvements at the end
+of~\autoref{sec:analys-chop-mazurka}. 
+
+
+Our data gives $y_i$ as the observed tempo (in bpm) of the note (or
+chord) of the $i^{th}$ note onset in Chopin's Mazurka Op.\ No.\ 3. The
+hidden continuous variable ($X_i$) is 
 taken to be a two component vector with the first component being the
-``ideal'' tempo and the second being the acceleration. 
+prevailing tempo and the second the amount of acceleration. The amount, or
+existence, of acceleration is determined by the current and previous
+switch states. We use $l_i$ to denote the musical duration of
+a particular note as given by the written score, so, throughout this piece, a quarter-note (\quarternote) has $l_i=1/3$, an
+eighth note (\eighthnote) has $l_i=1/6$, etc. This is because each
+measure contains three quarter notes. In more complicated
+music with changing time signatures or instances where the notation
+doesn't necessarily correspond with the time signature, more care
+would be required. The observed tempo is already normalized to account
+for variable note durations. When the performer is in state 1 (or
+transits in and out of state 4), we take the prevailing tempo as
+constant with no acceleration: $X_{i+1} = X_i$. 
+
+
 Corresponding to these configurations, the parameter
 matrices are given in \autoref{tab:parmats}
-
 \begin{table}[h!]
 \centering
 \begin{tabular}[h!]{cc|ccc}
@@ -824,26 +857,26 @@ matrices are given in \autoref{tab:parmats}
   \hline
   \multicolumn{2}{c|}{Switch states} & \multicolumn{3}{c}{Parameter
                                       matrices}\\
-  $s_{t}$ & $s_{t-1}$ & $d$ & $T$ & $R$ \\
+  $s_i$ & $s_{i-1}$ & $d$ & $T$ & $R$ \\
   \hline
   $S_1$ &  $S_1$ & 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
                  & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
-  $S_2$ & $S_1$ & $\begin{pmatrix} l_t\tau_t\\ \tau_t\end{pmatrix}$ 
+  $S_2$ & $S_1$ & $\begin{pmatrix} l_i\tau_i\\ \tau_i\end{pmatrix}$ 
                                     & $\begin{pmatrix} 1 & 0 \\ 0 &
                                       0 \end{pmatrix}$ 
-          & $\begin{pmatrix} 1 & l_t\\ 0 & 1 \end{pmatrix}$\\
-  $S_4$ & $S_1$ & $\begin{pmatrix}0\\\varphi_t\end{pmatrix}$ 
+          & $\begin{pmatrix} 1 & l_i\\ 0 & 1 \end{pmatrix}$\\
+  $S_4$ & $S_1$ & $\begin{pmatrix}0\\\varphi_i\end{pmatrix}$ 
                                      & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$
           & $\begin{pmatrix}1&0\\0&1\end{pmatrix}$\\
-  $S_2$ & $S_2$ & 0 & $\begin{pmatrix} 1 & l_t \\ 0 & 1 \end{pmatrix}$ 
+  $S_2$ & $S_2$ & 0 & $\begin{pmatrix} 1 & l_i \\ 0 & 1 \end{pmatrix}$ 
         & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
-  $S_3$ & $S_2$ & $\begin{pmatrix} -l_t\tau_t\\ -\tau_t\end{pmatrix}$ 
+  $S_3$ & $S_2$ & $\begin{pmatrix} -l_i\tau_i\\ -\tau_i\end{pmatrix}$ 
                                     & $\begin{pmatrix} 1 & 0 \\ 0 &
                                       0 \end{pmatrix}$ 
-          & $\begin{pmatrix} 1 & l_t\\ 0 & 1 \end{pmatrix}$\\
-  $S_1$ & $S_3$ & $\begin{pmatrix} \mu_t\\0\end{pmatrix}$ & 0
+          & $\begin{pmatrix} 1 & l_i\\ 0 & 1 \end{pmatrix}$\\
+  $S_1$ & $S_3$ & $\begin{pmatrix} \mu_i\\0\end{pmatrix}$ & 0
           & $\begin{pmatrix} 1 & 0\\ 0 & 0 \end{pmatrix}$\\
-  $S_3$ & $S_3$ & 0& $\begin{pmatrix} 1 & l_t \\ 0 & 1 \end{pmatrix}$ 
+  $S_3$ & $S_3$ & 0& $\begin{pmatrix} 1 & l_i \\ 0 & 1 \end{pmatrix}$ 
         & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
   $S_1$ &  $S_4$ & 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
         & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
@@ -852,7 +885,7 @@ matrices are given in \autoref{tab:parmats}
   \hline
   \multicolumn{2}{c|}{Switch states} & \multicolumn{3}{c}{Parameter
                                       matrices}\\
-  $s_t$ && $c$ & $Z$ & $G$\\
+  $s_i$ && $c$ & $Z$ & $G$\\
   \hline
   $S_4$ & & 0 & $\begin{pmatrix} 1 & 1 \end{pmatrix}$ &
                                                                   $\sigma^2_\epsilon$\\
@@ -865,9 +898,9 @@ matrices are given in \autoref{tab:parmats}
 Finally, 
 \[
 Q=\begin{cases}\begin{pmatrix} \sigma^2_1 &
-    0\\0&\sigma^2_4\end{pmatrix} & (s_t,\ s_{t-1})=(S_4,\ S_1)\\
+    0\\0&\sigma^2_4\end{pmatrix} & (s_i,\ s_{i-1})=(S_4,\ S_1)\\
                 \begin{pmatrix} \sigma^2_3 &
-                        0\\0&\sigma^2_4\end{pmatrix} & (s_t,\ s_{t-1})=(S_1,\ S_3)\\
+                        0\\0&\sigma^2_4\end{pmatrix} & (s_i,\ s_{i-1})=(S_1,\ S_3)\\
 \begin{pmatrix} \sigma^2_1 &
     0\\0&\sigma^2_2\end{pmatrix} & \textrm{else}.
 \end{cases}
@@ -890,8 +923,10 @@ Importantly, this is just one way to write this
 model.
 
 \subsection{Penalized likelihood maximization}
+\label{sec:penal-likel-maxim}
 
 \subsection{Computational issues}
+\label{sec:computational-issues}
 
 The problem with estimating a model like this is that, because the
 switch states and the continuous states are both hidden, this becomes
@@ -939,8 +974,10 @@ previous state. For this reason, the code uses 16 states rather than
 
 
 \section{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}
+\label{sec:analys-chop-mazurka}
 
 \section{Discussion}
+\label{sec:discussion}
 
 
 
