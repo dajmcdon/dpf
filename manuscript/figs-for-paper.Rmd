@@ -10,7 +10,7 @@ library(dpf)
 library(knitr)
 library(tidyr)
 library(splines)
-opts_chunk$set(message=FALSE, warning=FALSE,cache=TRUE,
+opts_chunk$set(message=FALSE, warning=FALSE,cache=FALSE,
                out.width ="6in",out.height="3in",
                fig.width = 6, fig.height = 3)
 library(ggplot2)
@@ -18,6 +18,9 @@ library(gplots)
 library(magrittr)
 library(heatmaply)
 load("mazurka2results.Rdata")
+row = rownames(pvec_ml)
+pvec_ml = data.frame(apply(pvec_ml, MARGIN = 2, scale), row.names = row)
+pvec_ml$sig1 = rep(0, nrow(pvec_ml))
 theme_set(theme_minimal(base_family="Times"))
 data(tempos)
 lt = diff(c(tempos$note.onset,61))
@@ -154,6 +157,8 @@ plotStates <- function(performers, pars, tempos,
 ```
 
 ```{r first-performance}
+remove(pvec_ml)
+load("mazurka2results.Rdata")
 perfs = c('Fliere_1977','Tomsic_1995')
 plotStates(perfs[1], pvec_ml, tempos)
 ```
