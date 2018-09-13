@@ -18,6 +18,7 @@
 {#1}\small\normalsize} \spacingset{1}
 % End JASA stuff --------------
 
+\usepackage{setspace}
 
 \usepackage[letterpaper=true,colorlinks=true,pdfpagemode=none,urlcolor=blue,linkcolor=blue,citecolor=blue,pdfstartview=FitH]{hyperref}
 \usepackage{amsmath,amsfonts,amssymb}
@@ -26,27 +27,31 @@
 \usepackage[round,sort&compress]{natbib}
 \usepackage{algorithm,algorithmic}
 \def\algorithmautorefname{Algorithm}
-
-
-\usepackage{pgf}
-\usepackage{tikz}
-\usetikzlibrary{fit,arrows,automata}					% fitting shapes to coordinates
-\usetikzlibrary{backgrounds}
-%\usepackage{autonum}
-
-
-% Bibliography
-
+\renewcommand{\algorithmiccomment}[1]{\hfill $\rhd$ #1}
 \renewcommand*{\figureautorefname}{Figure}%
 \renewcommand*{\tableautorefname}{Table}%
 \renewcommand*{\partautorefname}{Part}%
 \renewcommand*{\chapterautorefname}{Chapter}%
 \renewcommand*{\sectionautorefname}{Section}%
 \renewcommand*{\subsectionautorefname}{Section}%
-\renewcommand*{\subsubsectionautorefname}{Section}% 
+\renewcommand*{\subsubsectionautorefname}{Section}%
 
 
-%\graphicspath{{../PLS/plsPlotsv2/}}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{fit,arrows,automata}					% fitting shapes to coordinates
+\usetikzlibrary{backgrounds}
+\tikzstyle{state}=[circle,thick,minimum size=1.2cm, draw=black]
+% The (continuous) measurement vector is represented by an orange circle.
+\tikzstyle{measurement}=[circle,thick,minimum size=1.2cm,draw=black,
+fill=gray!25]  
+\tikzstyle{switch}=[rectangle,thick, minimum size=1cm, draw=black]
+
+
+% Bibliography
+
+
+\graphicspath{{gfx/},{figs-for-paper_files/figure-latex/}}
 %\renewcommand{\includegraphics}[2][]{}
 
 % Number only ref'ed equations
@@ -55,6 +60,15 @@
 
 \newcommand{\attn}[1]{\textcolor{red}{Note: #1}}
 \newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\renewcommand{\hat}{\widehat}
+% next three lines to give Kalman filter sample \varx_t=E[x_t|y_1,...,y_t]
+\usepackage{upgreek}
+\DeclareRobustCommand{\varx}{{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]{\protect\raisebox{\depth}{$#1\upchi$}}
+\newcommand{\given}{\ \vert\ }
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Expect}[1]{\E\left[#1\right]}
+\newcommand{\Var}[1]{\mathbb{V}\left[#1\right]}
 
 \begin{document}
 
@@ -196,6 +210,7 @@ recording of Beethoven's Fifth Symphony or Herbert von Karajan's and
 to articulate why.
 
 
+
 Musical recordings are complex data files that describe the intensity and onset time
 for every keystroke made by the performer. Matching this data to a
 musical score, removing incorrect notes, anticipating note onsets for
@@ -238,8 +253,171 @@ without purposeful knot
 duplication. Interestingly, such musical analyses can help to compare
 performances---it was discovered in 2006 that this
 particular recording was actually made in 1988 by Eugen
-Indjic~\citep{CookSapp2009}. 
+%Indjic~\citep{CookSapp2009}. 
 
+\subsection{Related work}
+One of the biggest reasons for having an off-line score-to-MIDI
+alignment is to create data sets for quantitatively studying music
+performance, which is a research area that receives much attention. To
+name a few, N.P. Todd has a series of works on computational modeling
+of timing and dynamics [Tod85] [Tod89] [Tod92], B.H. Repp has a series
+of research efforts on comparing different performances of the same
+music from different performers [Rep90] [Rep92] [Rep95]. S. Flossmann
+and G. Widmer have a series of studies on machine learning and
+rendering expressive performances [WFG09] [FGG+10] [FW11] [FGW13]. We
+also have a series of studies on performance interpretation parsing
+[GR12] [GR13]. All of these studies need data sets of MIDI
+performances with ground truth. 
+
+The existing MIDI data sets with ground truth are limited and some are
+copy- righted [FGG+10]. Also, none of these data are create solely
+with a score-performance alignment program because automated
+score-performance often contain many errors [FW11]. Researchers need
+data sets to explore the alignment algorithms. But without a good
+alignment algorithm it is often very hard to create enough data sets. 
+
+Online alignment:
+As opposed to the off-line version, on-line alignment doesn’t have
+access to “future data”. It processes performance actions in real-time
+as they are acquired. This version of alignment is often referred to
+as score following. [OLS03] has an annotated bibliography detailing
+the works of score following. Some of the recent developments can be
+found at [RG09] [Con10] [NTS14].
+
+One of the most direct applications of score following is automatic
+music accom- paniment. Active research on this topic continued for
+over two decades since the simultaneous premier of the first two such
+systems at the ICMC in 1984 [Dan84] [Ver84]. These systems seek to
+provide a flexible accompaniment to a live soloist that follows
+expressive timing and other performance nuances exhibited by the
+soloist.
+ 
+While there are some impressive successes for monophonic instruments
+in highly challenging domains [OLS03] [Rap04], a reliable
+accompaniment system for classical piano concerto for acoustic piano
+signal still pose challenges due to the high polyphony nature of the
+music [SOS04]. Some variant of HMM is used in recent development of
+audio score following for piano. But such research still calls for
+further development [CC14]. 
+
+Frequency of errors in piano:
+Even with highly skilled pianists, these errors occur far more often
+than one may expect. There are studies in which the error rate could
+go up to 10\%, even for highly skilled pianists [FGG+10]. Section
+4.3.1 discusses the error rate in detail. 
+
+Expressive timing:
+Although most approaches in the literature mainly focus on using the
+pitch informa- tion while dealing with notes in chronological order
+[Dan84] [PL92] [BBZ93] [Lar93], it has been shown that the IOIs
+between note clusters can also be useful in solving the alignment
+problem [Van95] [GM11]. Expressive timing is the deviation of inter-
+onset intervals from the written score [PVdS93]. It is one of the most
+important contributions that musicians give to bring music to life.
+
+[Ros92b] conducted an experiment on rhythmic tolerance. He observed
+that the listeners are expecting the IOIs to be close to their nominal
+lengths using the tempo marking, and the IOIs with same nominal length
+have an asymmetric distribution. Based on these observations, [Van95]
+proposes an online alignment system that mainly uses timing
+information. In this system, several recent IOIs are stored to compute
+a local average tempo. If the next IOI falls within a range determined
+by the average tempo, the system makes a match. A pitch-matching
+algorithm is used only when a match cannot be found. Despite its
+simplicity, this system shows its robustness when incorrect pitches
+are played at the expected time. The author shows reasonable results
+without using much pitch information. This can be seen as a strong
+indication that the timing information could be useful in a
+score-alignment system. [GM11] adopted the idea of using a local tempo
+model in an off-line matching algorithm. In this multi-pass alignment
+algorithm, unexpected IOIs computed from the local tempo are used to
+identify inserted notes. 
+
+
+Modeling tempo:
+Although the efforts in music modeling using quantitative methods have
+been increas- ing over the past two decades [Tod89] [DH94] [WG04]
+[GW11] [GK14], there are still very few modeling assumption that can
+be translated into familiar musical meaning. For example, we may be
+able to get the loudness of every note played by a pianist, but it is
+different from the term dynamic used by musicians, which is often
+referred to as a loudness trend over a group of notes. Similarly, when
+musicians talk about tempo, they usually mean changes happening over a
+period of time rather than the something related to the time
+difference of two consecutive notes they played. 
+
+Utility of having a model:
+One of the most straightforward applications is performance
+visualization. Music is communicated through sound. From the hearing
+point of view, the information we have direct access to at any given
+time is very limited – the sound we are hearing at the moment, which
+derives its meaning from context. Thus, it is time consuming for us to
+“browse” a performance using our ears since we have to listen as the
+music plays. Visualization is a tool to transform the sound into an
+image so that we can utilize our eyes to explore information within a
+certain time period at once. It opens a whole new world to describe,
+analyze and compare music. Also, visualization is often an interesting
+and rewarding experience for musicians while reviewing their
+performances. It provides a very different perspective for musicians
+to see what they have done or compare side by side with other
+performance of the same music.
+
+Most music visualization research focuses on analyzing music structure
+such as pattern and repetition [LNS07] [PK08] [WB10]. These
+visualization systems research and identify the structure of
+music. They provide tools for listeners to navigate through music
+quickly. 
+
+In the area of creating music, musicians have a long standing interest
+in improving and creating performances that aim towards
+perfection. Before the appearance of recording, the only way to
+improve a performance is to play it again. If someone wants a perfect
+performance, it has to be played perfectly – from the first note to
+the last note. With the development of recording technology, it became
+possible to splice sections of performances together. If there is an
+unsatisfactory part in a recording, it can be replaced. Thus, a
+performance can be improved and perfected section by section. But the
+convenience comes with a price: it is often not easy to make the
+splicing inaudible. Subtle things such as the sound change caused by
+different humidity levels, the slight inconsistency of articulation,
+the different dynamics from different takes and the different tempo
+variation from different takes could affect the quality of
+splicing. Also, the whole work flow is very labor intensive and can
+only be done by trial and error. But to this day, splicing is still
+one of the most commonly used techniques for improving recordings of
+performances. 
+
+With the development of computer technology, there is a growing
+interest in gen- erating performances that can match the level of a
+trained musician. Most existing rendering systems are rule-based or
+case-based. Such systems often include extracting and applying rules
+with preset parameters [SUZ03] [HBHK04] [FBS06]. The weak- ness of
+rule-based or case-based systems is that it is still debatable whether
+we can find a set of rules/cases that can cover what it takes to make
+a meaningful music. There are also several statistical approaches
+[FW11] [WFG09]. These approaches use statistical methods to train a
+note by note performance model from a large quantity of data (e.g. a
+complete recording of Chopin piano works from a reproducing
+piano). However, compared to the heavy parametrization of these
+models, the data sets are not as big as they looks. Thus, overfitting
+could occur in these models. 
+
+An accompaniment system can benefit from such a low-dimensional
+representation too. A traditional accompaniment system seeks to create
+a flexible accompaniment to a live soloist that follows the player
+[Dan84] [Rap03] [CEGJ12]. Most existing systems use the same following
+strategy to keep up with the soloist throughout a single piece. This
+could inevitably result in overfitting the soloist’s performance and
+failing to understand the player’s real intentions. Good following
+requires a deeper understanding of the performers’ intention, thus
+separating signal from noise. A low-dimensional representation
+provides a higher-level view of the music, which has the potential to
+recognize the different musical characters in different sections of a
+piece (e.g. the tempo of a section recognized as ritardando is
+expected to slow down gradually while the tempo is not expected to
+vary a lot in a section recognized as steady tempo). Different
+following strategies can be adapted to better follow performance
+within sections provided by such a representation. 
 
 \begin{itemize}
 \item We want to model tempo and dynamic decisions.
@@ -250,94 +428,360 @@ Indjic~\citep{CookSapp2009}.
 
 \section{Materials and methods}
 
+
+
+
 \subsection{Data and preprocessing}
 
 \subsection{Switching state-space models}
 
-We will use a switching state-space model as shown in
-\autoref{fig:switchss}. For now, we assume $s$ is a hidden Markov model on
+State-space models define the probability distribution of a time 
+series $Y$ by reference to some imagined, hidden state, $X$. In
+particular, the observation at a particular time $t$ is assumed to be
+independent of past and future observations conditional on the state
+at time $t$. Coupled with temporal dependence for $X$---most
+frequently obeying the Markov property---induces a temporal model for
+the observations.  The most general form of a state-space model is
+then characterized by the 
+observation equation (the conditional probability of observations
+given the states),
+the state transition equation (specifying the nature of Markovian
+dynamics), and an initial distribution for the state: 
+\begin{align}
+  y_t &= f_\theta(x_t,\epsilon_t) &
+  x_{t+1} &= g_\theta(x_{t},\eta_t) &
+  x_1 &\sim F,\label{eq:ssmod}
+\end{align}
+where $\epsilon_t$ are $\eta_t$ are marginally independent and
+identically distributed (IID) as well as mutually independent. Both
+$y_t$ and $x_t$ can be (generally) vector-valued, though in our
+application, $y_t$ will be univariate. The
+vector $\{y_t\}_{t=1}^n$ is observed, and the goal is to make
+inferences for the unobserved states $\{x_t\}_{t=1}^T$ as well as any
+unknown parameters $\theta$ characterizing $f_\theta$, $g_\theta$, and
+the distributions of $\epsilon_t$ and $\eta_t$.  \autoref{fig:ssmod}
+shows a directed acyclic graph for the dependence structure in the
+typical state-space model.
+
+\begin{figure}
+  \centering
+  % The continuous state vector is represented by a circle.
+  % "minimum size" makes sure all circles have the same size
+  % independently of their contents.
+  \begin{tikzpicture}[>=latex,text height=1.5ex,text
+    depth=0.25ex,ampersand replacement=\&] 
+    \matrix[row sep=1cm,column sep=1cm] {
+      % first line: hidden continuous state
+      \node (x_k-2) {$\cdots$}; \&
+      \node (x_k-1) [state] {$\mathbf{x}_{t-1}$}; \&
+      \node (x_k)   [state] {$\mathbf{x}_t$};     \&
+      \node (x_k+1) [state] {$\mathbf{x}_{t+1}$}; \&
+      \node (x_k+2) {$\cdots$};
+      \\
+      % Second line: Measurement
+      \node (y_k-2) {$\cdots$}; \&        
+      \node (y_k-1) [measurement] {$\mathbf{y}_{t-1}$}; \&
+      \node (y_k)   [measurement] {$\mathbf{y}_t$};     \&
+      \node (y_k+1) [measurement] {$\mathbf{y}_{t+1}$}; \&
+      \node (y_k+2) {$\cdots$};
+      \\
+    };
+    % The diagram elements are now connected through arrows:
+    \path[->]
+    (x_k-2) edge (x_k-1)
+    (x_k-1) edge (x_k)	
+    (x_k)   edge (x_k+1)	
+    (x_k+1)   edge (x_k+2)	
+    (x_k-1) edge (y_k-1)
+    (x_k) edge (y_k)
+    (x_k+1)   edge (y_k+1);
+  \end{tikzpicture}
+  \caption{State-space model. Filled objects are observed, circles
+    indicate that both hidden and observed states are
+    continuous.\label{fig:ssmod}} 
+\end{figure}
+
+In the case where $f_\theta$ and $g_\theta$ are linear with $\epsilon_t$ and
+$\eta_t$ normally distributed, \eqref{eq:ssmod} specializes to
+\begin{equation}
+  \begin{aligned}
+    x_{t}&= d+T x_t + R\eta_{t}, 
+    & \eta_t &\sim N(0,\ Q),     
+    &x_1 &\sim N(x_0,\ P_0).\\
+    y_t&= c + Z x_t + \epsilon_t,     
+    & \epsilon_t &\sim N(0,\ G) \\
+  \end{aligned}
+  \label{eq:lgmod}
+\end{equation}
+where the matrices $d,\ T,\ R,\ c,\ Z,$ and $G$ are allowed to depend
+on $\theta$ and can potentially vary (deterministically) with $t$. In this case,
+the Kalman filter, \autoref{alg:kalman} \citep[see e.g.][]{Kalman1960,Harvey1990},
+can be used to derive closed form 
+solutions for the conditional
+distributions of the states and to calculate the likelihood of $\theta$
+given data. 
+\begin{algorithm}[t!]
+  \begin{singlespace}
+  \caption{Kalman filter: estimate $x_t$ conditional on
+    $\{y_j\}_{j=1}^t$, for all $t=1,\ldots,n$ and calculate the log likelihood
+    for $\theta$\label{alg:kalman}}
+  \begin{algorithmic}
+    \STATE {\bf Input:} $Y$, $x_0$, $P_0$, $d,\ T,\ R,\ c,\ Z,$ and $G$
+    \STATE $\ell(\theta) \leftarrow 0$ \COMMENT{Initialize the log-likelihood}
+    \FOR{$t=1$ to  $n$}
+    \STATE $H = RQR'$ \COMMENT{Effective state variance}
+    \STATE $\begin{aligned}\varx_{t}
+      &\leftarrow d + T x_{t-1|t-1}, & P_{t} &\leftarrow H + T P_{t-1|t-1}
+      T'\end{aligned}$ \COMMENT{Predict current state}
+    \STATE $\begin{aligned}\widetilde{y}_{t}
+      &\leftarrow c + Z \varx_{t}, & F_{t} &\leftarrow G + Z P_{t}
+      Z'\end{aligned}$ \COMMENT{Predict current observation}
+    \STATE $\begin{aligned}v_{t}&\leftarrow y_t-\widetilde{y}_t& K_t&
+      \leftarrow P_t Z' F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
+    Kalman gain}
+    \STATE $\begin{aligned} x_{t|t}
+      &\leftarrow \varx_t + K_t v_t, & P_{t|t} &\leftarrow P_t - P_tZ'
+      K_t\end{aligned}$ \COMMENT{Update}
+    \STATE $\ell(\theta) = \ell(\theta) -v_t'F^{-1}v_t - \log(|F_t|)$
+    \ENDFOR
+    \RETURN $\widetilde{Y}=\{\widetilde{y}_t\}_{t=1}^n,\ \varx=\{\varx_t\}_{t=1}^n,\
+    \widetilde{X}=\{x_{t|t}\}_{t=1}^n,\ P=\{P_t\}_{t=1}^n,\
+    \widetilde{P}=\{P_{t|t}\}_{t=1}^n,\ \ell(\theta)$
+  \end{algorithmic}
+\end{singlespace}
+\end{algorithm}
+
+% However, in many applications, researchers are not so
+% lucky. For nonlinear  or non-Gaussian models, approximate solutions
+% exist using the particle filter and its derivatives (see for
+% example~\citet{Kitagawa1987,Kitagawa1996}
+% and~\citet{DoucetDe-Freitas2001} for an exposition of the particle
+% filter and~\citet{KoyamaPerez-Bolde2010}
+% and~\citet{DejongDharmarajan2009a} for improvements).
+
+While \autoref{alg:kalman} returns the likelihood for $\theta$, 
+$\varx_t$ and $P_t$ represent the mean and variance of the conditional distribution
+of the unobserved component given only the observations
+$\{y_j\}_{j=1}^t$: $\varx_t=\Expect{x_t\given y_1\ldots,y_t}$ and
+$P_t=\Var{x_t\given y_1,\ldots,y_t}$. To
+incorporate all future observations into these estimates, the Kalman
+smoother is required.
+\begin{algorithm}[t!]
+  \begin{singlespace}
+  \caption{Kalman smoother (Rauch-Tung-Striebel): estimate $\hat{X}$ conditional on
+    $Y$\label{alg:kalman-smoother}} 
+  \begin{algorithmic}
+    \STATE {\bf Input:} $\varx$, $\widetilde{X}$, $P$, $\widetilde{P}$,
+    $T,$ $c$, $Z$.
+    \STATE $t=n$,
+    \STATE $\hat{x}_{n}\leftarrow \widetilde{x}_n$, 
+    \WHILE{$t>1$}
+    \STATE $\hat{y}_{t} \leftarrow c + Z\hat{x}_t,$
+    \COMMENT{Predict observation vector}
+    \STATE $\begin{aligned} e &\leftarrow \hat{x}_t -
+      \varx_t, & V &\leftarrow P_t^{-1}\end{aligned}$,
+    \STATE $t\leftarrow t-1$, \COMMENT{Increment}
+    \STATE $\hat{x}_t = \widetilde{x}_t + \widetilde{P}_t T Ve $ 
+    \ENDWHILE
+    \RETURN $\widehat{Y}=\{\hat{y}_t\}_{t=1}^n, \hat{X}=\{\hat{x}_t\}_{t=1}^n$
+  \end{algorithmic}
+\end{singlespace}
+\end{algorithm}
+There are many different smoother algorithms tailored for different
+applications. \autoref{alg:kalman-smoother}, due
+to~\citet{RauchStriebel1965}, is often referred to as the classical
+fixed-interval smoother~\citep{AndersonMoore1979}. It produces only
+the unconditional expectations of the hidden state
+$\hat{x}_t=\Expect{x_t\given y_1,\ldots,y_n}$ for the sake of
+computational speed. This version is more appropriate for inference in
+the type of switching models we discuss below.
+
+
+Linear Gaussian state-space models can be made quite flexible
+by expanding the state vector or allowing the parameter matrices to
+vary with time. Furthermore, this general form encompasses many
+standard time series models: ARIMA models, ARCH and GARCH models,
+stochastic volatility models, exponential smoothers, and
+more~\citep[see][for many other
+examples]{DurbinKoopman2001}. Nonlinear, non-Gaussian versions have
+been extensively
+studied~\citep{DurbinKoopman1997,Fuh2006,Kitagawa1987,Kitagawa1996}
+and algorithms for filtering, smoothing, and parameter estimation have
+been derived~\citep[e.g.,][]{KoyamaPerez-Bolde2010,AndrieuDoucet2010}. 
+However, these models are less useful
+for change-point detection or other forms of discontinuous behavior
+when the times of discontinuity are unknown. 
+
+To remedy this deficiency, one can use a switching state-space
+model as shown in \autoref{fig:switchss}. Here, we assume $S$ is a
+hidden, discrete process with Markovian dynamics. Then, the value of
+the hidden state at time $t$, $s_t=k$ say, can determine the evolution of
+the continuous model at time $t$. The graphical model in
+\autoref{fig:switchss} gives the conditional independence properties
+we will use in our model for musical interpretation, but this
+represents just one of many possibilities. Switching state-space models have a long
+history with many applications in 
+economics~\citep{KimNelson1998,Kim1994,Hamilton2011} to speech
+processing~\citep{FoxSudderth2011} to animal
+movement~\citep{PattersonThomas2008,BlockJonsen2011}. An excellent
+overview of the history, typography, and algorithmic developments can
+be found in~\citep{GhahramaniHinton2000}. In \eqref{eq:lgmod}, the
+parameter matrices were not time varying. In our switching model, we
+allow the switch states $s_t, s_{t-1}$, along with the parameter
+vector $\theta$, to determine the specific dynamics at time $t$:
+\begin{equation}
+  \begin{aligned}
+    x_1 &\sim N(x_0,\ P_0),\\
+    x_{t+1}&= d(s_{t},s_{t-1})+T(s_{t},s_{t-1}) x_t +
+    R(s_{t},s_{t-1})\eta_{t}, 
+    & \eta_t &\sim N(0,Q(s_{t},s_{t-1})),\\
+    y_t&= c(s_t) + Z(s_t) x_t + \epsilon_t, & \epsilon_t &\sim N(0, G(s_t)).
+  \end{aligned}
+\end{equation}
+In other words, the hidden markov (switch) state determines which parameter
+matrices govern the evolution of the system. 
+
+
+
+
+
+follows a hidden Markov model on
 four states, denoted $S_1,\ldots,S_4$ with transition probability
 diagram given by \autoref{fig:transmat}.
 
 \begin{figure}
-\centering
-% The continuous state vector is represented by a circle.
-% "minimum size" makes sure all circles have the same size
-% independently of their contents.
-\tikzstyle{state}=[circle,
-                                    thick,
-                                    minimum size=1.2cm, draw=black]
-% The (continuous) measurement vector is represented by an orange circle.
-\tikzstyle{measurement}=[circle,
-                                                thick,
-                                                minimum size=1.2cm,
-                                                draw=orange!80,
-                                                fill=orange!25]
-                                                \tikzstyle{switch}=[rectangle,
-  thick, minimum size=1cm, draw=black]
-
-\begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex,ampersand replacement=\&]
-    % "text height" and "text depth" are required to vertically
-    % align the labels with and without indices.
-  
-  % The various elements are conveniently placed using a matrix:
-  \matrix[row sep=1cm,column sep=1cm] {
-    % First line: Switch state
-    \node (s_k-2)  {$\cdots$}; \&
-    \node (s_k-1) [switch]{$s_{k-1}$}; \&
-    \node (s_k)   [switch]{$s_k$};     \&
-    \node (s_k+1) [switch]{$s_{k+1}$}; \&
-    \node (s_k+2) {$\cdots$};
-    \\
-    % Second line: hidden continuous state
-   \node (x_k-2) {$\cdots$}; \&
-   \node (x_k-1) [state] {$\mathbf{x}_{k-1}$}; \&
-   \node (x_k)   [state] {$\mathbf{x}_k$};     \&
-   \node (x_k+1) [state] {$\mathbf{x}_{k+1}$}; \&
-   \node (x_k+2) {$\cdots$};
-   \\
-   % Third line: Measurement
-   \node (y_k-2) {$\cdots$}; \&        
-   \node (y_k-1) [measurement] {$\mathbf{y}_{k-1}$}; \&
-   \node (y_k)   [measurement] {$\mathbf{y}_k$};     \&
-   \node (y_k+1) [measurement] {$\mathbf{y}_{k+1}$}; \&
-   \node (y_k+2) {$\cdots$};
-   \\
-  };
-    
+  \centering
+  \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex,ampersand replacement=\&]
+    % The various elements are conveniently placed using a matrix:
+    \matrix[row sep=1cm,column sep=1cm] {
+      % First line: Switch state
+      \node (s_k-2)  {$\cdots$}; \&
+      \node (s_k-1) [switch]{$s_{t-1}$}; \&
+      \node (s_k)   [switch]{$s_t$};     \&
+      \node (s_k+1) [switch]{$s_{t+1}$}; \&
+      \node (s_k+2) {$\cdots$};
+      \\
+      % Second line: hidden continuous state
+      \node (x_k-2) {$\cdots$}; \&
+      \node (x_k-1) [state] {$\mathbf{x}_{t-1}$}; \&
+      \node (x_k)   [state] {$\mathbf{x}_t$};     \&
+      \node (x_k+1) [state] {$\mathbf{x}_{t+1}$}; \&
+      \node (x_k+2) {$\cdots$};
+      \\
+      % Third line: Measurement
+      \node (y_k-2) {$\cdots$}; \&        
+      \node (y_k-1) [measurement] {$\mathbf{y}_{t-1}$}; \&
+      \node (y_k)   [measurement] {$\mathbf{y}_t$};     \&
+      \node (y_k+1) [measurement] {$\mathbf{y}_{t+1}$}; \&
+      \node (y_k+2) {$\cdots$};
+      \\
+    };
     % The diagram elements are now connected through arrows:
     \path[->]
-        (s_k-2) edge (s_k-1)
-        (s_k-1) edge (s_k)	
-        (s_k)   edge (s_k+1)	
-        (s_k+1)   edge (s_k+2)	
-
-      (x_k-2) edge (x_k-1)
-      (x_k-1) edge (x_k)	
-      (x_k)   edge (x_k+1)	
-      (x_k+1)   edge (x_k+2)	
-      
-      (s_k-1) edge (x_k-1)
-      (s_k) edge (x_k)
-      (s_k+1)   edge (x_k+1)
-      
-      (x_k-1) edge (y_k-1)
-      (x_k) edge (y_k)
-      (x_k+1)   edge (y_k+1)
-      
-      (s_k-1) edge (x_k)
-      (s_k) edge (x_k+1)
-      (s_k+1)   edge (x_k+2)
-      
-      (s_k-1) edge[bend left] (y_k-1)
-      (s_k) edge[bend left] (y_k)
-      (s_k+1)   edge[bend left] (y_k+1)
-        ;
-\end{tikzpicture}
-
-\caption{Switching state space model. Filled objects are observed,
-  rectangles are discrete, and circles are continuous.\label{fig:switchss}}
+    (s_k-2) edge (s_k-1)
+    (s_k-1) edge (s_k)	
+    (s_k)   edge (s_k+1)	
+    (s_k+1)   edge (s_k+2)	
+    
+    (x_k-2) edge (x_k-1)
+    (x_k-1) edge (x_k)	
+    (x_k)   edge (x_k+1)	
+    (x_k+1)   edge (x_k+2)	
+    
+    (s_k-1) edge (x_k-1)
+    (s_k) edge (x_k)
+    (s_k+1)   edge (x_k+1)
+    
+    (x_k-1) edge (y_k-1)
+    (x_k) edge (y_k)
+    (x_k+1)   edge (y_k+1)
+    
+    (s_k-1) edge (x_k)
+    (s_k) edge (x_k+1)
+    (s_k+1)   edge (x_k+2)
+    
+    (s_k-1) edge[bend left] (y_k-1)
+    (s_k) edge[bend left] (y_k)
+    (s_k+1)   edge[bend left] (y_k+1)
+    ;
+  \end{tikzpicture}
+  \caption{Switching state space model. Filled objects are observed,
+    rectangles are discrete, and circles are continuous.\label{fig:switchss}}
 \end{figure}
+
+
+
+
+
+
+\subsection{A model for tempo decisions}
+
+
+In musical scores, tempi (the Italian plural of {\em tempo}) may be
+marked at various points throughout a piece of music. The
+beginning can be either explicit, with a metronome marking to
+indicate the number of beats per minute (bpm), and/or with some words
+(e.g. Adagio, Presto, Langsam, Sprightly) which indicate an
+approximate speed. 
+\begin{figure}[t!]
+  \centering
+  \includegraphics[height=3cm]{mazurka-top.pdf}
+  \includegraphics[height=3cm]{ballade-top.pdf}
+  \caption{The beginning of two Chopin piano compositions: the Mazurka
+    we analyze is on the left while the Ballade No.\ 1, Op.\ 23 is on
+    the right.}
+  \label{fig:tempo-markings}
+\end{figure}
+\autoref{fig:tempo-markings} shows the beginning of two Chopin piano
+compositions: the Mazurka we analyze and the Ballade No.\ 1, Op.\ 23. The initial tempo of the Mazurka is given with a metronome
+marking as well as the Italian phrase {\em Allegro ma non troppo}
+(``cheerful, but not too much''). The beginning of the Ballade is simply
+marked {\em Largo}, which translates literally as ``broad'' or
+``wide''. Obviously, the metronome markings are much more exact,
+though even these are often viewed as approximations rather than
+commandments. The metronome markings in most of Beethoven's
+compositions, for example, are notoriously fast, and some scholars
+believe that his metronome (one of the first ever made) was
+inaccurate. Often, compositions will have numerous such markings later
+in the piece of music, but these are only some of the ways that tempo
+is indicated. Composers will also indicate periods of speeding-up or
+slowing-down.
+
+Absent instructions from the composer, performers generally maintain
+(or try to maintain) a steady tempo, and this assumption plays a major
+role in our model of tempo decisions. Of course, a normal human being
+never plays precisely like a 
+metronome, although they may try quite hard to do so. The actual
+tempo is therefore best viewed as stochastic, the sum of an
+intentional, constant component, plus noise representing inaccuracy
+or, perhaps more charitably, unintentional variation which the
+listener fails to perceive as ``wrong''. For instance, the example in
+\autoref{fig:short-perf} shows the beginning of the piece as performed
+by Arthur Rubinstein in a 1961 recording. 
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
+  \caption{The solid line shows the observed note-by-note tempo for
+    the beginning of the Mazurka as performed by Arthur Rubinstein in
+    1961. The dashed line indicates 132 bpm.}
+  \label{fig:short-perf}
+\end{figure}
+The solid line shows the
+actual, performed tempo, while the dashed horizontal line is placed at
+the indicated tempo of 132 bpm. The figure has three important
+lessons: (1) actual tempo varies around intended tempo; (2) 132 bpm is
+not necessarily the tempo a performer will choose despite the
+indication; and (3) performers have other tempo intentions which are
+not marked, like the pronounced slow-down in measures 
+
+Estimating intended tempi does not seem to be very difficult at the
+first glance. If the boundaries of the tempo changes are known, then
+the average of tempi between boundaries would be a good estimate as
+could the “slope” derived though linear regression. But when the
+boundaries of the tempo changes are unknown, the problem becomes much
+more complicated than something solvable by regression. So we would
+like to use a switching model.
+
 
 
 \begin{figure}[h!]
@@ -362,19 +806,6 @@ diagram given by \autoref{fig:transmat}.
   \caption{Transition diagram. \label{fig:transmat}}
 \end{figure}
 
-
-Models like this can have many behaviors, but for our case, the
-general form is:
-\begin{align}
-  x_{t}&= d(s_{t},s_{t-1})+T(s_{t},s_{t-1}) x_t + R(s_{t},s_{t-1})\eta_{t} & \eta_t &\sim
-                                                      N(0,Q(s_{t},s_{t-1}))\\
-  y_t&= c(s_t) + Z(s_t) x_t + \epsilon_t & \epsilon_t &\sim N(0, G(s_t)).
-\end{align}
-In other words, the hidden markov (switch) state determines which parameter
-matrices govern the evolution of the system. 
-
-
-\subsection{A model for tempo decisions}
 
 
 The 4 switch states correspond to 4 different behaviors for the
