@@ -36,7 +36,7 @@ ggsave("extras/all_performances.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
 library(ggplot2)
 library(dpf)
 library(gridExtra)
-load("extras/mazurka1results.Rdata")
+load("manuscript/mazurka2results.Rdata")
 load('extras/ClusterLabels.Rdata')
 pvec = pvec_ml[-14,]#bad_perf which was removed before clustering
 pvec$clust = as.factor(clusts)

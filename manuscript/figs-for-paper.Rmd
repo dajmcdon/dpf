@@ -10,7 +10,7 @@ library(dpf)
 library(knitr)
 library(tidyr)
 library(splines)
-opts_chunk$set(message=FALSE, warning=FALSE,cache=TRUE,
+opts_chunk$set(message=FALSE, warning=FALSE,cache=FALSE,
                out.width ="6in",out.height="3in",
                fig.width = 6, fig.height = 3)
 library(ggplot2)
@@ -164,6 +164,8 @@ plotStates <- function(performers, pars, tempos,
 ```
 
 ```{r first-performance}
+remove(pvec_ml)
+load("mazurka2results.Rdata")
 perfs = c('Fliere_1977','Tomsic_1995')
 plotStates(perfs[1], pvec_ml, tempos)
 ```
