@@ -376,7 +376,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
                                     ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                                     Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                                     Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
-                                    HH.subcube(0,s,iter*HHtvar,arma::size(mm,1,1)), 
+                                    HHt.subcube(0,s,iter*HHtvar,arma::size(mm,1,1)), 
                                     GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                                     y.col(iter));
     
@@ -496,40 +496,41 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
 }
 
 List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
-                arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt,
-                arma::mat HHt, arma::mat GGt, arma::vec yt){
-    arma::uvec particles = arma::find(w0);
-    int npart = particles.n_elem;
-    if(npart == 0){return List::create(Named("BadPars") = 1);}
-    arma::vec weights = w0(particles);
-    arma::mat a11(a0.n_rows, npart);
-    arma::mat P11(P0.n_rows, npart);
-    arma::vec lik(npart);
-    for(int i = 0; i < npart; i++){
-        int p = particles(i);
-        KFOUT kfout = kf1step(a0.col(p), P0.col(p), dt.col(p), ct.col(p),
-                              Tt.col(p), Zt.col(p), HHt.col(p), GGt.col(p), yt);
-        arma::mat atmp = kfout.att;
-        arma::mat Ptmp = kfout.Ptt;
-        a11.col(i) = atmp;
-        P11.col(i) = Ptmp;
-        lik(i) = kfout.lik;
-    }
-    lik %= weights;
-    arma::vec w = arma::normalise(lik, 1);
-    w = resampleSubOptimal(w, N);
-    if( !arma::any(w)) return List::create(Named("BadPars") = 1);
-    arma::uvec nz = arma::find(w);
-    arma::vec newW = w(nz);
-    arma::uvec newstates = particles(nz);
-    arma::mat aout = a11.cols(nz);
-    arma::mat Pout = P11.cols(nz);
-    return List::create(Named("BadPars") = 0,
-                        Named("a1") = aout,
-                        Named("P1") = Pout,
-                        Named("newstates") = newstates,
-                        Named("newW") = newW);
+                         arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt,
+                         arma::mat HHt, arma::mat GGt, arma::vec yt){
+  arma::uvec particles = arma::find(w0);
+  int npart = particles.n_elem;
+  if(npart == 0){return List::create(Named("BadPars") = 1);}
+  arma::vec weights = w0(particles);
+  arma::mat a11(a0.n_rows, npart);
+  arma::mat P11(P0.n_rows, npart);
+  arma::vec lik(npart);
+  for(int i = 0; i < npart; i++){
+    int p = particles(i);
+    KFOUT kfout = kf1step(a0.col(p), P0.col(p), dt.col(p), ct.col(p),
+                          Tt.col(p), Zt.col(p), HHt.col(p), GGt.col(p), yt);
+    arma::mat atmp = kfout.att;
+    arma::mat Ptmp = kfout.Ptt;
+    a11.col(i) = atmp;
+    P11.col(i) = Ptmp;
+    lik(i) = kfout.lik;
+  }
+  lik %= weights;
+  arma::vec w = arma::normalise(lik, 1);
+  w = resampleSubOptimal(w, N);
+  if( !arma::any(w)) return List::create(Named("BadPars") = 1);
+  arma::uvec nz = arma::find(w);
+  arma::vec newW = w(nz);
+  arma::uvec newstates = particles(nz);
+  arma::mat aout = a11.cols(nz);
+  arma::mat Pout = P11.cols(nz);
+  return List::create(Named("BadPars") = 0,
+                      Named("a1") = aout,
+                      Named("P1") = Pout,
+                      Named("newstates") = newstates,
+                      Named("newW") = newW);
 }
+
 
 //' Greedy HMM estimation given continuous hidden states
 //' 
@@ -562,14 +563,13 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   // arma::uword Rtvar = Rt.n_slices > 1;
   // arma::uword Qtvar = Qt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
-  arma::uword q = sqrtf(Qt.n_rows);
   arma::uvec particles(maxpart, arma::fill::zeros);
   arma::uvec filler = arma::regspace<arma::uvec>(0,K-1);
   arma::umat paths(maxpart, n, arma::fill::zeros);
   arma::colvec weights(maxpart,arma::fill::zeros);
   List step = initializeParticles(w0, N, a0, P0, dt.slice(0), ct.slice(0),
                                   Tt.slice(0), Zt.slice(0), 
-                                  HHt.slice(0).reshape(m,m), 
+                                  HHt.slice(0), 
                                   GGt.slice(0), yt.col(0));
   int BP = step["BadPars"];
   if(BP) return List::create(Named("LastStep") = 1);

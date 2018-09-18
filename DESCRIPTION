@@ -6,14 +6,15 @@ Date: 2018-06-15
 Authors@R: c(
     person("McBride", "Michael", email = "michmcbr@iu.edu", role = "cre"),
     person("Daniel", "McDonald", email = "dajmcdon@indiana.edu", role = "aut"))
-URL: http://github.com/dajmcdon/aimer
-BugReports: http://github.com/dajmcdon/aimer/issues
+URL: http://github.com/dajmcdon/dpf
+BugReports: http://github.com/dajmcdon/dpf/issues
 Description: Estimates hidden Markov models greedily in the presence of Gaussian observations
     and continuous (Gaussian) hidden states.
 License: GPL
 LazyData: true
 Depends: R (>= 2.10)
-Imports: Rcpp (>= 0.12.10)
+Imports: Rcpp (>= 0.12.10),
+    ggplot2
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.0.1
 Suggests: testthat

@@ -5,7 +5,7 @@
 \alias{ddirichlet}
 \title{Dirichlet random variables}
 \usage{
-rdirichlet(n, K, alpha = rep(1, length(K)))
+rdirichlet(n, K = length(alpha), alpha = rep(1, K))
 
 ddirichlet(x, alpha, log = TRUE, normalize = FALSE)
 }

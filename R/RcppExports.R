@@ -13,10 +13,6 @@ kf1stepR <- function(a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt) {
     .Call('_dpf_kf1stepR', PACKAGE = 'dpf', a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt)
 }
 
-HHcreate <- function(Rt, Qt, r, q) {
-    .Call('_dpf_HHcreate', PACKAGE = 'dpf', Rt, Qt, r, q)
-}
-
 dpf <- function(currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt) {
     .Call('_dpf_dpf', PACKAGE = 'dpf', currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GGt, yt)
 }
@@ -38,8 +34,8 @@ getloglike <- function(pmats, path, y) {
 #' 
 #' @param lt durations between successive notes in the score
 #' @param sig2eps variance of the observation noise
-#' @param mus vector of 4 mean parameters
-#' @param sig2eta vector of 4 state variance parameters
+#' @param mus vector of 3 mean parameters
+#' @param sig2eta vector of 3 state variance parameters
 #' @param transprobs vector of 4 transition probabilities
 #' 
 #' @return List with components as appropriate for Kalman filtering or Beam Search
@@ -58,8 +54,8 @@ yupengMats <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initi
 #' @return List with components "paths", "weights", and "LastStep" 
 #' 
 #' @export 
-beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, N) {
-    .Call('_dpf_beamSearch', PACKAGE = 'dpf', a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, N)
+beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N) {
+    .Call('_dpf_beamSearch', PACKAGE = 'dpf', a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
 }
 
 #' Estimate continuous states given parameters and discrete hidden states

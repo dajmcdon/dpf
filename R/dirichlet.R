@@ -15,7 +15,7 @@
 #' 
 #' randos = rdirichlet(10, 3, c(7,2,1))
 #' density = ddirichlet(c(.5,.5,.5), c(7,2,1))
-rdirichlet <- function(n, K, alpha = rep(1,length(K))){
+rdirichlet <- function(n, K=length(alpha), alpha = rep(1,K)){
   stopifnot(n > 0, length(alpha)==K, all(alpha>0))
   mat = matrix(rgamma(n*K, alpha), nrow = n, byrow = TRUE)
   ys = rowSums(mat)
@@ -24,6 +24,7 @@ rdirichlet <- function(n, K, alpha = rep(1,length(K))){
 }
 
 #' @rdname rdirichlet
+#' @export
 ddirichlet <- function(x, alpha, log=TRUE, normalize=FALSE){
   if(is.vector(x)) x <- matrix(x, ncol=length(x))
   p = ncol(x)

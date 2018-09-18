@@ -11,9 +11,9 @@ yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
 
 \item{sig2eps}{variance of the observation noise}
 
-\item{mus}{vector of 4 mean parameters}
+\item{mus}{vector of 3 mean parameters}
 
-\item{sig2eta}{vector of 4 state variance parameters}
+\item{sig2eta}{vector of 3 state variance parameters}
 
 \item{transprobs}{vector of 4 transition probabilities}
 }
