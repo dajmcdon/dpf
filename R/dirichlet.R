@@ -28,7 +28,7 @@ rdirichlet <- function(n, K=length(alpha), alpha = rep(1,K)){
 ddirichlet <- function(x, alpha, log=TRUE, normalize=FALSE){
   p = length(x)
   stopifnot(length(alpha)==p, all(alpha>0))
-  if(any(x>1) || any(x)<0 || !all.equal(1,sum(x))){
+  if(any(x>1) || any(x<0) || !all.equal(1,sum(x))){
     return(ifelse(log,-Inf,0))
   }
   kern = sum(log(x) * alpha) # on the log scale, no constant
