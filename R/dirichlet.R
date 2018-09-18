@@ -26,16 +26,16 @@ rdirichlet <- function(n, K=length(alpha), alpha = rep(1,K)){
 #' @rdname rdirichlet
 #' @export
 ddirichlet <- function(x, alpha, log=TRUE, normalize=FALSE){
-  if(is.vector(x)) x <- matrix(x, ncol=length(x))
-  p = ncol(x)
-  stopifnot(length(alpha)==p, all(alpha>0), 
-            all.equal(rowSums(x), rep(1,nrow(x))),
-            all(x<=1), all(x>=0))
-  kern = drop(log(x) %*% alpha) # on the log scale, no constant
+  p = length(x)
+  stopifnot(length(alpha)==p, all(alpha>0))
+  if(any(x>1) || any(x)<0 || !all.equal(1,sum(x))){
+    return(ifelse(log,-Inf,0))
+  }
+  kern = sum(log(x) * alpha) # on the log scale, no constant
   if(normalize){
     const = -sum(lgamma(alpha)) + lgamma(sum(alpha))
     kern = kern + const
   }
   if(!log) kern = exp(kern)
-  drop(kern)
+  kern
 }
