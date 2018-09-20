@@ -5,9 +5,15 @@ front = sapply(splits, function(x) paste(x[1],x[2],sep='-'))
 ids = substr(front,4,nchar(front))
 
 meta = read.csv('extras/mazurka ids.csv')
+meta$performer = as.character(meta$performer)
+meta$pid = as.character(meta$pid)
 loc = match(ids, meta$pid)
 performers = as.character(meta$perf[loc])
-performers[is.na(performers)] = ids[is.na(performers)]
+years = meta$year[loc]
+performance_title = paste(performers, years, sep = '_')
+performance_title[ids == '9082-11'] = paste(performance_title[ids == '9082-11'], 'a', sep = '')
+performance_title[ids == '9091-17'] = paste(performance_title[ids == '9091-17'], 'b', sep = '')
+#performers[is.na(performers)] = ids[is.na(performers)]
 
 recordings = list()
 for(i in 1:n.recordings){
@@ -32,6 +38,15 @@ dynamic.mat = matrix(NA, n, n.recordings)
 for(i in 1:n.recordings) dynamic.mat[,i] = recordings[[i]]$dynamic
 time.mat = matrix(NA, n, n.recordings)
 for(i in 1:n.recordings) time.mat[,i] = recordings[[i]]$time
+
+#Save data
+dynamics = data.frame(cbind(d1$measure, d1$beat, d1$measure + (d1$beat - 1)/3, dynamic.mat))
+colnames(dynamics) = c('meas_num', 'beat', 'note_onset', performance_title)
+save(dynamics, file = 'data/dynamics.rda')
+
+record = data.frame(performers, years)
+colnames(record) = c('performer', 'year')
+save(record, file = 'data/recordings.rda')
 
 ## redo normalized 
 end.times = time.mat[n,]

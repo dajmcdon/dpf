@@ -1,7 +1,8 @@
 load("manuscript/mazurka2results.Rdata")
 source('extras/djm_optimization.R')
-fliere = ContoR(unlist(pvec_ml[substr(rownames(pvec_ml), 1, 6) == "Fliere",]))
-tomsic = ContoR(unlist(pvec_ml[substr(rownames(pvec_ml), 1, 6) == "Tomsic",]))
+library(dpf)
+fliere = ContoR(unlist(pvec_ml[substr(rownames(pvec_ml), 1, 6) == "Fliere",]))[-c(2,5)]
+tomsic = ContoR(unlist(pvec_ml[substr(rownames(pvec_ml), 1, 6) == "Tomsic",]))[-c(2,5)]
 data("tempos")
 lt = diff(c(tempos$note_onset,61))
 yf = matrix(tempos$Fliere_1977,1)

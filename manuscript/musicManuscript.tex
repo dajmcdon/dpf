@@ -758,14 +758,14 @@ or, perhaps more charitably, unintentional variation which the
 listener fails to perceive as ``wrong''. For instance, the example in
 \autoref{fig:short-perf} shows the beginning of the piece as performed
 by Arthur Rubinstein in a 1961 recording. 
-\begin{figure}[t!]
-  \centering
-  \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
-  \caption{The solid line shows the observed note-by-note tempo for
-    the beginning of the Mazurka as performed by Arthur Rubinstein in
-    1961. The dashed line indicates 132 bpm.}
-  \label{fig:short-perf}
-\end{figure}
+%\begin{figure}[t!]
+%  \centering
+%  \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
+%  \caption{The solid line shows the observed note-by-note tempo for
+%    the beginning of the Mazurka as performed by Arthur Rubinstein in
+%    1961. The dashed line indicates 132 bpm.}
+%  \label{fig:short-perf}
+%\end{figure}
 The solid line shows the
 actual, performed tempo, while the dashed horizontal line is placed at
 the indicated tempo of 132 bpm. The figure has three important
@@ -794,14 +794,14 @@ like to use a switching model.
        \node (S4) [switch] {$S_4$}; & \node (S3) [switch] {$S_3$}; \\
      };
      \path[->]
-     (S1) edge [bend right] (S4)
-     (S1) edge (S2)
-     (S2) edge (S3)
-     (S3) edge (S1)
-     (S4) edge [bend right] (S1);
-     \draw[->] (S1) to [out=90, in=180,looseness=4] (S1);
-     \draw[->] (S2) to [out=90, in=0,looseness=4] (S2);
-     \draw[->] (S3) to [out=270, in=0,looseness=4] (S3);
+     (S1) edge [bend right] node[midway, left]{$1-p_1-p_2$} (S4)
+     (S1) edge node[midway, above]{$p_2$} (S2)
+     (S2) edge node[midway, right]{$1-p_3$} (S3)
+     (S3) edge node[midway, above, right]{$p_4$} (S1)
+     (S4) edge [bend right] node[midway, left]{1} (S1);
+     \draw[->] (S1) to [out=90, in=180,looseness=4] node[above, left]{$p_1$} (S1);
+     \draw[->] (S2) to [out=90, in=0,looseness=4] node[above, right]{$p_3$} (S2);
+     \draw[->] (S3) to [out=270, in=0,looseness=4] node[below, right]{$1-p_4$} (S3);
   \end{tikzpicture}
   \caption{Transition diagram. \label{fig:transmat}}
 \end{figure}
@@ -942,7 +942,7 @@ previous state. For this reason, the code uses 16 states rather than
 
 \begin{table}[]
 \begin{tabular}{lllllllllll}
-$\sigma_\epsilon^2$ & $\mu$????? & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3^2$ & $\sigma_4^2$ & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
+$\sigma_\epsilon^2$ & $\mu$ & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3^2$ & $\sigma_4^2$ & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
 49 & 103 & -25 & -32 & 517 & 904 & 336 & 0.89 & 0.06 & 0.70 & 0.62\\
 \end{tabular}
 \caption{parameter estimates for Fliere's performance}
@@ -955,11 +955,11 @@ $\sigma_\epsilon^2$ & $\mu$????? & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3
     \label{figure:fliere}
 \end{figure}
 
-For Yakov Fliere's 1977 recording of Chopin's Mazurka Op. 68 No. 3, our model produced parameter estimates shown in \ref{table:fliere}. This means that our model estimates Fliere's variance around his intended tempo to be 49 beats per minute, ???????????, the average magnitude of his acceleration or deceleration to be 25 beats per minute per measure, the average amount by which he slows down when emphasizing a note to be 32 beats per minute, the variance of his accelerations and decelerations to be 517, ???(question about $\mu$)???, and ???(modify figure 3?)???.
+For Yakov Fliere's 1977 recording of Chopin's Mazurka Op. 68 No. 3, our model produced parameter estimates shown in \autoref{table:fliere}. This means that our model estimates Fliere's variance around his intended tempo to be 49 beats per minute, his average intended tempo to be 103 beats per minute, the average magnitude of his acceleration or deceleration to be 25 beats per minute per measure, the average amount by which he slows down when emphasizing a note to be 32 beats per minute, the variance of his accelerations and decelerations to be 517, the variance of his constant tempos to be 904 beats per minute, the variance of how much he slows down when emphasizing a note to be 336 beats per minute, and the transition probabilities as shown in \autoref{table:fliere}.
 
 \begin{table}[]
 \begin{tabular}{lllllllllll}
-$\sigma_\epsilon^2$ & $\mu$????? & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3^2$ & $\sigma_4^2$ & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
+$\sigma_\epsilon^2$ & $\mu$ & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3^2$ & $\sigma_4^2$ & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
 927 & 174 & -23 & -30 & 433 & 976 & 398 & 0.95 & 0.02 & 0.64 & 0.58\\
 \end{tabular}
 \caption{parameter estimates for Tomsic's performance}
@@ -972,7 +972,9 @@ $\sigma_\epsilon^2$ & $\mu$????? & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3
     \label{figure:tomsic}
 \end{figure}
 
-We can see that our model's parameters have very simple musical interpretations. By looking at the estimates produced by fitting our model we can make comparisons between different performances. For example, we can compare Fliere's performance with Tomsic's 1995 performance. The estimates of the parameters for Tomsic's performance are provided in \ref{table:tomsic}.
+We can see that our model's parameters have very simple musical interpretations. By looking at the estimates produced by fitting our model we can make comparisons between different performances. For example, we can compare Fliere's performance with Tomsic's 1995 performance. The estimates of the parameters for Tomsic's performance are provided in \autoref{table:tomsic}. We can see that, compared to Fliere, Tomsic has a much larger variation in his performed tempo, and is more likely to stay in a constant tempo.
+
+One issue in our model that the effect of states two and three can be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and $\sigma_2^2$ are large enough, it would be possible to get a negative number for the acceleration term when in state 2 or a positive number when in state three and still get a reasonably high likelihood. This could be fixed by adding a constraint on the ratio of the $\tau_t$ and $\sigma$'s 2 and 4.
 
 \section{Discussion}
 

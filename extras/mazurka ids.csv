@@ -1,48 +1,50 @@
-opus,key,performer,year,time,seconds,label,pid,status
-68.3,F maj,Smidowicz,1948,1:40,100,Selene CD-s 9905.50,9082-11,precor
-68.3,F maj,Smidowicz,1948,1:43,103,Muza PNCD 300,9091-17,precor
-68.3,F maj,Ashkenazy,1981,1:14,74,Decca 448 086-2,9058b-19,precor
-68.3,F maj,Bacha,1997,1:46,106,Forlane 126817,9166b-09,-
-68.3,F maj,Barbosa,1983,1:28,88,Centaur CRC2098/9,9174b-19,-
-68.3,F maj,Biret,1990,1:59,119,Naxos 8.550359,9062b-22,precor
-68.3,F maj,Block,1995,1:45,105,ProPiano PPR224507 ,9064-02,precor
-68.3,F maj,Brailowsky,1960,1:51,111,Sony SB2K 63237,9060b-17,precor
-68.3,F maj,Chiu,1999,1:42,102,HMX 2907352.53,9048b-22,xprecor
-68.3,F maj,Clidat,1994,1:25,85,Forlane UCD16729 ,9067-27,precor
-68.3,F maj,Cohen,1997,1:34,94,Glossa 920507 ,9069-19,precor
-68.3,F maj,Cortot,1951,2:46,166,Concert Artist 9180/12 ,9066b-19,precor
-68.3,F maj,Csalog,1996,1:58,118,Hungaroton HCD 31755/6,1263b-19,-
-68.3,F maj,Ezaki,2006,1:20,80,Triton OVCT-00035,9139b-21,-
-68.3,F maj,Ferenczy,1958,2:12,132,Hungaroton HCD 32121,9097-15,-
-68.3,F maj,Fliere,1977,2:02,122,Melodia 10 00439,9063b-25,precor
-68.3,F maj,Fou,1978,1:25,85,Sony SB2K 53 246,9071-04,precor
-68.3,F maj,Francois,1956,1:16,76,EMI CZS 7 67413 2,9070b-31,precor
-68.3,F maj,Grinberg,1951,1:14,74,Denon COCQ-84244,9112-11,-
-68.3,F maj,Hatto,1988,1:47,107,Con. Artist 9270/12,9073b-25,precor
-68.3,F maj,Indjic,1988,1:46,106,Calliope 3321,9050b-21,precor
-68.3,F maj,Jonas,1947,2:22,142,PERL GEM 0077,9096-03,precor
-68.3,F maj,Kapell,1951,1:41,101,RCA 09026-68990-2,9090-26,precor
-68.3,F maj,Kiepura,1999,1:36,96,Patria KIE2000,9098-07,-
-68.3,F maj,Koczalski,1948,1:20,80,Selene CD-s 9801.37,9140-05,-
-68.3,F maj,Kushner,1989,3:09,189,Connoisseur CD4181/2,9118b-25,-
-68.3,F maj,Luisada,1991,1:47,107,DG 463054-2,9055b-19,xprecor
-68.3,F maj,Lushtak,2004,2:08,128,Centaur CRC 2707,9088-25,precor
-68.3,F maj,Magaloff,1978,1:41,101,Phillips 426 817/29-2,9074g-19,precor
-68.3,F maj,Meguri,1997,2:09,129,Live Notes WWCC-7313,9137-22,-
-68.3,F maj,Milkina,1970,1:45,105,Unterschrift/EMI,9099b-25,-
-68.3,F maj,Mohovich,1999,1:35,95,Agora AG 231.2,9104b-19,-
-68.3,F maj,Ohlsson,1999,1:39,99,Arabesque Z6730-2,9153b-21,-
-68.3,F maj,Olejniczac,1990,1:31,91,Na&iuml;ve OP20002,9100b-08,-
-68.3,F maj,Osinska,1989,1:48,108,Cassiopee 969 213/6,9101c-13,-
-68.3,F maj,Rangell,2001,1:34,94,Dorian DOR-93258,9094b-27,precor
-68.3,F maj,Richter,1976,1:11,71,Doremi DHR-7724,9172-12,-
-68.3,F maj,Rubinstein,1939,1:27,87,Naxos 8.110656-57,9049b-19,xprecor
-68.3,F maj,Rubinstein,1952,1:09,69,BMG 09026 63027-2,9075b-19,precor
-68.3,F maj,Rubinstein,1961,1:26,86,Philips 456 955-2,5667285b-10,xprecor
-68.3,F maj,Rubinstein,1966,1:26,86,BMG 09026-63050-2,9059b-23,precor
-68.3,F maj,Shebanova,2002,1:32,92,DUX 0350/0351,9072b-23,precor
-68.3,F maj,Smith,1975,3:42,222,EMI 724358576726,9054b-21,xprecor
-68.3,F maj,Sofronitsky,1949,1:23,83,Vista Vera VVCD-00118-2,9114-34,-
-68.3,F maj,Sztompka,1959,1:40,100,Muza PNOD 313 A/B,9170b-21,-
-68.3,F maj,Uninsky,1971,1:45,105,Philips 442 574-2,9061b-16,precor
-68.3,F maj,Wasowski,1980,1:38,98,Concord CCD-42036,9111b-21,-
+performer,year,pid
+Ashkenazy,1981,9058b-19
+Bacha,1997,9166b-09
+Barbosa,1983,9174b-19
+Biret,1990,9062b-22
+Block,1995,9064-02
+Brailowsky,1960,9060b-17
+Chiu,1999,9048b-22
+Clidat,1994,9067-27
+Cohen,1997,9069-19
+Cortot,1951,9066b-19
+Csalog,1996,1263b-19
+Czerny.Stefanska,1990,9192b-21
+Ezaki,2006,9139b-21
+Ferenczy,1958,9097-15
+Fliere,1977,9063b-25
+Fou,1978,9071-04
+Francois,1956,9070b-31
+Grinberg,1951,9112-11
+Hatto,1993,610003b-23
+Hatto,2006,9073b-25
+Indjic,1988,9050b-21
+Jonas,1947,9096-03
+Kapell,1951,9090-26
+Kiepura,1999,9098-07
+Koczalski,1948,9140-05
+Kushner,1989,9118b-25
+Luisada,1991,9055b-19
+Lushtak,2004,9088-25
+Meguri,1997,9137-22
+Milkina,1970,9099b-25
+Mohovich,1999,9104b-19
+Niedzielski,1931,919401-04
+Ohlsson,1999,9153b-21
+Olejniczac,1990,9100b-08
+Rangell,2001,9094b-27
+Richter,1976,9172-12
+Rubinstein,1939,9049b-19
+Rubinstein,1952,9075b-19
+Rubinstein,1961,5667285b-10
+Rubinstein,1966,9059b-23
+Shebanova,2002,9072b-23
+Smidowicz,1948,9082-11
+Smidowicz,1948,9091-17
+Smith,1975,9054b-21
+Sofronitsky,1949,9114-34
+Sztompka,1959,9170b-21
+Tomsic,1995,9190-11
+Uninsky,1971,9061b-16
+Wasowski,1980,9111b-21

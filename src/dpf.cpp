@@ -221,8 +221,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
     return output;
 }
 
- //' @export 
- //[[Rcpp::export]]
+
 arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
   arma::uword K = Rt.n_cols;
   arma::mat Rtmp(r,q);

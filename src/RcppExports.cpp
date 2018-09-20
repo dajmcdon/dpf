@@ -49,20 +49,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// HHcreate
-arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q);
-RcppExport SEXP _dpf_HHcreate(SEXP RtSEXP, SEXP QtSEXP, SEXP rSEXP, SEXP qSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type Rt(RtSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type Qt(QtSEXP);
-    Rcpp::traits::input_parameter< int >::type r(rSEXP);
-    Rcpp::traits::input_parameter< int >::type q(qSEXP);
-    rcpp_result_gen = Rcpp::wrap(HHcreate(Rt, Qt, r, q));
-    return rcpp_result_gen;
-END_RCPP
-}
 // dpf
 List dpf(arma::uvec currentStates, arma::colvec w, int N, arma::mat transProbs, arma::mat a0, arma::mat P0, arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::vec yt);
 RcppExport SEXP _dpf_dpf(SEXP currentStatesSEXP, SEXP wSEXP, SEXP NSEXP, SEXP transProbsSEXP, SEXP a0SEXP, SEXP P0SEXP, SEXP dtSEXP, SEXP ctSEXP, SEXP TtSEXP, SEXP ZtSEXP, SEXP HHtSEXP, SEXP GGtSEXP, SEXP ytSEXP) {
@@ -157,7 +143,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_resampleSubOptimal", (DL_FUNC) &_dpf_resampleSubOptimal, 2},
     {"_dpf_resampleOptimal", (DL_FUNC) &_dpf_resampleOptimal, 2},
     {"_dpf_kf1stepR", (DL_FUNC) &_dpf_kf1stepR, 9},
-    {"_dpf_HHcreate", (DL_FUNC) &_dpf_HHcreate, 4},
     {"_dpf_dpf", (DL_FUNC) &_dpf_dpf, 13},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 7},
