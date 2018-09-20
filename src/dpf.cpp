@@ -319,8 +319,8 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
 
 //' Evaluate the likelihood given parameters and discrete states
 //' 
-//' @param pmats a list of parameter matrices for the kalman filter
-//' @param path the desired path for hidden discrete states
+//' @param pmats a list of parameter matrices for the kalman filter. This can either be the output of yupengMats, or a list with the same names as the output of yupengMats.
+//' @param path vector giving the desired path for hidden discrete states
 //' @param y observations, each time point in a column
 //' 
 //' @return the negative log-likelihood
