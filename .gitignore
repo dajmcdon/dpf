@@ -10,3 +10,8 @@
 *_files/
 *.pdfsync
 example-articles/
+*.DS_Store
+*.synctex.gz
+*.out
+*.log
+*.aux

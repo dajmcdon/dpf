@@ -34,7 +34,7 @@
 \citation{RauchStriebel1965}
 \citation{AndersonMoore1979}
 \newlabel{alg:kalman}{{1}{9}{Switching state-space models}{algorithm.1}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Kalman filter: estimate $x_t$ conditional on $\{y_j\}_{j=1}^t$, for all $t=1,\ldots  ,n$ and calculate the log likelihood for $\theta $}}{9}{algorithm.1}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Kalman filter: estimate $x_i$ conditional on $\{y_j\}_{j=1}^i$, for all $i=1,\ldots  ,n$ and calculate the log likelihood for $\theta $}}{9}{algorithm.1}}
 \newlabel{alg:kalman-smoother}{{2}{9}{Switching state-space models}{algorithm.2}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Kalman smoother (Rauch-Tung-Striebel): estimate $\setbox \z@ \hbox {\frozen@everymath \@emptytoks \mathsurround \z@ $\textstyle X$}\mathaccent "0362{X}$ conditional on $Y$}}{9}{algorithm.2}}
 \newlabel{eq:lgmod}{{2}{9}{Switching state-space models}{equation.2.2}{}}
@@ -52,42 +52,25 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}A model for tempo decisions}{11}{subsection.2.3}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Transition diagram. }}{13}{figure.5}}
 \newlabel{fig:transmat}{{5}{13}{Transition diagram}{figure.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter matrices of the switching state space model.}}{13}{table.1}}
-\newlabel{tab:parmats}{{1}{13}{Parameter matrices of the switching state space model}{table.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Penalized likelihood maximization}{14}{subsection.2.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Computational issues}{14}{subsection.2.5}}
-\newlabel{alg:beamsearch}{{3}{15}{Computational issues}{algorithm.3}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Beam search}}{15}{algorithm.3}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces parameter estimates for Fliere's performance}}{15}{table.2}}
-\newlabel{table:fliere}{{2}{15}{parameter estimates for Fliere's performance}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter matrices of the switching state space model.}}{14}{table.1}}
+\newlabel{tab:parmats}{{1}{14}{Parameter matrices of the switching state space model}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Penalized likelihood maximization}{15}{subsection.2.4}}
+\newlabel{sec:penal-likel-maxim}{{2.4}{15}{Penalized likelihood maximization}{subsection.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Computational issues}{15}{subsection.2.5}}
+\newlabel{sec:computational-issues}{{2.5}{15}{Computational issues}{subsection.2.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{15}{section.3}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces parameter estimates for Tomsic's performance}}{15}{table.3}}
-\newlabel{table:tomsic}{{3}{15}{parameter estimates for Tomsic's performance}{table.3}{}}
+\newlabel{sec:analys-chop-mazurka}{{3}{15}{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{section.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces parameter estimates for Fliere's performance}}{16}{table.2}}
+\newlabel{table:fliere}{{2}{16}{parameter estimates for Fliere's performance}{table.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{16}{figure.6}}
 \newlabel{figure:fliere}{{6}{16}{Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{16}{figure.7}}
-\newlabel{figure:tomsic}{{7}{16}{Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.7}{}}
+\newlabel{alg:beamsearch}{{3}{17}{Computational issues}{algorithm.3}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Beam search}}{17}{algorithm.3}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces parameter estimates for Tomsic's performance}}{17}{table.3}}
+\newlabel{table:tomsic}{{3}{17}{parameter estimates for Tomsic's performance}{table.3}{}}
 \bibstyle{agsm}
 \bibdata{AllReferences}
-\bibcite{AndersonMoore1979}{{1}{1979}{{Anderson and\ Moore}}{{}}}
-\bibcite{AndrieuDoucet2010}{{2}{2010}{{Andrieu et~al.}}{{Andrieu, Doucet and\ Holenstein}}}
-\bibcite{Bernstein2005}{{3}{2005}{{Bernstein}}{{}}}
-\bibcite{BlockJonsen2011}{{4}{2011}{{Block et~al.}}{{Block, Jonsen, Jorgensen, Winship, Shaffer, Bograd, Hazen, Foley, Breed, Harrison et~al.}}}
-\bibcite{DrorKoenigstein2012}{{5}{2012}{{Dror et~al.}}{{Dror, Koenigstein, Koren and\ Weimer}}}
-\bibcite{DurbinKoopman2001}{{6}{2001}{{Durbin and\ Koopman}}{{}}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{17}{section.4}}
-\bibcite{DurbinKoopman1997}{{7}{1997}{{Durbin and\ Koopman}}{{}}}
-\bibcite{FoxSudderth2011}{{8}{2011}{{Fox et~al.}}{{Fox, Sudderth, Jordan and\ Willsky}}}
-\bibcite{Fuh2006}{{9}{2006}{{Fuh}}{{}}}
-\bibcite{GhahramaniHinton2000}{{10}{2000}{{Ghahramani and\ Hinton}}{{}}}
-\bibcite{Hamilton2011}{{11}{2011}{{Hamilton}}{{}}}
-\bibcite{Harvey1990}{{12}{1990}{{Harvey}}{{}}}
-\bibcite{Kalman1960}{{13}{1960}{{Kalman}}{{}}}
-\bibcite{Kim1994}{{14}{1994}{{Kim}}{{}}}
-\bibcite{KimNelson1998}{{15}{1998}{{Kim and\ Nelson}}{{}}}
-\bibcite{Kitagawa1987}{{16}{1987}{{Kitagawa}}{{}}}
-\bibcite{Kitagawa1996}{{17}{1996}{{Kitagawa}}{{}}}
-\bibcite{KoyamaPerez-Bolde2010}{{18}{2010}{{Koyama et~al.}}{{Koyama, P{\'e}rez-Bolde, Shalizi and\ Kass}}}
-\bibcite{McDonald2016}{{19}{2016}{{McDonald}}{{}}}
-\bibcite{PattersonThomas2008}{{20}{2008}{{Patterson et~al.}}{{Patterson, Thomas, Wilcox, Ovaskainen and\ Matthiopoulos}}}
-\bibcite{RauchStriebel1965}{{21}{1965}{{Rauch et~al.}}{{Rauch, Striebel and\ Tung}}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{18}{figure.7}}
+\newlabel{figure:tomsic}{{7}{18}{Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{18}{section.4}}
+\newlabel{sec:discussion}{{4}{18}{Discussion}{section.4}{}}

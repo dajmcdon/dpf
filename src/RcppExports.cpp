@@ -103,8 +103,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // beamSearch
-List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0, arma::cube dt, arma::cube ct, arma::cube Tt, arma::cube Zt, arma::cube Rt, arma::cube Qt, arma::cube GGt, arma::mat yt, arma::mat transProbs, int N);
-RcppExport SEXP _dpf_beamSearch(SEXP a0SEXP, SEXP P0SEXP, SEXP w0SEXP, SEXP dtSEXP, SEXP ctSEXP, SEXP TtSEXP, SEXP ZtSEXP, SEXP RtSEXP, SEXP QtSEXP, SEXP GGtSEXP, SEXP ytSEXP, SEXP transProbsSEXP, SEXP NSEXP) {
+List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0, arma::cube dt, arma::cube ct, arma::cube Tt, arma::cube Zt, arma::cube HHt, arma::cube GGt, arma::mat yt, arma::mat transProbs, int N);
+RcppExport SEXP _dpf_beamSearch(SEXP a0SEXP, SEXP P0SEXP, SEXP w0SEXP, SEXP dtSEXP, SEXP ctSEXP, SEXP TtSEXP, SEXP ZtSEXP, SEXP HHtSEXP, SEXP GGtSEXP, SEXP ytSEXP, SEXP transProbsSEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -115,13 +115,12 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::cube >::type ct(ctSEXP);
     Rcpp::traits::input_parameter< arma::cube >::type Tt(TtSEXP);
     Rcpp::traits::input_parameter< arma::cube >::type Zt(ZtSEXP);
-    Rcpp::traits::input_parameter< arma::cube >::type Rt(RtSEXP);
-    Rcpp::traits::input_parameter< arma::cube >::type Qt(QtSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type HHt(HHtSEXP);
     Rcpp::traits::input_parameter< arma::cube >::type GGt(GGtSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type yt(ytSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type transProbs(transProbsSEXP);
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
-    rcpp_result_gen = Rcpp::wrap(beamSearch(a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, N));
+    rcpp_result_gen = Rcpp::wrap(beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -146,7 +145,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_dpf", (DL_FUNC) &_dpf_dpf, 13},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 7},
-    {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 13},
+    {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 12},
     {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
     {NULL, NULL, 0}
 };

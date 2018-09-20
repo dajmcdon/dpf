@@ -5,9 +5,8 @@ logprior <- function(pvec, samp_mean){
   #mu1 = dnorm(theta[2], samp_mean, sd=20.0, log = TRUE)
   mu2 = dnorm(theta[3], -10.0, sd=10.0, log = TRUE)
   mu3 = dnorm(theta[4], -30.0, sd=10.0, log = TRUE)
-  #sig2obs = dnorm(theta[5], 0.0001, sd=0.1, log=TRUE)
-  sig2acc = dnorm(theta[6], 400, sd=100, log=TRUE)
-  sig2dec = dnorm(theta[7], 400, sd=100, log=TRUE)
+  sig2tempo = dnorm(theta[6], 400, sd=100, log=TRUE)
+  sig2acc = dnorm(theta[7], 400, sd=100, log=TRUE)
   sig2stress = dnorm(theta[8], 900, sd=100, log=TRUE)
   p1 = ddirichlet(p1s, alpha=c(20,5,5))
   p22 = dbeta(theta[11], 9, 6, log=TRUE)
@@ -21,7 +20,7 @@ logprior <- function(pvec, samp_mean){
 ddirichlet <- function(theta, alpha) sum(alpha*log(theta)) # on the log scale, no constant
 
 init <- function(samp_mean, noise = 0){
-  means = c(400, samp_mean, -10, -30, .0001, 400, 400, 900, .85, .1, 9/15, 1/2)
+  means = c(400, samp_mean, -10, -30, 400, 400, 900, .85, .1, 9/15, 1/2)
   m = ContoR(means)
   ini = rnorm(length(m), m, sd = noise)
   ini = ini[-c(2,5)]
@@ -35,15 +34,15 @@ invlogistic <- function(x) log(x/(1-x))
 nonneg <- function(x) log(x)
 invnonneg <- function(x) exp(x)
 RtoCon <- function(p){
-  tp = logistic(p[9:12])
+  tp = logistic(p[8:11])
   tp[2] = toab(tp[2], 0, 1-tp[1])
-  return(c(invnonneg(p[1]), p[2], -invnonneg(p[3:4]), 0, invnonneg(p[6:8]), tp))
+  return(c(invnonneg(p[1]), p[2], -invnonneg(p[3:4]), invnonneg(p[5:7]), tp))
 }
 ContoR <- function(p){
   #deal with the simplex
   p[10] = toabInv(p[10], 0, 1-p[9])
-  return(c(nonneg(p[1]), p[2], nonneg(-p[3:4]), 0, nonneg(p[6:8]), 
-           invlogistic(p[9:12])))
+  return(c(nonneg(p[1]), p[2], nonneg(-p[3:4]), nonneg(p[5:7]), 
+           invlogistic(p[8:11])))
 }
 
 logStatesGivenParams <- function(states,transProbs){
@@ -53,14 +52,14 @@ logStatesGivenParams <- function(states,transProbs){
 
 toOptimize <- function(theta, yt, lt, Npart, badvals=Inf){
   samp_mean = mean(yt)
-  theta = c(theta[1], samp_mean, theta[2:3], 0, theta[4:10])
+  theta = c(theta[1], samp_mean, theta[2:10])
   pvec = RtoCon(theta)
-  pmats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12],
+  pmats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:7], pvec[9:12],
                      initialMean = c(132,0), # 132 is marked tempo, 0 is unused
                      initialVariance = c(400,10)) # sd of 20, 10 is unused
   beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0), 
                     pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
-                    pmats$Rt, pmats$Qt, pmats$GGt, yt, pmats$transMat, Npart)
+                    pmats$HHt, pmats$GGt, yt, pmats$transMat, Npart)
   if(beam$LastStep < length(lt)){
     cat('beam$LastStep < length(lt)\n')
     return(badvals)
@@ -103,7 +102,7 @@ optimizer <- function(perf, lt, Npart=200, ntries = 5, spread_init=3,
   out = rbind.data.frame(out1, out2)
   if(all(is.na(out$value))) return(rep(NA, 12))
   theta = unlist(out[which.min(out$value), 1:10])
-  theta = c(theta[1], samp_mean, theta[2:3], 0, theta[4:10])
+  theta = c(theta[1], samp_mean, theta[2:10])
   pvec = RtoCon(theta)
   pvec
 }

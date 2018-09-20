@@ -222,18 +222,18 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 }
 
 
-arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
-  arma::uword K = Rt.n_cols;
-  arma::mat Rtmp(r,q);
-  arma::mat Qtmp(q,q);
-  arma::mat HHt(r*r, K);
-  for(arma::uword iter=0; iter < K; iter++){
-    Rtmp = reshape(Rt.col(iter), r, q);
-    Qtmp = reshape(Qt.col(iter), q, q);
-    HHt.col(iter) = arma::vectorise(Rtmp * Qtmp * Rtmp.t());
-  }
-  return(HHt);
-}
+// arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
+//   arma::uword K = Rt.n_cols;
+//   arma::mat Rtmp(r,q);
+//   arma::mat Qtmp(q,q);
+//   arma::mat HHt(r*r, K);
+//   for(arma::uword iter=0; iter < K; iter++){
+//     Rtmp = reshape(Rt.col(iter), r, q);
+//     Qtmp = reshape(Qt.col(iter), q, q);
+//     HHt.col(iter) = arma::vectorise(Rtmp * Qtmp * Rtmp.t());
+//   }
+//   return(HHt);
+// }
 
 //currentStates: vector of the current discrete state for each particle
 //w: resampling weight for each particle
@@ -334,8 +334,9 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::cube ct = pmats["ct"];
   arma::cube Tt = pmats["Tt"];
   arma::cube Zt = pmats["Zt"];
-  arma::cube Rt = pmats["Rt"];
-  arma::cube Qt = pmats["Qt"];
+  arma::cube HHt = pmats["HHt"];
+  // arma::cube Rt = pmats["Rt"];
+  // arma::cube Qt = pmats["Qt"];
   arma::cube GGt = pmats["GGt"];
   
   arma::uword n = y.n_cols;
@@ -349,12 +350,12 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::uword ctvar = ct.n_slices > 1;
   arma::uword Ttvar = Tt.n_slices > 1;
   arma::uword Ztvar = Zt.n_slices > 1;
-  arma::uword Rtvar = Rt.n_slices > 1;
-  arma::uword Qtvar = Qt.n_slices > 1;
+  // arma::uword Rtvar = Rt.n_slices > 1;
+  // arma::uword Qtvar = Qt.n_slices > 1;
+  arma::uword HHtvar = HHt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
-  arma::mat HHt(m,m);
-  arma::mat R(mm,1);
-  arma::mat Q(mm,1);
+  // arma::mat R(mm,1);
+  // arma::mat Q(mm,1);
   
   arma::mat aa0 = a0.col(path(0));
   arma::mat PP0 = reshape(P0.col(path(0)), m, m);
@@ -364,18 +365,19 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   
   for(arma::uword iter=0; iter<n; iter++){
     arma::uword s = path(iter);
-    if(iter==0 || Rtvar || Qtvar){ 
-      R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
-      Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
-      R.reshape(m,m);
-      Q.reshape(m,m);
-      HHt = R * Q * R.t();
-    }
+    // if(iter==0 || Rtvar || Qtvar){ 
+    //   R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
+    //   Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
+    //   R.reshape(m,m);
+    //   Q.reshape(m,m);
+    //   HHt = R * Q * R.t();
+    // }
     KFOUT step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                                     ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                                     Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                                     Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
-                                    HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
+                                    HHt.subcube(0,s,iter*HHtvar,arma::size(mm,1,1)), 
+                                    GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                                     y.col(iter));
     
     aa0 = step.att;
@@ -392,8 +394,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' 
 //' @param lt durations between successive notes in the score
 //' @param sig2eps variance of the observation noise
-//' @param mus vector of 4 mean parameters
-//' @param sig2eta vector of 4 state variance parameters
+//' @param mus vector of 3 mean parameters
+//' @param sig2eta vector of 3 state variance parameters
 //' @param transprobs vector of 4 transition probabilities
 //' 
 //' @return List with components as appropriate for Kalman filtering or Beam Search
@@ -443,19 +445,26 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
   Zt.tube(0,0,0,7) += 1;
   Zt(1,2,0) += 1;
-  arma::cube Rt(mm, nstates, n, arma::fill::zeros);
+  // arma::cube Rt(mm, nstates, n, arma::fill::zeros);
+  arma::cube HHt(mm, nstates, n, arma::fill::zeros);
+  for(int iter=0; iter<3; iter++) HHt.tube(iter,1) = sig2eta(1)*lt;
+  HHt.tube(3,1) += sig2eta(1);
+  HHt.tube(3,2) += sig2eta(2);
+  for(int iter=0; iter<3; iter++) HHt.tube(iter,4) = sig2eta(1)*lt;
+  HHt.tube(3,4) += sig2eta(1);
+  HHt.tube(0,5) += sig2eta(0);
   // Rt.tube(0,0) += 1;
-  Rt.tube(0,0,0,7) += 1;
+  // Rt.tube(0,0,0,7) += 1;
   // Rt.tube(0,5) += 1;
-  Rt.tube(3,1,3,2) += 1;
-  Rt.tube(3,4) += 1;
-  Rt.tube(2,1) = lt;
-  Rt.tube(2,4) = lt;
-  arma::cube Qt(mm, nstates, 1, arma::fill::zeros);
-  Qt.tube(0,0,0,7) += sig2eta(0);
-  Qt.tube(3,0,3,7) += sig2eta(1);
-  Qt.tube(3,2) -= sig2eta(1) - sig2eta(2);
-  Qt.tube(0,5) = sig2eta(3);
+  // Rt.tube(3,1,3,2) += 1;
+  // Rt.tube(3,4) += 1;
+  // Rt.tube(2,1) = lt;
+  // Rt.tube(2,4) = lt;
+  // arma::cube Qt(mm, nstates, 1, arma::fill::zeros);
+  // Qt.tube(0,0,0,7) += sig2eta(0);
+  // Qt.tube(3,0,3,7) += sig2eta(1);
+  // Qt.tube(3,2) -= sig2eta(1) - sig2eta(2);
+  // Qt.tube(0,5) = sig2eta(3);
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
@@ -480,46 +489,48 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
                       Named("Tt") = Tt, Named("Zt") = Zt,
-                      Named("Rt") = Rt, Named("Qt") = Qt,
+                      Named("HHt") = HHt,
+                      // Named("Rt") = Rt, Named("Qt") = Qt,
                       Named("GGt") = GGt,
                       Named("transMat") = transMat);
 }
 
 List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
-                arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt,
-                arma::mat HHt, arma::mat GGt, arma::vec yt){
-    arma::uvec particles = arma::find(w0);
-    int npart = particles.n_elem;
-    if(npart == 0){return List::create(Named("BadPars") = 1);}
-    arma::vec weights = w0(particles);
-    arma::mat a11(a0.n_rows, npart);
-    arma::mat P11(P0.n_rows, npart);
-    arma::vec lik(npart);
-    for(int i = 0; i < npart; i++){
-        int p = particles(i);
-        KFOUT kfout = kf1step(a0.col(p), P0.col(p), dt.col(p), ct.col(p),
-                              Tt.col(p), Zt.col(p), HHt.col(p), GGt.col(p), yt);
-        arma::mat atmp = kfout.att;
-        arma::mat Ptmp = kfout.Ptt;
-        a11.col(i) = atmp;
-        P11.col(i) = Ptmp;
-        lik(i) = kfout.lik;
-    }
-    lik %= weights;
-    arma::vec w = arma::normalise(lik, 1);
-    w = resampleSubOptimal(w, N);
-    if( !arma::any(w)) return List::create(Named("BadPars") = 1);
-    arma::uvec nz = arma::find(w);
-    arma::vec newW = w(nz);
-    arma::uvec newstates = particles(nz);
-    arma::mat aout = a11.cols(nz);
-    arma::mat Pout = P11.cols(nz);
-    return List::create(Named("BadPars") = 0,
-                        Named("a1") = aout,
-                        Named("P1") = Pout,
-                        Named("newstates") = newstates,
-                        Named("newW") = newW);
+                         arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt,
+                         arma::mat HHt, arma::mat GGt, arma::vec yt){
+  arma::uvec particles = arma::find(w0);
+  int npart = particles.n_elem;
+  if(npart == 0){return List::create(Named("BadPars") = 1);}
+  arma::vec weights = w0(particles);
+  arma::mat a11(a0.n_rows, npart);
+  arma::mat P11(P0.n_rows, npart);
+  arma::vec lik(npart);
+  for(int i = 0; i < npart; i++){
+    int p = particles(i);
+    KFOUT kfout = kf1step(a0.col(p), P0.col(p), dt.col(p), ct.col(p),
+                          Tt.col(p), Zt.col(p), HHt.col(p), GGt.col(p), yt);
+    arma::mat atmp = kfout.att;
+    arma::mat Ptmp = kfout.Ptt;
+    a11.col(i) = atmp;
+    P11.col(i) = Ptmp;
+    lik(i) = kfout.lik;
+  }
+  lik %= weights;
+  arma::vec w = arma::normalise(lik, 1);
+  w = resampleSubOptimal(w, N);
+  if( !arma::any(w)) return List::create(Named("BadPars") = 1);
+  arma::uvec nz = arma::find(w);
+  arma::vec newW = w(nz);
+  arma::uvec newstates = particles(nz);
+  arma::mat aout = a11.cols(nz);
+  arma::mat Pout = P11.cols(nz);
+  return List::create(Named("BadPars") = 0,
+                      Named("a1") = aout,
+                      Named("P1") = Pout,
+                      Named("newstates") = newstates,
+                      Named("newW") = newW);
 }
+
 
 //' Greedy HMM estimation given continuous hidden states
 //' 
@@ -533,7 +544,7 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
 // [[Rcpp::export]]
 List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                 arma::cube dt, arma::cube ct, arma::cube Tt, arma::cube Zt,
-                arma::cube Rt, arma::cube Qt, arma::cube GGt, arma::mat yt,
+                arma::cube HHt, arma::cube GGt, arma::mat yt,
                 arma::mat transProbs, int N){
   arma::uword n = yt.n_cols;
   arma::uword K = transProbs.n_cols;
@@ -548,18 +559,18 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   arma::uword ctvar = ct.n_slices > 1;
   arma::uword Ttvar = Tt.n_slices > 1;
   arma::uword Ztvar = Zt.n_slices > 1;
-  arma::uword Rtvar = Rt.n_slices > 1;
-  arma::uword Qtvar = Qt.n_slices > 1;
+  arma::uword HHtvar = HHt.n_slices > 1;
+  // arma::uword Rtvar = Rt.n_slices > 1;
+  // arma::uword Qtvar = Qt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
-  arma::uword q = sqrtf(Qt.n_rows);
   arma::uvec particles(maxpart, arma::fill::zeros);
   arma::uvec filler = arma::regspace<arma::uvec>(0,K-1);
   arma::umat paths(maxpart, n, arma::fill::zeros);
   arma::colvec weights(maxpart,arma::fill::zeros);
-  arma::mat HHt(m*m, K);
-  HHt = HHcreate(Rt.slice(0), Qt.slice(0), m, q);
   List step = initializeParticles(w0, N, a0, P0, dt.slice(0), ct.slice(0),
-                                  Tt.slice(0), Zt.slice(0), HHt, GGt.slice(0), yt.col(0));
+                                  Tt.slice(0), Zt.slice(0), 
+                                  HHt.slice(0), 
+                                  GGt.slice(0), yt.col(0));
   int BP = step["BadPars"];
   if(BP) return List::create(Named("LastStep") = 1);
   arma::vec newW = step["newW"];
@@ -574,15 +585,16 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   paths(arma::span(0, CurrentPartNum - 1), 0) = newS;
   arma::uword iter = 1;
   while(iter < n){
-    if(Rtvar || Qtvar){ 
-      HHt = HHcreate(Rt.slice(iter * Rtvar), Qt.slice(iter * Qtvar), m, q);
-    }
+    // if(Rtvar || Qtvar){ 
+    //   HHt = HHcreate(Rt.slice(iter * Rtvar), Qt.slice(iter * Qtvar), m, q);
+    // }
     step = dpf(particles.head(CurrentPartNum), weights.head(CurrentPartNum), 
                               maxpart, transProbs, 
                               a0.head_cols(CurrentPartNum), P0.head_cols(CurrentPartNum),
                               dt.slice(iter * dtvar), ct.slice(iter * ctvar), 
                               Tt.slice(iter * Ttvar), Zt.slice(iter * Ztvar), 
-                              HHt, GGt.slice(iter * GGtvar), yt.col(iter));
+                              HHt.slice(iter * HHtvar), 
+                              GGt.slice(iter * GGtvar), yt.col(iter));
     int BP = step["BadPars"];
     if(BP) break;
     arma::vec newW = step["newW"];
@@ -735,8 +747,9 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   arma::cube ct = pmats["ct"];
   arma::cube Tt = pmats["Tt"];
   arma::cube Zt = pmats["Zt"];
-  arma::cube Rt = pmats["Rt"];
-  arma::cube Qt = pmats["Qt"];
+  arma::cube HHt = pmats["HHt"];
+  // arma::cube Rt = pmats["Rt"];
+  // arma::cube Qt = pmats["Qt"];
   arma::cube GGt = pmats["GGt"];
   
   arma::uword n = y.n_cols;
@@ -750,12 +763,13 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   arma::uword ctvar = ct.n_slices > 1;
   arma::uword Ttvar = Tt.n_slices > 1;
   arma::uword Ztvar = Zt.n_slices > 1;
-  arma::uword Rtvar = Rt.n_slices > 1;
-  arma::uword Qtvar = Qt.n_slices > 1;
+  arma::uword HHtvar = HHt.n_slices > 1;
+  // arma::uword Rtvar = Rt.n_slices > 1;
+  // arma::uword Qtvar = Qt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
-  arma::mat HHt(m,m);
-  arma::mat R(mm,1);
-  arma::mat Q(mm,1);
+  // arma::mat HHt(m,m);
+  // arma::mat R(mm,1);
+  // arma::mat Q(mm,1);
   
   
   // output storage
@@ -779,20 +793,21 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   arma::uword iter=0;
   while(iter < n){ //issue only happens when variables are declared both in and before the loop
     s = path(iter);
-    if(iter==0 || Rtvar || Qtvar){ 
-      R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
-      Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
-      R.reshape(m,m);
-      Q.reshape(m,m);
-      HHt = R * Q * R.t();
-    }
+    // if(iter==0 || Rtvar || Qtvar){ 
+    //   R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
+    //   Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
+    //   R.reshape(m,m);
+    //   Q.reshape(m,m);
+    //   HHt = R * Q * R.t();
+    // }
     
     KFOUT step = kf1step(a00, P00, 
                          dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                          ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                          Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
                          Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
-                         HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
+                         HHt.subcube(0,s,iter*HHtvar,arma::size(mm,1,1)), 
+                         GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
                          y.col(iter));
     at.col(iter) = step.at;
     att.col(iter) = step.att;

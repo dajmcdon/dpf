@@ -4,7 +4,7 @@
 \alias{beamSearch}
 \title{Greedy HMM estimation given continuous hidden states}
 \usage{
-beamSearch(a0, P0, w0, dt, ct, Tt, Zt, Rt, Qt, GGt, yt, transProbs, N)
+beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
 }
 \arguments{
 \item{a0}{a px1 matrix of state prior means}
