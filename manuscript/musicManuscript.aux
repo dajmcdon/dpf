@@ -21,38 +21,56 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}}
 \newlabel{sec:introduction}{{1}{2}{Introduction}{section.1}{}}
 \citation{McDonald2016}
-\citation{CookSapp2009}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The tempo (beats/minute) of a 2003 recording attributed to Joyce Hatto.}}{3}{figure.1}}
 \newlabel{fig:music}{{1}{3}{The tempo (beats/minute) of a 2003 recording attributed to Joyce Hatto}{figure.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous.}}{4}{figure.2}}
-\newlabel{fig:switchss}{{2}{4}{Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous}{figure.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Materials and methods}{4}{section.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data and preprocessing}{4}{subsection.2.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Switching state-space models}{4}{subsection.2.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Transition diagram. }}{5}{figure.3}}
-\newlabel{fig:transmat}{{3}{5}{Transition diagram}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}A model for tempo decisions}{5}{subsection.2.3}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter matrices of the switching state space model.}}{6}{table.1}}
-\newlabel{tab:parmats}{{1}{6}{Parameter matrices of the switching state space model}{table.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Penalized likelihood maximization}{7}{subsection.2.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Computational issues}{7}{subsection.2.5}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{7}{section.3}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces parameter estimates for Fliere's performance}}{8}{table.2}}
-\newlabel{table:fliere}{{2}{8}{parameter estimates for Fliere's performance}{table.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{8}{figure.4}}
-\newlabel{figure:fliere}{{4}{8}{Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.4}{}}
-\newlabel{alg:beamsearch}{{1}{9}{Computational issues}{algorithm.1}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Beam search}}{9}{algorithm.1}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces parameter estimates for Tomsic's performance}}{9}{table.3}}
-\newlabel{table:tomsic}{{3}{9}{parameter estimates for Tomsic's performance}{table.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{9}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Related work}{4}{subsection.1.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces State-space model. Filled objects are observed, circles indicate that both hidden and observed states are continuous.}}{8}{figure.2}}
+\newlabel{fig:ssmod}{{2}{8}{State-space model. Filled objects are observed, circles indicate that both hidden and observed states are continuous}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Materials and methods}{8}{section.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data and preprocessing}{8}{subsection.2.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Switching state-space models}{8}{subsection.2.2}}
+\newlabel{eq:ssmod}{{1}{8}{Switching state-space models}{equation.2.1}{}}
+\citation{Kalman1960,Harvey1990}
+\citation{RauchStriebel1965}
+\citation{AndersonMoore1979}
+\newlabel{alg:kalman}{{1}{9}{Switching state-space models}{algorithm.1}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Kalman filter: estimate $x_i$ conditional on $\{y_j\}_{j=1}^i$, for all $i=1,\ldots  ,n$ and calculate the log likelihood for $\theta $}}{9}{algorithm.1}}
+\newlabel{alg:kalman-smoother}{{2}{9}{Switching state-space models}{algorithm.2}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Kalman smoother (Rauch-Tung-Striebel): estimate $\setbox \z@ \hbox {\frozen@everymath \@emptytoks \mathsurround \z@ $\textstyle X$}\mathaccent "0362{X}$ conditional on $Y$}}{9}{algorithm.2}}
+\newlabel{eq:lgmod}{{2}{9}{Switching state-space models}{equation.2.2}{}}
+\citation{DurbinKoopman2001}
+\citation{DurbinKoopman1997,Fuh2006,Kitagawa1987,Kitagawa1996}
+\citation{KoyamaPerez-Bolde2010,AndrieuDoucet2010}
+\citation{KimNelson1998,Kim1994,Hamilton2011}
+\citation{FoxSudderth2011}
+\citation{PattersonThomas2008,BlockJonsen2011}
+\citation{GhahramaniHinton2000}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous.}}{11}{figure.3}}
+\newlabel{fig:switchss}{{3}{11}{Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The beginning of two Chopin piano compositions: the Mazurka we analyze is on the left while the Ballade No.\ 1, Op.\ 23 is on the right.}}{11}{figure.4}}
+\newlabel{fig:tempo-markings}{{4}{11}{The beginning of two Chopin piano compositions: the Mazurka we analyze is on the left while the Ballade No.\ 1, Op.\ 23 is on the right}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}A model for tempo decisions}{11}{subsection.2.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Transition diagram. }}{13}{figure.5}}
+\newlabel{fig:transmat}{{5}{13}{Transition diagram}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter matrices of the switching state space model.}}{14}{table.1}}
+\newlabel{tab:parmats}{{1}{14}{Parameter matrices of the switching state space model}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Penalized likelihood maximization}{15}{subsection.2.4}}
+\newlabel{sec:penal-likel-maxim}{{2.4}{15}{Penalized likelihood maximization}{subsection.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Computational issues}{15}{subsection.2.5}}
+\newlabel{sec:computational-issues}{{2.5}{15}{Computational issues}{subsection.2.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{15}{section.3}}
+\newlabel{sec:analys-chop-mazurka}{{3}{15}{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{section.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces parameter estimates for Fliere's performance}}{16}{table.2}}
+\newlabel{table:fliere}{{2}{16}{parameter estimates for Fliere's performance}{table.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{16}{figure.6}}
+\newlabel{figure:fliere}{{6}{16}{Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.6}{}}
+\newlabel{alg:beamsearch}{{3}{17}{Computational issues}{algorithm.3}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Beam search}}{17}{algorithm.3}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces parameter estimates for Tomsic's performance}}{17}{table.3}}
+\newlabel{table:tomsic}{{3}{17}{parameter estimates for Tomsic's performance}{table.3}{}}
 \bibstyle{agsm}
 \bibdata{AllReferences}
-\bibcite{Bernstein2005}{{1}{2005}{{Bernstein}}{{}}}
-\bibcite{CookSapp2009}{{2}{2009}{{Cook and\ Sapp}}{{}}}
-\bibcite{DrorKoenigstein2012}{{3}{2012}{{Dror et~al.}}{{Dror, Koenigstein, Koren and\ Weimer}}}
-\bibcite{GhahramaniHinton2000}{{4}{2000}{{Ghahramani and\ Hinton}}{{}}}
-\bibcite{McDonald2016}{{5}{2016}{{McDonald}}{{}}}
-\bibcite{Raphael2002}{{6}{2002}{{Raphael}}{{}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{10}{figure.5}}
-\newlabel{figure:tomsic}{{5}{10}{Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}}{18}{figure.7}}
+\newlabel{figure:tomsic}{{7}{18}{Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo}{figure.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{18}{section.4}}
+\newlabel{sec:discussion}{{4}{18}{Discussion}{section.4}{}}
