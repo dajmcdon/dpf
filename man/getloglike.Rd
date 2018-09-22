@@ -7,9 +7,9 @@
 getloglike(pmats, path, y)
 }
 \arguments{
-\item{pmats}{a list of parameter matrices for the kalman filter}
+\item{pmats}{a list of parameter matrices for the kalman filter. This can either be the output of yupengMats, or a list with the same names as the output of yupengMats.}
 
-\item{path}{the desired path for hidden discrete states}
+\item{path}{vector giving the desired path for hidden discrete states}
 
 \item{y}{observations, each time point in a column}
 }

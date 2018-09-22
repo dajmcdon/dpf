@@ -14,9 +14,9 @@
 #' @name dpf
 NULL
 
-#' @useDynLib dpf
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
+#' @importFrom stats rgamma
 NULL
 
 #' Dynamics of 46 Chopin piano recordings
@@ -63,3 +63,4 @@ NULL
 #' 
 #' @source \url{http://www.mazurka.org.uk}
 "recordings"
+

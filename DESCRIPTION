@@ -11,10 +11,11 @@ BugReports: http://github.com/dajmcdon/dpf/issues
 Description: Estimates hidden Markov models greedily in the presence of Gaussian observations
     and continuous (Gaussian) hidden states.
 License: GPL
-LazyData: true
+LazyData: TRUE
 Depends: R (>= 2.10)
 Imports: Rcpp (>= 0.12.10),
     ggplot2
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.1.0
 Suggests: testthat
+Encoding: UTF-8

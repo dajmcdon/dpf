@@ -4,7 +4,8 @@
 \alias{yupengMats}
 \title{Create parameter matrices as in Gu (2017)}
 \usage{
-yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
+yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
+  initialVariance)
 }
 \arguments{
 \item{lt}{durations between successive notes in the score}

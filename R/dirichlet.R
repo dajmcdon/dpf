@@ -1,5 +1,3 @@
-
-
 #' Dirichlet random variables
 #'
 #' @param x vector of probabilities supported on the K-1 simplex. ddirichlet is vectorized over x.
