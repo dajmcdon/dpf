@@ -14,6 +14,7 @@
 #' @name dpf
 NULL
 
+#' @useDynLib dpf
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats rgamma
