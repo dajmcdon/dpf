@@ -48,6 +48,16 @@ record = data.frame(performers, years)
 colnames(record) = c('performer', 'year')
 save(record, file = 'data/recordings.rda')
 
+tempos = array(dim = c(nrow(dynamics), ncol(dynamics)))
+tempos[,1:3] = as.matrix(dynamics[,1:3])
+for(i in 4:ncol(tempos)){
+    tempos[,i] = diff(c(dynamics$note_onset,61))*3*60/diff(c(recordings[[i-3]]$time,113))
+    tempos[nrow(tempos),i] = mean(c(tempos[nrow(tempos) - 1,i], tempos[nrow(tempos) - 2,i]))
+}
+colnames(tempos) = colnames(dynamics)
+tempos = data.frame(tempos)
+save(tempos, file = 'data/tempos.rda')
+
 ## redo normalized 
 end.times = time.mat[n,]
 mean.duration = mean(end.times)
