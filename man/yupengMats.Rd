@@ -12,14 +12,24 @@ yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
 
 \item{sig2eps}{variance of the observation noise}
 
-\item{mus}{vector of 3 mean parameters}
+\item{mus}{vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})}
 
-\item{sig2eta}{vector of 3 state variance parameters}
+\item{sig2eta}{vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})}
 
-\item{transprobs}{vector of 4 transition probabilities}
+\item{transprobs}{vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})}
 }
 \value{
-List with components as appropriate for Kalman filtering or Beam Search
+List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
+\item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
+\item{P0}{a (p^2)xd matrix of the initial covariances of the hidden state. The j'th column corresponds to the initial covariances stored columnwise when starting in the j'th discrete state.}
+\item{dt}{a pxdxn cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+\item{ct}{a kxdx1 cube of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.}
+\item{Tt}{a (p^2)xdxn cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+\item{Zt}{a pkxdx1 cube of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.}
+\item{HHt}{a (p^2)xdxn cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+\item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
+\item{transMat}{a dxd matrix of transition probabilities for the discrete states}
+}
 }
 \description{
 Create parameter matrices as in Gu (2017)

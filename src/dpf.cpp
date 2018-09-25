@@ -248,6 +248,20 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 //HHt: variance of the predicted mean of the continuous state
 //GGt: variance of the observation
 //yt: observation
+//' @param currentStates a vector of the current discrete state for each particle
+//' @param w a vector of the sampling weights for each particle
+//' @param N the maximum particle number
+//' @param transProbs a dxd matrix of transition probabilities for the discrete states
+//' @param a0 a pxN matrix of the current estimate of the state means. Each column represents a particle
+//' @param P0 a (p^2)xN state prior covariance matrix
+//' @param dt a pxd matrix of state intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.
+//' @param ct a kxd matrix of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.
+//' @param Tt a (p^2)xd matrix of state slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.
+//' @param Zt a pkxd matrix of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.
+//' @param HHt a (p^2)xd matrix of state covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.
+//' @param GGt a (k^2)xd matrix of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.
+//' @param yt a kxn matrix of obervations
+//' 
  //' @export 
  // [[Rcpp::export]]
 List dpf(arma::uvec currentStates, arma::colvec w, int N,                      //MICHAEL: What are these?
@@ -394,11 +408,21 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' 
 //' @param lt durations between successive notes in the score
 //' @param sig2eps variance of the observation noise
-//' @param mus vector of 3 mean parameters
-//' @param sig2eta vector of 3 state variance parameters
-//' @param transprobs vector of 4 transition probabilities
+//' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
+//' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
+//' @param transprobs vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})
 //' 
-//' @return List with components as appropriate for Kalman filtering or Beam Search
+//' @return List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
+//' \item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
+//' \item{P0}{a (p^2)xd matrix of the initial covariances of the hidden state. The j'th column corresponds to the initial covariances stored columnwise when starting in the j'th discrete state.}
+//' \item{dt}{a pxdxn cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+//' \item{ct}{a kxdx1 cube of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.}
+//' \item{Tt}{a (p^2)xdxn cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+//' \item{Zt}{a pkxdx1 cube of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.}
+//' \item{HHt}{a (p^2)xdxn cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+//' \item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
+//' \item{transMat}{a dxd matrix of transition probabilities for the discrete states}
+//' }
 //' 
 //' @export    
 // [[Rcpp::export]]
@@ -535,10 +559,19 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
 //' Greedy HMM estimation given continuous hidden states
 //' 
 //' @param a0 a px1 matrix of state prior means
-//' @param P0 a pxp matrix of state
-//' @param dt dx1 or dxn matrix of 
+//' @param P0 a pxp state prior covariance matrix
+//' @param w0 a vector specifying the prior probability of starting in each of the d discrete states
+//' @param dt a pxdxn (or pxdx1 if all n slices are the same) cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.
+//' @param ct a kxdxn (or kxdx1 if all n slices are the same) cube of observation intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.
+//' @param Tt a (p^2)xdxn (or (p^2)xdx1 if all n slices are the same) cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.
+//' @param Zt a pkxdxn (or pkxdx1 if all n slices are the same) cube of obvervation slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.
+//' @param HHt a (p^2)xdxn (or (p^2)xdx1 if all n slices are the same) cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.
+//' @param GGt a (k^2)xdxn (or kxdx1 if all n slices are the same) cube of observation covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.
+//' @param yt a kxn matrix of obervations
+//' @param transProbs a dxd matrix of transition probabilities for the discrete states
+//' @param N the maximum particle number
 //' 
-//' @return List with components "paths", "weights", and "LastStep" 
+//' @return List with components "paths", "weights", and "LastStep". "paths" is an Nxn matrix specifying the paths of each particle, "weights" is a vector giving the final sampling weight of each path, and "LastStep" is the timestep computed. "LastStep" will alway equal n unless all of the sampling weights vanish.
 //' 
 //' @export 
 // [[Rcpp::export]]

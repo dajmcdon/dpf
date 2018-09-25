@@ -34,11 +34,21 @@ getloglike <- function(pmats, path, y) {
 #' 
 #' @param lt durations between successive notes in the score
 #' @param sig2eps variance of the observation noise
-#' @param mus vector of 3 mean parameters
-#' @param sig2eta vector of 3 state variance parameters
-#' @param transprobs vector of 4 transition probabilities
+#' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
+#' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
+#' @param transprobs vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})
 #' 
-#' @return List with components as appropriate for Kalman filtering or Beam Search
+#' @return List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
+#' \item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
+#' \item{P0}{a (p^2)xd matrix of the initial covariances of the hidden state. The j'th column corresponds to the initial covariances stored columnwise when starting in the j'th discrete state.}
+#' \item{dt}{a pxdxn cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+#' \item{ct}{a kxdx1 cube of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.}
+#' \item{Tt}{a (p^2)xdxn cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+#' \item{Zt}{a pkxdx1 cube of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.}
+#' \item{HHt}{a (p^2)xdxn cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+#' \item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
+#' \item{transMat}{a dxd matrix of transition probabilities for the discrete states}
+#' }
 #' 
 #' @export    
 yupengMats <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
@@ -48,10 +58,19 @@ yupengMats <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initi
 #' Greedy HMM estimation given continuous hidden states
 #' 
 #' @param a0 a px1 matrix of state prior means
-#' @param P0 a pxp matrix of state
-#' @param dt dx1 or dxn matrix of 
+#' @param P0 a pxp state prior covariance matrix
+#' @param w0 a vector specifying the prior probability of starting in each of the d discrete states
+#' @param dt a pxdxn (or pxdx1 if all n slices are the same) cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.
+#' @param ct a kxdxn (or kxdx1 if all n slices are the same) cube of observation intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.
+#' @param Tt a (p^2)xdxn (or (p^2)xdx1 if all n slices are the same) cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.
+#' @param Zt a pkxdxn (or pkxdx1 if all n slices are the same) cube of obvervation slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.
+#' @param HHt a (p^2)xdxn (or (p^2)xdx1 if all n slices are the same) cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.
+#' @param GGt a (k^2)xdxn (or kxdx1 if all n slices are the same) cube of observation covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.
+#' @param yt a kxn matrix of obervations
+#' @param transProbs a dxd matrix of transition probabilities for the discrete states
+#' @param N the maximum particle number
 #' 
-#' @return List with components "paths", "weights", and "LastStep" 
+#' @return List with components "paths", "weights", and "LastStep". "paths" is an Nxn matrix specifying the paths of each particle, "weights" is a vector giving the final sampling weight of each path, and "LastStep" is the timestep computed. "LastStep" will alway equal n unless all of the sampling weights vanish.
 #' 
 #' @export 
 beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N) {
