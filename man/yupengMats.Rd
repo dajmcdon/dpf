@@ -17,6 +17,10 @@ yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
 \item{sig2eta}{vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})}
 
 \item{transprobs}{vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})}
+
+\item{initialMean}{a vector of length 2 giving the prior tempo and the prior acceleration for when state 3 is the starting state}
+
+\item{initialVariance}{a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 3 is the starting state}
 }
 \value{
 List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
@@ -33,4 +37,16 @@ List with components as appropriate for Kalman filtering or Beam Search. These i
 }
 \description{
 Create parameter matrices as in Gu (2017)
+}
+\examples{
+#load tempos data
+data('tempos')
+#create lt
+lt = diff(c(tempos$note_onset, 61))
+#get parameter matrices using specified parameters
+yupengMats(lt, 3, mus = c(1,2,3),                #mu = 1, tau = 2, phi = 3
+           sig2eta = c(4,5,6),                   #sigma3^2 = 4, sigma2^2 = 5, sigma4^2 = 6
+           transprobs = c(0.1, 0.2, 0.3, 0.4),   #p1 = 0.1, p2 = 0.2, p3 = 0.3, p4 = 0.4
+           initialMean = c(50, 10), initialVariance = c(20, 5))
+
 }

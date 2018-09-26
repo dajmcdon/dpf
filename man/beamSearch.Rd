@@ -7,9 +7,9 @@
 beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
 }
 \arguments{
-\item{a0}{a px1 matrix of state prior means}
+\item{a0}{a pxd matrix of state prior means, where the i'th column is the mean for the i'th state}
 
-\item{P0}{a pxp state prior covariance matrix}
+\item{P0}{a (p^2)xd state prior covariance matrix, where the i'th column is the covariance matrix stored columnwise for the i'th state}
 
 \item{w0}{a vector specifying the prior probability of starting in each of the d discrete states}
 

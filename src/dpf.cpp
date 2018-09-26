@@ -248,6 +248,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 //HHt: variance of the predicted mean of the continuous state
 //GGt: variance of the observation
 //yt: observation
+//' Move the particles forward in time one step
 //' @param currentStates a vector of the current discrete state for each particle
 //' @param w a vector of the sampling weights for each particle
 //' @param N the maximum particle number
@@ -411,6 +412,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
 //' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
 //' @param transprobs vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})
+//' @param initialMean a vector of length 2 giving the prior tempo and the prior acceleration for when state 3 is the starting state
+//' @param initialVariance a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 3 is the starting state 
 //' 
 //' @return List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
 //' \item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
@@ -423,6 +426,17 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' \item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
 //' \item{transMat}{a dxd matrix of transition probabilities for the discrete states}
 //' }
+//' 
+//' @examples
+//' #load tempos data
+//' data('tempos')
+//' #create lt
+//' lt = diff(c(tempos$note_onset, 61))
+//' #get parameter matrices using specified parameters
+//' yupengMats(lt, 3, mus = c(1,2,3),                #mu = 1, tau = 2, phi = 3
+//'            sig2eta = c(4,5,6),                   #sigma3^2 = 4, sigma2^2 = 5, sigma4^2 = 6
+//'            transprobs = c(0.1, 0.2, 0.3, 0.4),   #p1 = 0.1, p2 = 0.2, p3 = 0.3, p4 = 0.4
+//'            initialMean = c(50, 10), initialVariance = c(20, 5))
 //' 
 //' @export    
 // [[Rcpp::export]]
@@ -558,8 +572,8 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
 
 //' Greedy HMM estimation given continuous hidden states
 //' 
-//' @param a0 a px1 matrix of state prior means
-//' @param P0 a pxp state prior covariance matrix
+//' @param a0 a pxd matrix of state prior means, where the i'th column is the mean for the i'th state
+//' @param P0 a (p^2)xd state prior covariance matrix, where the i'th column is the covariance matrix stored columnwise for the i'th state
 //' @param w0 a vector specifying the prior probability of starting in each of the d discrete states
 //' @param dt a pxdxn (or pxdx1 if all n slices are the same) cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.
 //' @param ct a kxdxn (or kxdx1 if all n slices are the same) cube of observation intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.

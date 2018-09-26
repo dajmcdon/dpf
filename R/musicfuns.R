@@ -34,6 +34,21 @@ convert8to4 <- function(path){
 }
 
 
+#' Wrapper function for beamsSearch
+#' 
+#' @param pvec a vector of the parameters for yupengMats in the order \eqn{\sigma_\eps^2, }
+#' @param y the performed tempo of each note
+#' @param onset a vector giving the measure number (including fracitons for notes within a measure) of the start of each note
+#' @param Npart the desired number of particles
+#' @param w0 the prior probability of starting in each state
+#' @param npaths the number of most likely paths to return
+#' 
+#' @return list (length npaths) of lists. Each list contains the following: \describe{
+#' \item{paths}{a vector giving the state path}
+#' \item{weight}{the final sampling weight of the path}
+#' \item{ests}{the smoothed tempo estimates from the path}
+#' \item{llik}{the negative log liklihood for the path}
+#' }
 #' @export
 beamSearchWrap <- function(pvec, y, onset, Npart, w0 = c(1,0,0,0,0,0,0,0), npaths = 1){
     if(!is.matrix(y)) dim(y) = c(1,length(y))
