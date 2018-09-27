@@ -7,14 +7,32 @@
 beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
 }
 \arguments{
-\item{a0}{a px1 matrix of state prior means}
+\item{a0}{a pxd matrix of state prior means, where the i'th column is the mean for the i'th state}
 
-\item{P0}{a pxp matrix of state}
+\item{P0}{a (p^2)xd state prior covariance matrix, where the i'th column is the covariance matrix stored columnwise for the i'th state}
 
-\item{dt}{dx1 or dxn matrix of}
+\item{w0}{a vector specifying the prior probability of starting in each of the d discrete states}
+
+\item{dt}{a pxdxn (or pxdx1 if all n slices are the same) cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+
+\item{ct}{a kxdxn (or kxdx1 if all n slices are the same) cube of observation intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+
+\item{Tt}{a (p^2)xdxn (or (p^2)xdx1 if all n slices are the same) cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+
+\item{Zt}{a pkxdxn (or pkxdx1 if all n slices are the same) cube of obvervation slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+
+\item{HHt}{a (p^2)xdxn (or (p^2)xdx1 if all n slices are the same) cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+
+\item{GGt}{a (k^2)xdxn (or kxdx1 if all n slices are the same) cube of observation covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+
+\item{yt}{a kxn matrix of obervations}
+
+\item{transProbs}{a dxd matrix of transition probabilities for the discrete states}
+
+\item{N}{the maximum particle number}
 }
 \value{
-List with components "paths", "weights", and "LastStep"
+List with components "paths", "weights", and "LastStep". "paths" is an Nxn matrix specifying the paths of each particle, "weights" is a vector giving the final sampling weight of each path, and "LastStep" is the timestep computed. "LastStep" will alway equal n unless all of the sampling weights vanish.
 }
 \description{
 Greedy HMM estimation given continuous hidden states

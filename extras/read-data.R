@@ -39,14 +39,6 @@ for(i in 1:n.recordings) dynamic.mat[,i] = recordings[[i]]$dynamic
 time.mat = matrix(NA, n, n.recordings)
 for(i in 1:n.recordings) time.mat[,i] = recordings[[i]]$time
 
-#Save data
-dynamics = data.frame(cbind(d1$measure, d1$beat, d1$measure + (d1$beat - 1)/3, dynamic.mat))
-colnames(dynamics) = c('meas_num', 'beat', 'note_onset', performance_title)
-save(dynamics, file = 'data/dynamics.rda')
-
-record = data.frame(performers, years)
-colnames(record) = c('performer', 'year')
-save(record, file = 'data/recordings.rda')
 
 ## redo normalized 
 end.times = time.mat[n,]
@@ -74,3 +66,23 @@ phrase.starts$one.bar = 1:60
 phrase.ends = phrase.starts
 phrase.ends = lapply(phrase.ends, function(x) x-1)
 phrase.ends = lapply(phrase.ends, function(x) c(x[-1],60))
+
+#Save data
+dynamics = data.frame(cbind(d1$measure, d1$beat, d1$measure + (d1$beat - 1)/3, dynamic.mat))
+colnames(dynamics) = c('meas_num', 'beat', 'note_onset', performance_title)
+save(dynamics, file = 'data/dynamics.rda')
+
+tempos = array(dim = c(nrow(dynamics), ncol(dynamics)))
+tempos[,1:3] = as.matrix(dynamics[,1:3])
+for(i in 4:ncol(tempos)){
+    tempos[,i] = diff(c(dynamics$note_onset,61))*3*60/diff(c(recordings[[i-3]]$time,113))
+    tempos[nrow(tempos),i] = mean(c(tempos[nrow(tempos) - 1,i], tempos[nrow(tempos) - 2,i]))
+}
+colnames(tempos) = colnames(dynamics)
+tempos = data.frame(tempos)
+save(tempos, file = 'data/tempos.rda')
+
+remove(recordings)
+recordings = data.frame(performers, years)
+colnames(recordings) = c('performer', 'year')
+save(recordings, file = 'data/recordings.rda')

@@ -1,3 +1,12 @@
+#' Plot the state path found by beamSearch along with the smoothed tempo estimate
+#' 
+#' @param performance a vector of the performed tempo of each note
+#' @param performer a string giving the name of the performer
+#' @param onset a vector giving the measure number (including fracitons for notes within a measure) of the start of each note
+#' @param particleNumber the desired number of particles to be used in beamSearch (default 200)
+#' @param initialMeans a vector to be passed to yupengMats (default is c(132,0))
+#' @param initialVariance a vector to be passed to yupengMats (default is c(400,10))
+
 #' @export
 plotStates <- function(performance, performer, onset, params, particleNumber = 200, initialMean = c(132,0), initialVariance = c(400,10)){
     if(is.list(params)) params = unlist(params)
