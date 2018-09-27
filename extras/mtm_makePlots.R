@@ -2,7 +2,7 @@ library(ggplot2)
 library(dpf)
 library(gridExtra)
 data("tempos")
-load("extras/mazurka1results.Rdata")
+load("extras/mazurka3results.Rdata")
 #similar and different plots
 performances = rownames(pvec_ml)
 similarPerformances = c("Hatto_1988","Chiu_1999",
@@ -31,7 +31,7 @@ plots = vector("list", 4)
 for(i in 1:nrow(pvec_ml)){
     plots[[i]] = plotStates(tempos[,i+3], rownames(pvec_ml)[i], tempos$note_onset, unlist(pvec_ml[i,]))
 }
-ggsave("extras/all_performances.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
+ggsave("extras/all_performances3.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
 #density plots
 library(ggplot2)
 library(dpf)

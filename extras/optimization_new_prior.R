@@ -1,16 +1,15 @@
 logprior <- function(theta, samp_mean=132){
   p1s = c(theta[8:9], 1-sum(theta[8:9]))
-  sig2eps = dgamma(theta[1], shape=8, scale=50, log = TRUE)
+  sig2eps = dgamma(theta[1], shape=40, scale=10, log = TRUE)
   mu1 = dgamma(theta[2], samp_mean^2/100, scale=100/samp_mean, log = TRUE)
-  ## Combine mu1/sig2tempo?
-  mu2 = dgamma(-theta[3], 4, scale=2.5, log = TRUE)
-  mu3 = dgamma(-theta[4], 8, scale=2.5, log = TRUE)
-  sig2tempo = dgamma(theta[5], shape=8, scale=50, log=TRUE)
-  sig2acc = dgamma(theta[6], shape=8, scale=50, log=TRUE)
-  sig2stress = dgamma(theta[7], shape=8, scale=50, log=TRUE)
-  p1 = ddirichlet(p1s, alpha=c(20,5,5))
-  p22 = dbeta(theta[10], 9, 6, log=TRUE)
-  p31 = dbeta(theta[11], 10, 10, log=TRUE)
+  mu2 = dgamma(-theta[3], 15, scale=2/3, log = TRUE)
+  mu3 = dgamma(-theta[4], 30, scale=1/2, log = TRUE)
+  sig2tempo = dgamma(theta[5], shape=40, scale=10, log=TRUE)
+  sig2acc = dgamma(theta[6], shape=1, scale=1, log=TRUE)
+  sig2stress = dgamma(theta[7], shape=1, scale=1, log=TRUE)
+  p1 = ddirichlet(p1s, alpha=c(34,2,4))
+  p22 = dbeta(theta[10], 10, 5, log=TRUE)
+  p31 = dbeta(theta[11], 5, 10, log=TRUE)
   lp = sum(sig2eps, mu1, 
            mu2, mu3, #sig2obs, 
            sig2tempo, sig2acc, sig2stress, p1, p22, p31)
@@ -18,22 +17,21 @@ logprior <- function(theta, samp_mean=132){
 }
 
 prior_means <- function(samp_mean=132){
-  c(400, samp_mean, -4*2.5, -8*2.5, 400, 400, 400, 20/30, 5/30, 9/15, 10/20)
+  c(400, samp_mean, -10, -15, 400, 1, 1, .85, 1/20, 10/15, 5/15)
 }
 
 rprior <- function(n, samp_mean=132){
-  sig2eps = rgamma(n, shape=8, scale=50)
+  sig2eps = rgamma(n, shape=40, scale=10)
   mu1 = rgamma(n, samp_mean^2/100, scale=100/samp_mean)
-  ## Combine mu1/sig2tempo?
-  mu2 = -1*rgamma(n, 4, scale=2.5)
-  mu3 = -1*rgamma(n, 8, scale=2.5)
-  sig2tempo = rgamma(n, shape=8, scale=50)
-  sig2acc = rgamma(n, shape=8, scale=50)
-  sig2stress = rgamma(n, shape=8, scale=50)
-  p1 = rdirichlet(n, alpha=c(20,5,5))[,-3,drop=FALSE]
+  mu2 = -1*rgamma(n, 15, scale=2/3)
+  mu3 = -1*rgamma(n, 30, scale=1/2)
+  sig2tempo = rgamma(n, shape=40, scale=10)
+  sig2acc = rgamma(n, shape=1, scale=1)
+  sig2stress = rgamma(n, shape=1, scale=1)
+  p1 = rdirichlet(n, alpha=c(34,2,4))[,-3,drop=FALSE]
   colnames(p1) = c('p11', 'p12')
-  p22 = rbeta(n, 9, 6)
-  p31 = rbeta(n, 10, 10)
+  p22 = rbeta(n, 10, 5)
+  p31 = rbeta(n, 5, 10)
   cbind(sig2eps, mu1, mu2, mu3, sig2tempo, sig2acc, sig2stress, p1, p22, p31)
 }
 
