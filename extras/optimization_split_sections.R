@@ -87,16 +87,35 @@ optimizer <- function(perf, lt, Npart=200, ntries = 5, samp_mean=132, badvals=1e
   yt = matrix(perf, nrow=1)
   if(is.null(samp_mean)) samp_mean = mean(yt)
   randos = NULL
+  Bs = 119:172
+  # A section
   if(ntries > 1) randos = rprior(ntries-1, samp_mean)
   init_vals = rbind(prior_means(samp_mean), randos)
-  out1 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
-                   badvals=badvals,samp_mean=samp_mean,
-                   method='Nelder-Mead',
-                   control=list(trace=0, maxit=5000, badval=badvals))
-  out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
+  out1 = multistart(init_vals, toOptimize, yt=yt[,-Bs,drop=FALSE], 
+                    lt=lt[-Bs], Npart=Npart, 
+                    badvals=badvals,samp_mean=samp_mean,
+                    method='Nelder-Mead',
+                    control=list(trace=0, maxit=5000, badval=badvals))
+  out2 = multistart(init_vals, toOptimize, yt=yt[,-Bs,drop=FALSE], 
+                    lt=lt[-Bs], Npart=Npart, 
                     badvals=badvals,samp_mean=samp_mean,
                     method='SANN',
                     control=list(trace=0, maxit=5000,badval=badvals))
-  out = rbind.data.frame(out1, out2)
+  outa = rbind.data.frame(out1, out2)
+  samp_mean = mean(yt[Bs])
+  if(ntries > 1) randos = rprior(ntries-1, samp_mean)
+  init_vals = rbind(prior_means(samp_mean), randos)
+  out1 = multistart(init_vals, toOptimize, yt=yt[,Bs,drop=FALSE], 
+                    lt=lt[Bs], Npart=Npart, 
+                    badvals=badvals,samp_mean=samp_mean,
+                    method='Nelder-Mead',
+                    control=list(trace=0, maxit=5000, badval=badvals))
+  out2 = multistart(init_vals, toOptimize, yt=yt[,Bs,drop=FALSE], 
+                    lt=lt[Bs], Npart=Npart, 
+                    badvals=badvals,samp_mean=samp_mean,
+                    method='SANN',
+                    control=list(trace=0, maxit=5000,badval=badvals))
+  outb = rbind.data.frame(out1, out2)
+  out = list(outa,outb)
   out
 }
