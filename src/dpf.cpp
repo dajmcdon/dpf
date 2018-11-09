@@ -449,81 +449,94 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   //   4 transition matrix parameters
   // up to 22 parameters per performance
   // for now, everything constant, except mu_tempo
-  int nstates = 8;
+  // States are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) [(1,3) (2,1)]
+  int nstates = 10;
   int d = 1;
   int m = 2;
   int mm = m*m;
   int n = lt.n_elem;
+  
   arma::mat a0(m, nstates, arma::fill::zeros);
   a0.row(0) += initialMean(0);
   a0(1,4) += initialMean(1);
   a0(1,6) += initialMean(1);
+  
   arma::mat P0(mm, nstates, arma::fill::zeros);
   P0.row(0) += initialVariance(0);
   P0(3,4) += initialVariance(1);
   P0(3,6) += initialVariance(1);
+  
   arma::cube dt(m, nstates, n, arma::fill::zeros);
   dt.tube(0,1) = lt*mus(1);
   dt.tube(0,4) = -lt*mus(1);
+  dt.tube(0,8) = -lt*mus(1);
+  dt.tube(0,9) = lt*mus(1);
   dt.tube(1,1) += mus(1);
   dt.tube(1,4) -= mus(1);
+  dt.tube(1,8) -= mus(1);
+  dt.tube(1,9) += mus(1);
   dt.tube(1,2) += mus(2);
-  arma::vec tempo_mus(n, arma::fill::zeros);
-  // tempo_mus.elem( find(temposwitch > 0) ) += mus(1);
-  //tempo_mus.elem( find(temposwitch == 0) ) += mus(0);
   dt.tube(0,5) += mus(0);
+  dt.tube(0,9) += mus(0);
+  
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
+  
   arma::cube Tt(mm, nstates, n, arma::fill::zeros);
   Tt.tube(0,0,0,4) += 1;
-  Tt.tube(0,6,0,7) += 1;
+  Tt.tube(0,6,0,8) += 1;
   Tt.tube(3,3) += 1;
   Tt.tube(3,6) += 1;
   Tt.tube(2,6) = lt;
   Tt.tube(2,3) = lt;
+  
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
   Zt.tube(0,0,0,7) += 1;
   Zt(1,2,0) += 1;
-  // arma::cube Rt(mm, nstates, n, arma::fill::zeros);
+  
   arma::cube HHt(mm, nstates, n, arma::fill::zeros);
-  for(int iter=0; iter<3; iter++) HHt.tube(iter,1) = sig2eta(1)*lt;
+  //(1,2)
+  HHt.tube(0,1) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,1) = sig2eta(1)*lt;
   HHt.tube(3,1) += sig2eta(1);
+  //(1,4)
   HHt.tube(3,2) += sig2eta(2);
-  for(int iter=0; iter<3; iter++) HHt.tube(iter,4) = sig2eta(1)*lt;
+  //(2,3)
+  HHt.tube(0,4) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,4) = sig2eta(1)*lt;
   HHt.tube(3,4) += sig2eta(1);
+  //(3,1)
   HHt.tube(0,5) += sig2eta(0);
-  // Rt.tube(0,0) += 1;
-  // Rt.tube(0,0,0,7) += 1;
-  // Rt.tube(0,5) += 1;
-  // Rt.tube(3,1,3,2) += 1;
-  // Rt.tube(3,4) += 1;
-  // Rt.tube(2,1) = lt;
-  // Rt.tube(2,4) = lt;
-  // arma::cube Qt(mm, nstates, 1, arma::fill::zeros);
-  // Qt.tube(0,0,0,7) += sig2eta(0);
-  // Qt.tube(3,0,3,7) += sig2eta(1);
-  // Qt.tube(3,2) -= sig2eta(1) - sig2eta(2);
-  // Qt.tube(0,5) = sig2eta(3);
+  //(1,3)
+  HHt.tube(0,8) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,8) = sig2eta(1)*lt;
+  HHt.tube(3,8) += sig2eta(1);
+  //(2,1)
+  HHt.tube(0,9) += sig2eta(0);
+  // Extra noise
+  if(sig2eta.n_elem>3) HHt.tube(0,0,0,9) += sig2eta(3); // set to zero, generally
+  
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
+  
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
+  if(transprobs.n_elem<6) transprobs.resize(6);
   transMat(0,0) = transprobs(0); // (1,1) -> (1,1)
   transMat(0,1) = transprobs(1); // (1,1) -> (1,2)
-  transMat(0,2) = 1-transprobs(0)-transprobs(1); // (1,1) -> (1,4)
-  transMat(1,3) = transprobs(2); // (1,2) -> (2,2)
-  transMat(1,4) = 1-transprobs(2); // (1,2) -> (2,3)
+  transMat(0,2) = 1-transprobs(0)-transprobs(1)-transprobs(4); // (1,1) -> (1,4)
+  transMat(0,8) = transprobs(4); // (1,1) -> (1,3)
+  transMat(1,3) = 1; // (1,2) -> (2,2)
   transMat(2,7) = 1; // (1,4) -> (4,1)
   transMat(3,3) = transprobs(2); // (2,2) -> (2,2)
-  transMat(3,4) = 1-transprobs(2); // (2,2) -> (2,3)
-  transMat(4,5) = transprobs(3); // (2,3) -> (3,1)
-  transMat(4,6) = 1-transprobs(3); // (2,3) -> (3,3)
-  transMat(5,0) = transprobs(0); // (3,1) -> (1,1)
-  transMat(5,1) = transprobs(1); // (3,1) -> (1,2)
-  transMat(5,2) = 1-transprobs(0)-transprobs(1); // (3,1) -> (1,4)
+  transMat(3,4) = 1 - transprobs(2) - transprobs(5); // (2,2) -> (2,3)
+  transMat(3,9) = transprobs(5); // (2,2) -> (2,1)
+  transMat(4,6) = 1; // (2,3) -> (3,3)
+  transMat(5,0) = 1; // (3,1) -> (1,1)
   transMat(6,5) = transprobs(3); // (3,3) -> (3,1)
-  transMat(6,6) = 1-transprobs(3); // (3,3) -> (3,3)
-  transMat(7,0) = transprobs(0); // (4,1) -> (1,1)
-  transMat(7,1) = transprobs(1); // (4,1) -> (1,2)
-  transMat(7,2) = 1-transprobs(0)-transprobs(1); // (4,1) -> (1,4)
+  transMat(6,6) = 1 - transprobs(3); // (3,3) -> (3,3)
+  transMat(7,0) = 1; // (4,1) -> (1,1)
+  transMat(8,6) = 1; // (1,3) -> (3,3)
+  transMat(9,0) = 1; // (2,1) -> (1,1)
+  
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
                       Named("Tt") = Tt, Named("Zt") = Zt,
