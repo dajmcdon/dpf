@@ -474,7 +474,7 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   dt.tube(1,1) += mus(1);
   dt.tube(1,4) -= mus(1);
   dt.tube(1,8) -= mus(1);
-  dt.tube(1,9) += mus(1);
+  //dt.tube(1,9) += mus(1);
   dt.tube(1,2) += mus(2);
   dt.tube(0,5) += mus(0);
   dt.tube(0,9) += mus(0);
@@ -490,7 +490,7 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   Tt.tube(2,3) = lt;
   
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
-  Zt.tube(0,0,0,7) += 1;
+  Zt.tube(0,0,0,9) += 1;
   Zt(1,2,0) += 1;
   
   arma::cube HHt(mm, nstates, n, arma::fill::zeros);
