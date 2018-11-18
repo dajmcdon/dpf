@@ -4,11 +4,11 @@ logprior <- function(theta, samp_mean=132){
   sig2eps = dgamma(theta[1], shape=40, scale=10, log = TRUE)
   mu1 = dgamma(theta[2], samp_mean^2/100, scale=100/samp_mean, log = TRUE)
   mu2 = dgamma(-theta[3], 15, scale=2/3, log = TRUE)
-  mu3 = dgamma(-theta[4], 30, scale=1/2, log = TRUE)
+  mu3 = dgamma(-theta[4], 20, scale=2, log = TRUE)
   sig2tempo = dgamma(theta[5], shape=40, scale=10, log=TRUE)
   sig2acc = dgamma(theta[6], shape=1, scale=1, log=TRUE)
   sig2stress = dgamma(theta[7], shape=1, scale=1, log=TRUE)
-  p1 = ddirichlet(p1s, alpha=c(85,4,7,4))
+  p1 = ddirichlet(p1s, alpha=c(85,5,8,2))
   p22 = ddirichlet(p2s, alpha=c(10,1,4))
   p31 = dbeta(theta[11], 5, 10, log=TRUE)
   lp = sum(sig2eps, mu1, 
@@ -18,18 +18,18 @@ logprior <- function(theta, samp_mean=132){
 }
 
 prior_means <- function(samp_mean=132){
-  c(400, samp_mean, -10, -15, 400, 1, 1, .85, 1/25, 10/15, 5/15, 1/25, 4/15)
+  c(400, samp_mean, -10, -40, 400, 1, 1, .85, 1/20, 10/15, 5/15, 1/50, 4/15)
 }
 
 rprior <- function(n, samp_mean=132){
   sig2eps = rgamma(n, shape=40, scale=10)
   mu1 = rgamma(n, samp_mean^2/100, scale=100/samp_mean)
   mu2 = -1*rgamma(n, 15, scale=2/3)
-  mu3 = -1*rgamma(n, 30, scale=1/2)
+  mu3 = -1*rgamma(n, 20, scale=2)
   sig2tempo = rgamma(n, shape=40, scale=10)
   sig2acc = rgamma(n, shape=1, scale=1)
   sig2stress = rgamma(n, shape=1, scale=1)
-  p1 = rdirichlet(n, alpha=c(85,4,7,4))
+  p1 = rdirichlet(n, alpha=c(85,5,8,2))
   p13 = p1[,4]
   p11 = p1[,1]
   p12 = p1[,2]
