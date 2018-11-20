@@ -2,7 +2,7 @@ library(ggplot2)
 library(dpf)
 library(gridExtra)
 data("tempos")
-load("extras/mazurka3results.Rdata")
+# load("extras/mazurka3results.Rdata")
 
 plotStates_mine <- function(performance, performer, onset, params, particleNumber = 200, initialMean = c(132,0), initialVariance = c(400,10)){
   if(is.list(params)) params = unlist(params)

@@ -20,7 +20,16 @@ KLgaussian <- function(m1, m2, s1, s2, symmetric=TRUE){
   f = log(s2) - log(s1)
   g = (s1 + (m1-m2)^2)/(2*s2)
   sc = -1/2
-  if(symmetric) g = g/2 + (s2 + (m2-m1)^2)/s1 + sc
+  if(symmetric) g = (g + (s2 + (m2-m1)^2)/(2*s1))/2 + sc
   else g = f + g + sc
   g
+}
+
+KLmultinom <- function(a, b, symmetric=TRUE){
+  one = sum(a*log(a)) - sum(a*log(b))
+  if(symmetric){
+    two = sum(b*log(b)) - sum(b*log(a))
+    one = (one + two)/2
+  }
+  one
 }
