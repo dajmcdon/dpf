@@ -33,3 +33,26 @@ KLmultinom <- function(a, b, symmetric=TRUE){
   }
   one
 }
+
+
+full_multinom <- function(p){
+    return(c(p, 1-sum(p)))
+}
+
+KLtotal <- function(p1, p2, symmetric=TRUE){
+    p1 = as.vector(unlist(p1))
+    p2 = as.vector(unlist(p2))
+    observed = KLgaussian(0,0,p1[1],p2[1],symmetric)
+    constant = KLgaussian(p1[2],p2[2],p1[5],p2[5],symmetric)
+    accel = KLgaussian(p1[3],p2[3],p1[6],p2[6],symmetric)
+    stress = KLgaussian(p1[4],p2[4],p1[7],p2[7],symmetric)
+    state1 = KLmultinom(full_multinom(p1[c(8,9,12)]),
+                        full_multinom(p2[c(8,9,12)]),
+                        symmetric)
+    state2 = KLmultinom(full_multinom(p1[c(10,13)]),
+                        full_multinom(p2[c(10,13)]),
+                        symmetric)
+    state3 = KLmultinom(full_multinom(p1[11]),
+                        full_multinom(p2[11]))
+    return(observed+constant+accel+stress+state1+state2+state3)
+}
