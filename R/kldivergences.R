@@ -56,3 +56,14 @@ KLtotal <- function(p1, p2, symmetric=TRUE){
                         full_multinom(p2[11]))
     return(observed+constant+accel+stress+state1+state2+state3)
 }
+
+Dist <- function(pvec_ml){
+    n = nrow(pvec_ml)
+    out = array(dim = c(n,n))
+    for(i in 1:n){
+        for(j in 1:i){
+            out[i,j] = out[j,i] = KLtotal(pvec_ml[i,],pvec_ml[j,])
+        }
+    }
+    return(as.dist(out))
+}
