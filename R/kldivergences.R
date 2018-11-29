@@ -68,6 +68,6 @@ Dist <- function(pvec_ml){
             }
         }
     }
-    out = dist(out)
+    out = as.dist(out)
     return(out)
 }
