@@ -439,7 +439,7 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   // up to 22 parameters per performance
   // for now, everything constant, except mu_tempo
   // States are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) [(1,3) (2,1)]
-  int nstates = 10;
+  int nstates = 11;
   int d = 1;
   int m = 2;
   int mm = m*m;
@@ -521,10 +521,12 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   transMat(4,6) = 1; // (2,3) -> (3,3)
   transMat(5,0) = 1; // (3,1) -> (1,1)
   transMat(6,5) = transprobs(3); // (3,3) -> (3,1)
-  transMat(6,6) = 1 - transprobs(3); // (3,3) -> (3,3)
+  transMat(6,10) = transprobs(6); // (3,3) -> (3,2)
+  transMat(6,6) = 1 - transprobs(3) - transprobs(6); // (3,3) -> (3,3)
   transMat(7,0) = 1; // (4,1) -> (1,1)
   transMat(8,6) = 1; // (1,3) -> (3,3)
   transMat(9,0) = 1; // (2,1) -> (1,1)
+  transMat(10,3) = 1; // (3,2) -> (2,2)
   
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,

@@ -1,6 +1,7 @@
 logprior <- function(theta, samp_mean=132){
   p1s = c(theta[c(8,9)], 1-sum(theta[c(8,9,12)]), theta[12])
   p2s = c(theta[10], 1-sum(theta[c(10,13)]), theta[13])
+  p3s = c(theta[11], 1-sum(theta[c(11,14)]), theta[14])
   sig2eps = dgamma(theta[1], shape=40, scale=10, log = TRUE)
   mu1 = dgamma(theta[2], samp_mean^2/100, scale=100/samp_mean, log = TRUE)
   mu2 = dgamma(-theta[3], 15, scale=2/3, log = TRUE)
@@ -10,7 +11,7 @@ logprior <- function(theta, samp_mean=132){
   sig2stress = dgamma(theta[7], shape=1, scale=1, log=TRUE)
   p1 = ddirichlet(p1s, alpha=c(85,5,8,2))
   p22 = ddirichlet(p2s, alpha=c(10,1,4))
-  p31 = dbeta(theta[11], 5, 10, log=TRUE)
+  p31 = ddirichlet(p3s, alpha=c(5,7,3))
   lp = sum(sig2eps, mu1, 
            mu2, mu3, #sig2obs, 
            sig2tempo, sig2acc, sig2stress, p1, p22, p31)
@@ -18,7 +19,7 @@ logprior <- function(theta, samp_mean=132){
 }
 
 prior_means <- function(samp_mean=132){
-  c(400, samp_mean, -10, -40, 400, 1, 1, .85, 1/20, 10/15, 5/15, 1/50, 4/15)
+  c(400, samp_mean, -10, -40, 400, 1, 1, .85, 1/20, 10/15, 5/15, 1/50, 4/15, 3/15)
 }
 
 rprior <- function(n, samp_mean=132){
@@ -36,9 +37,11 @@ rprior <- function(n, samp_mean=132){
   p2 = rdirichlet(n, alpha=c(10,1,4))
   p22 = p2[,1]
   p21 = p2[,3]
-  p31 = rbeta(n, 5, 10)
+  p3 = rdirichlet(n, alpha=c(5,7,3))
+  p31 = p3[,1]
+  p32 = p3[,3]
   cbind(sig2eps, mu1, mu2, mu3, sig2tempo, sig2acc, sig2stress, 
-        p11, p12, p22, p31, p13, p21)
+        p11, p12, p22, p31, p13, p21, p32)
 }
 
 
@@ -58,7 +61,7 @@ logStatesGivenParams <- function(states,transProbs){
 }
 
 toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
-  pmats = yupengMats(lt, theta[1], theta[2:4], theta[5:7], theta[8:13],
+  pmats = yupengMats(lt, theta[1], theta[2:4], theta[5:7], theta[8:14],
                      initialMean = c(samp_mean,0), # 132 is marked tempo, 0 is unused
                      initialVariance = c(400,10)) # sd of 20, 10 is unused
   beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0,0,0), 
