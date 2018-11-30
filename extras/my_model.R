@@ -41,7 +41,6 @@ rprior <- function(n, samp_mean=132){
         p11, p12, p22, p31, p13, p21)
 }
 
-# ddirichlet <- function(theta, alpha) sum(alpha*log(theta)) # on the log scale, no constant
 
 init <- function(samp_mean=132, noise = 0){
   if(noise > 0){
@@ -80,11 +79,6 @@ toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
   obj = negllike + logp + sgp
   obj
 }
-
-## add transition from 2->1??
-
-## Code to run on cluster
-
 
 
 # Cluster funs ------------------------------------------------------------

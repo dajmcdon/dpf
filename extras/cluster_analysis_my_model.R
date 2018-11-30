@@ -9,7 +9,7 @@ library(optimr) # cran version
 data(tempos)
 lt = diff(c(tempos$note_onset,61))
 source("mazurka_code/my_model.R")
-makeRegistry("my-mazurka01", packages=c('dpf','optimr'), 
+makeRegistry("my-mazurka02", packages=c('dpf','optimr'), 
              source = "mazurka_code/my_model.R",
              seed = 20181109)
 batchMap(optimizer, as.list(select(tempos, -meas_num, -note_onset, -beat)),

@@ -3,7 +3,7 @@ import csv
 page = requests.get('http://mazurka.org.uk/auto/earis/mazurka68-3/')
 from bs4 import BeautifulSoup
 soup = BeautifulSoup(page.content, 'html.parser')
-outfile = csv.writer(open('mazurka ids.csv', 'w'))
+outfile = csv.writer(open('mazurka_ids.csv', 'w'))
 outfile.writerow(['performer', 'year', 'pid'])
 for perf in soup.find_all('b'):
     text = perf.contents[0]
