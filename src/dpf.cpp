@@ -5,23 +5,6 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 
 
-arma::uvec SampleNoReplace(arma::uvec x, int size) {
-  int nOrig = x.size();
-  arma::uvec index(size);
-  arma::uvec sub(nOrig);
-  for (int ii = 0; ii < nOrig; ii++) sub(ii) = ii;
-  RNGScope scope4;
-  for (int ii = 0; ii < size; ii++) {
-    int jj = floor(nOrig * runif(1)[0]);
-    index(ii) = sub(jj);
-    // replace sampled element with last, decrement
-    sub(jj) = sub(--nOrig);
-  }
-  arma::uvec ret(size);
-  ret = x(index);
-  return(ret);
-}
-
  //[[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
   int M = w.size();
@@ -222,18 +205,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 }
 
 
-// arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
-//   arma::uword K = Rt.n_cols;
-//   arma::mat Rtmp(r,q);
-//   arma::mat Qtmp(q,q);
-//   arma::mat HHt(r*r, K);
-//   for(arma::uword iter=0; iter < K; iter++){
-//     Rtmp = reshape(Rt.col(iter), r, q);
-//     Qtmp = reshape(Qt.col(iter), q, q);
-//     HHt.col(iter) = arma::vectorise(Rtmp * Qtmp * Rtmp.t());
-//   }
-//   return(HHt);
-// }
+
 
 //currentStates: vector of the current discrete state for each particle
 //w: resampling weight for each particle
@@ -680,111 +652,6 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                       Named("LastStep") = iter++);
 }
 
-
-List pathStuffold(List pmats, arma::uvec path, arma::mat y){
-    // Note: this function's smoother isn't quite right, see below
-    // What if I want different initial state (instead of 0)?
-    
-    arma::mat a0 = pmats["a0"];
-    arma::mat P0 = pmats["P0"];
-    arma::cube dt = pmats["dt"];
-    arma::cube ct = pmats["ct"];
-    arma::cube Tt = pmats["Tt"];
-    arma::cube Zt = pmats["Zt"];
-    arma::cube Rt = pmats["Rt"];
-    arma::cube Qt = pmats["Qt"];
-    arma::cube GGt = pmats["GGt"];
-    
-    arma::uword n = y.n_cols;
-    arma::uword m = a0.n_rows;
-    arma::uword mm = m*m;
-    arma::uword d = y.n_rows;
-    arma::uword dm = d*m;
-    arma::uword dd = d*d;
-    
-    arma::uword dtvar = dt.n_slices > 1;
-    arma::uword ctvar = ct.n_slices > 1;
-    arma::uword Ttvar = Tt.n_slices > 1;
-    arma::uword Ztvar = Zt.n_slices > 1;
-    arma::uword Rtvar = Rt.n_slices > 1;
-    arma::uword Qtvar = Qt.n_slices > 1;
-    arma::uword GGtvar = GGt.n_slices > 1;
-    arma::mat HHt(m,m);
-    arma::mat R(mm,1);
-    arma::mat Q(mm,1);
-    
-    
-    // output storage
-    arma::colvec llik = arma::zeros(n);
-    arma::mat at(m,n,arma::fill::zeros); // predicted mean E[a_t | y_1:t-1]
-    arma::cube Pt(m,m,n,arma::fill::zeros); // predicted variance
-    arma::mat preds(d,n,arma::fill::zeros); // predictions  
-    arma::mat ahat(m,n,arma::fill::zeros); // smoothed mean E[a_t | y_1:n]
-    arma::cube Phat(m,m,n,arma::fill::zeros); // smoothed variance
-    arma::mat ests(d,n,arma::fill::zeros); //smoothed estimates
-    double liktmp = 0.0;
-    
-    // initialization
-    arma::uword s = path(0); // See comment above, replace 0 with appropriate initial s.
-    arma::mat a00 =  a0.col(s);
-    arma::mat P00 = reshape(P0.col(s), m, m);
-    // arma::mat Z0 = Zt.subcube(0,s,0,arma::size(dm,1,1));
-    // Z0.reshape(d,m);
-    // arma::colvec c0 = ct.subcube(0,s,0,arma::size(d,1,1)); // does this work??
-    // preds.col(0) = c0 + Z0 * at.col(0);
-        
-    
-    // Kalman filtering
-    for(arma::uword iter=0; iter<n; iter++){ //issue only happens when variables are declared both in and before the loop
-        s = path(iter);
-        if(iter==0 || Rtvar || Qtvar){ 
-            R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
-            Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
-            R.reshape(m,m);
-            Q.reshape(m,m);
-            HHt = R * Q * R.t();
-        }
-        
-        KFOUT step = kf1step(a00, P00, 
-                            dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
-                            ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
-                            Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
-                            Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
-                            HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
-                            y.col(iter));
-        at.col(iter) = step.at;
-        Pt.slice(iter) = arma::reshape(step.Pt, m, m);
-        preds.col(iter) = step.pred;
-        a00 = step.att;
-        P00 = arma::reshape(step.Ptt, m, m);
-        liktmp = step.lik;
-        llik(iter) += log(liktmp);
-    }
-    
-    // Kalman smoothing. Recalculation is inefficient, but likely doesn't matter.
-    arma::mat r1(m,1,arma::fill::zeros);
-    arma::mat N1(m,m,arma::fill::zeros);
-    arma::uword iter = n;
-    while(iter > 0){
-        iter--;
-        s = path(iter);
-        arma::mat PP = Pt.slice(iter); // for ease
-        arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
-        arma::mat ZZ = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
-        KFOUT step = ks1step(r1, N1, at.col(iter), PP, 
-                             cc, Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
-                             ZZ, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
-                             y.col(iter));
-        r1 = step.at;
-        N1 = step.Pt;
-        ahat.col(iter) = at.col(iter) + PP * r1;
-        Phat.slice(iter) = PP - PP * N1 * PP;
-        ests.col(iter) = cc + arma::reshape(ZZ, d, m) * ahat.col(iter);
-    }
-    return List::create(Named("at") = at, Named("Pt") = Pt, Named("preds") = preds,
-                              Named("ahat") = ahat, Named("Phat") = Phat,
-                              Named("ests") = ests, Named("llik") = llik);
-}
 
 
 

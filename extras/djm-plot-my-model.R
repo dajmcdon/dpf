@@ -2,7 +2,7 @@ library(ggplot2)
 library(dpf)
 library(gridExtra)
 data("tempos")
-# load("extras/mazurka3results.Rdata")
+load("extras/my-mazurka02-results.Rdata")
 
 plotStates_mine <- function(performance, performer, onset, params, particleNumber = 200, initialMean = c(132,0), initialVariance = c(400,10)){
   if(is.list(params)) params = unlist(params)
@@ -37,4 +37,4 @@ plots = vector("list", 4)
 for(i in 1:nrow(pvec_ml)){
   plots[[i]] = plotStates_mine(tempos[,i+3], rownames(pvec_ml)[i], tempos$note_onset, unlist(pvec_ml[i,]))
 }
-ggsave("extras/all_performances_mine.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
+ggsave("extras/all_performances_mine2.pdf", marrangeGrob(plots, nrow = 2, ncol = 2))
