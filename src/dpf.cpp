@@ -5,6 +5,23 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 
 
+arma::uvec SampleNoReplace(arma::uvec x, int size) {
+  int nOrig = x.size();
+  arma::uvec index(size);
+  arma::uvec sub(nOrig);
+  for (int ii = 0; ii < nOrig; ii++) sub(ii) = ii;
+  RNGScope scope4;
+  for (int ii = 0; ii < size; ii++) {
+    int jj = floor(nOrig * runif(1)[0]);
+    index(ii) = sub(jj);
+    // replace sampled element with last, decrement
+    sub(jj) = sub(--nOrig);
+  }
+  arma::uvec ret(size);
+  ret = x(index);
+  return(ret);
+}
+
  //[[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
   int M = w.size();

@@ -1,81 +1,102 @@
-#' Converts a 4 state 2-Markov path HMM to an 8 state 1-Markov path
-#' 
-#' This function is specific to the HMM given in Gu (2017)
-#'
-#' @param path a vector of length n containing the integers 1 to 4
-#'
-#' @return a vector of length n containing the integers 0 to 7 (appropriate for C++)
-#' @export
-convert4to8 <- function(path){
-    cpps = 0:7
-    tm1 = c(1,1,1,2,2,3,3,4)
-    t1 = c(1,2,4,2,3,1,3,1)
-    n = length(path)
-    npath = c(1,path[-n])
-    path4 = integer(n)
-    for(i in 1:n){
-        path4[i] = cpps[tm1==npath[i] & t1==path[i]]
-    }
-    return(path4)
-}
 
-#' Converts an 8 state 1-Markov path HMM to a 4 state 2-Markov path
-#' 
-#' This function is specific to the HMM given in Gu (2017)
+#' Title
 #'
-#' @param path a vector of length n containing the integers 0 to 7 (as output by BeamSearch when applied to the yupengMats parameterization)
+#' @param path 
 #'
-#' @return a vector of length n containing the integers 1 to 4
+#' @return
 #' @export
-convert8to4 <- function(path){
-    t1 = c(1,2,4,2,3,1,3,1)
-    path8 = t1[path+1]
-    return(path8)
+#'
+#' @examples
+convert10to4 <- function(path){
+  t1 = c(1,2,4,2,3,1,3,1,3,1)
+  path10 = t1[path+1]
+  path10
 }
 
 
-#' Wrapper function for beamsSearch
-#' 
-#' @param pvec a vector of the parameters for yupengMats in the order \eqn{\sigma_\eps^2, }
-#' @param y the performed tempo of each note
-#' @param onset a vector giving the measure number (including fracitons for notes within a measure) of the start of each note
-#' @param Npart the desired number of particles
-#' @param w0 the prior probability of starting in each state
-#' @param npaths the number of most likely paths to return
-#' 
-#' @return list (length npaths) of lists. Each list contains the following: \describe{
-#' \item{paths}{a vector giving the state path}
-#' \item{weight}{the final sampling weight of the path}
-#' \item{ests}{the smoothed tempo estimates from the path}
-#' \item{llik}{the negative log liklihood for the path}
-#' }
-#' @export
-beamSearchWrap <- function(pvec, y, onset, Npart, w0 = c(1,0,0,0,0,0,0,0), npaths = 1){
-    if(!is.matrix(y)) dim(y) = c(1,length(y))
-    if(is.list(pvec)) pvec = unlist(pvec)
-    lt = lt = diff(c(onset, 61))
-    mats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12], c(10,10))
-    bs = beamSearch(mats$a0, mats$P0, c(1,0,0,0,0,0,0,0), mats$dt, mats$ct, mats$Tt, mats$Zt,
-                    mats$HHt, mats$GGt, y, mats$transMat, Npart)
-    if(npaths == 1){
-        bestpath = bs$paths[which.max(bs$weights),]
-        kal = kalman(mats, bestpath, y)
-        return(list(paths = convert8to4(bestpath), weight = max(bs$weights),
-                    ests = kal$ests, llik = sum(kal$llik)))
-    }
-    else{
-        rank = order(bs$weights, decreasing = TRUE)[1:npaths]
-        out = vector("list", npaths)
-        for(i in 1:npaths){
-            path = bs$paths[rank[i],]
-            kal = kalman(mats, path, y)
-            out[[i]] = list(paths = convert8to4(path), weight = max(bs$weights),
-                            ests = kal$ests, llik = sum(kal$llik))
-        }
-        return(out)
-    }
-}
+# Deprecated --------------------------------------------------------------
 
+
+# #' Converts a 4 state 2-Markov path HMM to an 8 state 1-Markov path
+# #' 
+# #' This function is specific to the HMM given in Gu (2017)
+# #'
+# #' @param path a vector of length n containing the integers 1 to 4
+# #'
+# #' @return a vector of length n containing the integers 0 to 7 (appropriate for C++)
+# #' @export
+# convert4to8 <- function(path){
+#     cpps = 0:7
+#     tm1 = c(1,1,1,2,2,3,3,4)
+#     t1 = c(1,2,4,2,3,1,3,1)
+#     n = length(path)
+#     npath = c(1,path[-n])
+#     path4 = integer(n)
+#     for(i in 1:n){
+#         path4[i] = cpps[tm1==npath[i] & t1==path[i]]
+#     }
+#     return(path4)
+# }
+# 
+# #' Converts an 8 state 1-Markov path HMM to a 4 state 2-Markov path
+# #' 
+# #' This function is specific to the HMM given in Gu (2017)
+# #'
+# #' @param path a vector of length n containing the integers 0 to 7 (as output by BeamSearch when applied to the yupengMats parameterization)
+# #'
+# #' @return a vector of length n containing the integers 1 to 4
+# #' @export
+# convert8to4 <- function(path){
+#     t1 = c(1,2,4,2,3,1,3,1)
+#     path8 = t1[path+1]
+#     return(path8)
+# }
+# 
+# 
+# 
+# 
+# #' Wrapper function for beamsSearch
+# #' 
+# #' @param pvec a vector of the parameters for yupengMats in the order \eqn{\sigma_\eps^2, }
+# #' @param y the performed tempo of each note
+# #' @param onset a vector giving the measure number (including fracitons for notes within a measure) of the start of each note
+# #' @param Npart the desired number of particles
+# #' @param w0 the prior probability of starting in each state
+# #' @param npaths the number of most likely paths to return
+# #' 
+# #' @return list (length npaths) of lists. Each list contains the following: \describe{
+# #' \item{paths}{a vector giving the state path}
+# #' \item{weight}{the final sampling weight of the path}
+# #' \item{ests}{the smoothed tempo estimates from the path}
+# #' \item{llik}{the negative log liklihood for the path}
+# #' }
+# #' @export
+# beamSearchWrap <- function(pvec, y, onset, Npart, w0 = c(1,0,0,0,0,0,0,0), npaths = 1){
+#     if(!is.matrix(y)) dim(y) = c(1,length(y))
+#     if(is.list(pvec)) pvec = unlist(pvec)
+#     lt = lt = diff(c(onset, 61))
+#     mats = yupengMats(lt, pvec[1], pvec[2:4], pvec[5:8], pvec[9:12], c(10,10))
+#     bs = beamSearch(mats$a0, mats$P0, c(1,0,0,0,0,0,0,0), mats$dt, mats$ct, mats$Tt, mats$Zt,
+#                     mats$HHt, mats$GGt, y, mats$transMat, Npart)
+#     if(npaths == 1){
+#         bestpath = bs$paths[which.max(bs$weights),]
+#         kal = kalman(mats, bestpath, y)
+#         return(list(paths = convert8to4(bestpath), weight = max(bs$weights),
+#                     ests = kal$ests, llik = sum(kal$llik)))
+#     }
+#     else{
+#         rank = order(bs$weights, decreasing = TRUE)[1:npaths]
+#         out = vector("list", npaths)
+#         for(i in 1:npaths){
+#             path = bs$paths[rank[i],]
+#             kal = kalman(mats, path, y)
+#             out[[i]] = list(paths = convert8to4(path), weight = max(bs$weights),
+#                             ests = kal$ests, llik = sum(kal$llik))
+#         }
+#         return(out)
+#     }
+# }
+# 
 
 # Deprecated --------------------------------------------------------------
 
