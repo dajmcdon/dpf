@@ -222,18 +222,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 }
 
 
-// arma::mat HHcreate(arma::mat Rt, arma::mat Qt, int r, int q){
-//   arma::uword K = Rt.n_cols;
-//   arma::mat Rtmp(r,q);
-//   arma::mat Qtmp(q,q);
-//   arma::mat HHt(r*r, K);
-//   for(arma::uword iter=0; iter < K; iter++){
-//     Rtmp = reshape(Rt.col(iter), r, q);
-//     Qtmp = reshape(Qt.col(iter), q, q);
-//     HHt.col(iter) = arma::vectorise(Rtmp * Qtmp * Rtmp.t());
-//   }
-//   return(HHt);
-// }
+
 
 //currentStates: vector of the current discrete state for each particle
 //w: resampling weight for each particle
@@ -449,81 +438,96 @@ List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
   //   4 transition matrix parameters
   // up to 22 parameters per performance
   // for now, everything constant, except mu_tempo
-  int nstates = 8;
+  // States are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) [(1,3) (2,1)]
+  int nstates = 11;
   int d = 1;
   int m = 2;
   int mm = m*m;
   int n = lt.n_elem;
+  
   arma::mat a0(m, nstates, arma::fill::zeros);
   a0.row(0) += initialMean(0);
   a0(1,4) += initialMean(1);
   a0(1,6) += initialMean(1);
+  
   arma::mat P0(mm, nstates, arma::fill::zeros);
   P0.row(0) += initialVariance(0);
   P0(3,4) += initialVariance(1);
   P0(3,6) += initialVariance(1);
+  
   arma::cube dt(m, nstates, n, arma::fill::zeros);
   dt.tube(0,1) = lt*mus(1);
   dt.tube(0,4) = -lt*mus(1);
+  dt.tube(0,8) = -lt*mus(1);
+  dt.tube(0,9) = lt*mus(1);
   dt.tube(1,1) += mus(1);
   dt.tube(1,4) -= mus(1);
+  dt.tube(1,8) -= mus(1);
+  //dt.tube(1,9) += mus(1);
   dt.tube(1,2) += mus(2);
-  arma::vec tempo_mus(n, arma::fill::zeros);
-  // tempo_mus.elem( find(temposwitch > 0) ) += mus(1);
-  //tempo_mus.elem( find(temposwitch == 0) ) += mus(0);
   dt.tube(0,5) += mus(0);
+  dt.tube(0,9) += mus(0);
+  
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
+  
   arma::cube Tt(mm, nstates, n, arma::fill::zeros);
   Tt.tube(0,0,0,4) += 1;
-  Tt.tube(0,6,0,7) += 1;
+  Tt.tube(0,6,0,8) += 1;
   Tt.tube(3,3) += 1;
   Tt.tube(3,6) += 1;
   Tt.tube(2,6) = lt;
   Tt.tube(2,3) = lt;
+  
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
-  Zt.tube(0,0,0,7) += 1;
+  Zt.tube(0,0,0,9) += 1;
   Zt(1,2,0) += 1;
-  // arma::cube Rt(mm, nstates, n, arma::fill::zeros);
+  
   arma::cube HHt(mm, nstates, n, arma::fill::zeros);
-  for(int iter=0; iter<3; iter++) HHt.tube(iter,1) = sig2eta(1)*lt;
+  //(1,2)
+  HHt.tube(0,1) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,1) = sig2eta(1)*lt;
   HHt.tube(3,1) += sig2eta(1);
+  //(1,4)
   HHt.tube(3,2) += sig2eta(2);
-  for(int iter=0; iter<3; iter++) HHt.tube(iter,4) = sig2eta(1)*lt;
+  //(2,3)
+  HHt.tube(0,4) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,4) = sig2eta(1)*lt;
   HHt.tube(3,4) += sig2eta(1);
+  //(3,1)
   HHt.tube(0,5) += sig2eta(0);
-  // Rt.tube(0,0) += 1;
-  // Rt.tube(0,0,0,7) += 1;
-  // Rt.tube(0,5) += 1;
-  // Rt.tube(3,1,3,2) += 1;
-  // Rt.tube(3,4) += 1;
-  // Rt.tube(2,1) = lt;
-  // Rt.tube(2,4) = lt;
-  // arma::cube Qt(mm, nstates, 1, arma::fill::zeros);
-  // Qt.tube(0,0,0,7) += sig2eta(0);
-  // Qt.tube(3,0,3,7) += sig2eta(1);
-  // Qt.tube(3,2) -= sig2eta(1) - sig2eta(2);
-  // Qt.tube(0,5) = sig2eta(3);
+  //(1,3)
+  HHt.tube(0,8) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,8) = sig2eta(1)*lt;
+  HHt.tube(3,8) += sig2eta(1);
+  //(2,1)
+  HHt.tube(0,9) += sig2eta(0);
+  // Extra noise
+  if(sig2eta.n_elem>3) HHt.tube(0,0,0,9) += sig2eta(3); // set to zero, generally
+  
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
+  
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
+  if(transprobs.n_elem<6) transprobs.resize(6);
   transMat(0,0) = transprobs(0); // (1,1) -> (1,1)
   transMat(0,1) = transprobs(1); // (1,1) -> (1,2)
-  transMat(0,2) = 1-transprobs(0)-transprobs(1); // (1,1) -> (1,4)
-  transMat(1,3) = transprobs(2); // (1,2) -> (2,2)
-  transMat(1,4) = 1-transprobs(2); // (1,2) -> (2,3)
+  transMat(0,2) = 1-transprobs(0)-transprobs(1)-transprobs(4); // (1,1) -> (1,4)
+  transMat(0,8) = transprobs(4); // (1,1) -> (1,3)
+  transMat(1,3) = 1; // (1,2) -> (2,2)
   transMat(2,7) = 1; // (1,4) -> (4,1)
   transMat(3,3) = transprobs(2); // (2,2) -> (2,2)
-  transMat(3,4) = 1-transprobs(2); // (2,2) -> (2,3)
-  transMat(4,5) = transprobs(3); // (2,3) -> (3,1)
-  transMat(4,6) = 1-transprobs(3); // (2,3) -> (3,3)
-  transMat(5,0) = transprobs(0); // (3,1) -> (1,1)
-  transMat(5,1) = transprobs(1); // (3,1) -> (1,2)
-  transMat(5,2) = 1-transprobs(0)-transprobs(1); // (3,1) -> (1,4)
+  transMat(3,4) = 1 - transprobs(2) - transprobs(5); // (2,2) -> (2,3)
+  transMat(3,9) = transprobs(5); // (2,2) -> (2,1)
+  transMat(4,6) = 1; // (2,3) -> (3,3)
+  transMat(5,0) = 1; // (3,1) -> (1,1)
   transMat(6,5) = transprobs(3); // (3,3) -> (3,1)
-  transMat(6,6) = 1-transprobs(3); // (3,3) -> (3,3)
-  transMat(7,0) = transprobs(0); // (4,1) -> (1,1)
-  transMat(7,1) = transprobs(1); // (4,1) -> (1,2)
-  transMat(7,2) = 1-transprobs(0)-transprobs(1); // (4,1) -> (1,4)
+  transMat(6,10) = transprobs(6); // (3,3) -> (3,2)
+  transMat(6,6) = 1 - transprobs(3) - transprobs(6); // (3,3) -> (3,3)
+  transMat(7,0) = 1; // (4,1) -> (1,1)
+  transMat(8,6) = 1; // (1,3) -> (3,3)
+  transMat(9,0) = 1; // (2,1) -> (1,1)
+  transMat(10,3) = 1; // (3,2) -> (2,2)
+  
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
                       Named("Tt") = Tt, Named("Zt") = Zt,
@@ -667,111 +671,6 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                       Named("LastStep") = iter++);
 }
 
-
-List pathStuffold(List pmats, arma::uvec path, arma::mat y){
-    // Note: this function's smoother isn't quite right, see below
-    // What if I want different initial state (instead of 0)?
-    
-    arma::mat a0 = pmats["a0"];
-    arma::mat P0 = pmats["P0"];
-    arma::cube dt = pmats["dt"];
-    arma::cube ct = pmats["ct"];
-    arma::cube Tt = pmats["Tt"];
-    arma::cube Zt = pmats["Zt"];
-    arma::cube Rt = pmats["Rt"];
-    arma::cube Qt = pmats["Qt"];
-    arma::cube GGt = pmats["GGt"];
-    
-    arma::uword n = y.n_cols;
-    arma::uword m = a0.n_rows;
-    arma::uword mm = m*m;
-    arma::uword d = y.n_rows;
-    arma::uword dm = d*m;
-    arma::uword dd = d*d;
-    
-    arma::uword dtvar = dt.n_slices > 1;
-    arma::uword ctvar = ct.n_slices > 1;
-    arma::uword Ttvar = Tt.n_slices > 1;
-    arma::uword Ztvar = Zt.n_slices > 1;
-    arma::uword Rtvar = Rt.n_slices > 1;
-    arma::uword Qtvar = Qt.n_slices > 1;
-    arma::uword GGtvar = GGt.n_slices > 1;
-    arma::mat HHt(m,m);
-    arma::mat R(mm,1);
-    arma::mat Q(mm,1);
-    
-    
-    // output storage
-    arma::colvec llik = arma::zeros(n);
-    arma::mat at(m,n,arma::fill::zeros); // predicted mean E[a_t | y_1:t-1]
-    arma::cube Pt(m,m,n,arma::fill::zeros); // predicted variance
-    arma::mat preds(d,n,arma::fill::zeros); // predictions  
-    arma::mat ahat(m,n,arma::fill::zeros); // smoothed mean E[a_t | y_1:n]
-    arma::cube Phat(m,m,n,arma::fill::zeros); // smoothed variance
-    arma::mat ests(d,n,arma::fill::zeros); //smoothed estimates
-    double liktmp = 0.0;
-    
-    // initialization
-    arma::uword s = path(0); // See comment above, replace 0 with appropriate initial s.
-    arma::mat a00 =  a0.col(s);
-    arma::mat P00 = reshape(P0.col(s), m, m);
-    // arma::mat Z0 = Zt.subcube(0,s,0,arma::size(dm,1,1));
-    // Z0.reshape(d,m);
-    // arma::colvec c0 = ct.subcube(0,s,0,arma::size(d,1,1)); // does this work??
-    // preds.col(0) = c0 + Z0 * at.col(0);
-        
-    
-    // Kalman filtering
-    for(arma::uword iter=0; iter<n; iter++){ //issue only happens when variables are declared both in and before the loop
-        s = path(iter);
-        if(iter==0 || Rtvar || Qtvar){ 
-            R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
-            Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
-            R.reshape(m,m);
-            Q.reshape(m,m);
-            HHt = R * Q * R.t();
-        }
-        
-        KFOUT step = kf1step(a00, P00, 
-                            dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
-                            ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
-                            Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
-                            Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1)), 
-                            HHt, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
-                            y.col(iter));
-        at.col(iter) = step.at;
-        Pt.slice(iter) = arma::reshape(step.Pt, m, m);
-        preds.col(iter) = step.pred;
-        a00 = step.att;
-        P00 = arma::reshape(step.Ptt, m, m);
-        liktmp = step.lik;
-        llik(iter) += log(liktmp);
-    }
-    
-    // Kalman smoothing. Recalculation is inefficient, but likely doesn't matter.
-    arma::mat r1(m,1,arma::fill::zeros);
-    arma::mat N1(m,m,arma::fill::zeros);
-    arma::uword iter = n;
-    while(iter > 0){
-        iter--;
-        s = path(iter);
-        arma::mat PP = Pt.slice(iter); // for ease
-        arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
-        arma::mat ZZ = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
-        KFOUT step = ks1step(r1, N1, at.col(iter), PP, 
-                             cc, Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
-                             ZZ, GGt.subcube(0,s,iter*GGtvar,arma::size(dd,1,1)), 
-                             y.col(iter));
-        r1 = step.at;
-        N1 = step.Pt;
-        ahat.col(iter) = at.col(iter) + PP * r1;
-        Phat.slice(iter) = PP - PP * N1 * PP;
-        ests.col(iter) = cc + arma::reshape(ZZ, d, m) * ahat.col(iter);
-    }
-    return List::create(Named("at") = at, Named("Pt") = Pt, Named("preds") = preds,
-                              Named("ahat") = ahat, Named("Phat") = Phat,
-                              Named("ests") = ests, Named("llik") = llik);
-}
 
 
 

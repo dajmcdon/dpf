@@ -15,6 +15,8 @@
 NULL
 
 #' @useDynLib dpf
+#' @import ggplot2
+#' @importFrom usedist dist_make
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats rgamma
