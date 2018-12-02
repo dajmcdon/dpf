@@ -416,20 +416,9 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' \item{transMat}{a dxd matrix of transition probabilities for the discrete states}
 //' }
 //' 
-//' @examples
-//' #load tempos data
-//' data('tempos')
-//' #create lt
-//' lt = diff(c(tempos$note_onset, 61))
-//' #get parameter matrices using specified parameters
-//' yupengMats(lt, 3, mus = c(1,2,3),                #mu = 1, tau = 2, phi = 3
-//'            sig2eta = c(4,5,6),                   #sigma3^2 = 4, sigma2^2 = 5, sigma4^2 = 6
-//'            transprobs = c(0.1, 0.2, 0.3, 0.4),   #p1 = 0.1, p2 = 0.2, p3 = 0.3, p4 = 0.4
-//'            initialMean = c(50, 10), initialVariance = c(20, 5))
-//' 
 //' @export    
 // [[Rcpp::export]]
-List yupengMats(arma::vec lt, double sig2eps, arma::vec mus,
+List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
                 arma::vec sig2eta, arma::vec transprobs,
                 arma::vec initialMean, arma::vec initialVariance){ 
   //confirm that t's stay in same order for each matrix

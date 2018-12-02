@@ -1,4 +1,4 @@
-#' Title
+#' plots the state transition for a performance given the model parameters
 #'
 #' @param performance 
 #' @param performer 
@@ -8,10 +8,8 @@
 #' @param initialMean 
 #' @param initialVariance 
 #'
-#' @return
+#' @return a ggplot2 plot
 #' @export
-#'
-#' @examples
 plotStates <- function(performance, performer, onset, params, 
                        particleNumber = 200, initialMean = c(132,0), 
                        initialVariance = c(400,10)){

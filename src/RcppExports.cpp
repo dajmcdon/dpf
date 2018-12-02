@@ -85,9 +85,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// yupengMats
-List yupengMats(arma::vec lt, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs, arma::vec initialMean, arma::vec initialVariance);
-RcppExport SEXP _dpf_yupengMats(SEXP ltSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP, SEXP initialMeanSEXP, SEXP initialVarianceSEXP) {
+// musicModel
+List musicModel(arma::vec lt, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs, arma::vec initialMean, arma::vec initialVariance);
+RcppExport SEXP _dpf_musicModel(SEXP ltSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP, SEXP initialMeanSEXP, SEXP initialVarianceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -98,7 +98,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type transprobs(transprobsSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type initialMean(initialMeanSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type initialVariance(initialVarianceSEXP);
-    rcpp_result_gen = Rcpp::wrap(yupengMats(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance));
+    rcpp_result_gen = Rcpp::wrap(musicModel(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -144,7 +144,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_kf1stepR", (DL_FUNC) &_dpf_kf1stepR, 9},
     {"_dpf_dpf", (DL_FUNC) &_dpf_dpf, 13},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
-    {"_dpf_yupengMats", (DL_FUNC) &_dpf_yupengMats, 7},
+    {"_dpf_musicModel", (DL_FUNC) &_dpf_musicModel, 7},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 12},
     {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
     {NULL, NULL, 0}

@@ -1,12 +1,10 @@
 
-#' Title
+#' convert from the expanded ten-state notation to four-state notation
 #'
-#' @param path 
+#' @param path path in ten-state form
 #'
-#' @return
+#' @return path in four-state form
 #' @export
-#'
-#' @examples
 convert10to4 <- function(path){
   t1 = c(1,2,4,2,3,1,3,1,3,1)
   path10 = t1[path+1]

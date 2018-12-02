@@ -2,13 +2,16 @@
 % Please edit documentation in R/musicfuns.R
 \name{convert10to4}
 \alias{convert10to4}
-\title{Title}
+\title{convert from the expanded ten-state notation to four-state notation}
 \usage{
 convert10to4(path)
 }
 \arguments{
-\item{path}{}
+\item{path}{path in ten-state form}
+}
+\value{
+path in four-state form
 }
 \description{
-Title
+convert from the expanded ten-state notation to four-state notation
 }
