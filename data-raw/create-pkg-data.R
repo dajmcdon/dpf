@@ -3,7 +3,7 @@ library(XML)
 tmp = tempdir()
 # put stuff here, fix the python script to write there
 
-reticulate::source_python('getMeta.ph') # this "should" give R access to all the
+reticulate::source_python('data-raw/getMeta.py') # this "should" give R access to all the
 # python objects, you may not need to save the csv
 
 url = 'http://mazurka.org.uk/auto/earis/mazurka68-3/'
@@ -15,6 +15,8 @@ for(i in 1:length(links)){
 }
 
 
-source('read-data.R')
+source('data-raw/read-data.R')
+
+file.remove('mazurka_ids.csv')
 
 unlink(tmp) # deletes the tmp directory and its contents
