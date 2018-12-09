@@ -16,7 +16,7 @@ musicModel(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
 
 \item{sig2eta}{vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})}
 
-\item{transprobs}{vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})}
+\item{transprobs}{vector of 7 transition probabilities}
 
 \item{initialMean}{a vector of length 2 giving the prior tempo and the prior acceleration for when state 3 is the starting state}
 

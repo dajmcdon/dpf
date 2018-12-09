@@ -36,8 +36,8 @@ dpf <- function(currentStates, w, N, transProbs, a0, P0, dt, ct, Tt, Zt, HHt, GG
 
 #' Evaluate the likelihood given parameters and discrete states
 #' 
-#' @param pmats a list of parameter matrices for the kalman filter. This can either be the output of yupengMats, or a list with the same names as the output of yupengMats.
-#' @param path vector giving the desired path for hidden discrete states
+#' @param pmats a list of parameter matrices for the kalman filter. This can either be the output of musicModel, or a list with the same names as the output of musicModel.
+#' @param path vector giving the path for hidden discrete states
 #' @param y observations, each time point in a column
 #' 
 #' @return the negative log-likelihood
@@ -53,7 +53,7 @@ getloglike <- function(pmats, path, y) {
 #' @param sig2eps variance of the observation noise
 #' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
 #' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
-#' @param transprobs vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})
+#' @param transprobs vector of 7 transition probabilities
 #' @param initialMean a vector of length 2 giving the prior tempo and the prior acceleration for when state 3 is the starting state
 #' @param initialVariance a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 3 is the starting state 
 #' 
@@ -98,7 +98,7 @@ beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N) 
 
 #' Estimate continuous states given parameters and discrete hidden states
 #' 
-#' @param pmats e.g., as output from yupengMats
+#' @param pmats e.g., as output from musicModel
 #' @param path path of discrete hidden states
 #' @param y observations
 #' 

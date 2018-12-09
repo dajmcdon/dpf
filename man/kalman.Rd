@@ -7,7 +7,7 @@
 kalman(pmats, path, y)
 }
 \arguments{
-\item{pmats}{e.g., as output from yupengMats}
+\item{pmats}{e.g., as output from musicModel}
 
 \item{path}{path of discrete hidden states}
 

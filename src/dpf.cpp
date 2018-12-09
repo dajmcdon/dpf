@@ -28,7 +28,6 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   double tol = 1e-10;
   arma::vec ws = w;
   ws.elem( arma::find( ws < tol) ).zeros();
-  // ws = arma::normalise(ws,1);
   arma::vec nzz = arma::nonzeros(ws);
   arma::uword nz = nzz.n_elem;
   if(M <= N || nz <= N){
@@ -66,7 +65,6 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   double tol = 1e-10;
   arma::colvec ws = w;
   ws.elem( arma::find( ws < tol) ).zeros();
-  // ws = arma::normalise(ws,1);
   arma::vec nzz = arma::nonzeros(ws);
   arma::uword nz = nzz.n_elem;
   if(M <= N || nz <= N){ 
@@ -160,8 +158,6 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   // Incorporate current information into a_t|t
   arma::mat a1 = atemp + Kt * vt;
   arma::mat P1 = Ptemp - Ptemp * Zt.t() * Kt.t();
-  // a1 = dt + Tt * a1;
-  // P1 = HHt + Tt * P1 * Tt.t();
 
   // Calculate likelihood
   double ftdet = arma::det(Ftinv);
@@ -172,10 +168,6 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   P1.reshape(m*m, 1);
   KFOUT output = {a1, atemp, P1, Ptemp, lik, pred};
   return output;
-  /*return List::create(Named("a1") = a1,
-                      Named("P1") = P1,
-                      Named("lik") = lik,
-                      Named("pred") = pred);*/
 }
 
  // [[Rcpp::export]]
@@ -209,7 +201,6 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
     GGt.reshape(d,d); // Obs var
     
     // KS
-    // arma::mat pred = ct + Zt * at;
     arma::mat vt = yt - pred;
     arma::mat Ft = GGt + Zt * Pt * Zt.t();
     arma::mat Ftinv = arma::inv(Ft);
@@ -223,20 +214,6 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 
 
 
-
-//currentStates: vector of the current discrete state for each particle
-//w: resampling weight for each particle
-//N: max number of particles
-//transProbs: matrix of transition probabilities for the discrete states
-//a0: estimated means of the current continous state for each particle
-//P0: estimated variances of the continous state for each particle
-//dt: continuous state intercept. each column is an intercept
-//ct: observation (yt) intercept
-//Tt: continous state slope
-//Zt: observation (yt) slope
-//HHt: variance of the predicted mean of the continuous state
-//GGt: variance of the observation
-//yt: observation
 //' Move the particles forward in time one step
 //' @param currentStates a vector of the current discrete state for each particle
 //' @param w a vector of the sampling weights for each particle
@@ -254,7 +231,7 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 //' 
  //' @export 
  // [[Rcpp::export]]
-List dpf(arma::uvec currentStates, arma::colvec w, int N,                      //MICHAEL: What are these?
+List dpf(arma::uvec currentStates, arma::colvec w, int N,
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
          arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt, //Matrices stored in columns of these variables. Re turned into matrices in other functions.
@@ -282,7 +259,6 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
     a1.slice(part) = a11;
     P1.slice(part) = P11;
   }
-  // arma::mat blah = transProbs.rows(currentStates);
   arma::mat testLik = lik;
   lik %= transProbs.rows(currentStates);
   lik.each_col() %= w;
@@ -323,8 +299,8 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,                      /
 
 //' Evaluate the likelihood given parameters and discrete states
 //' 
-//' @param pmats a list of parameter matrices for the kalman filter. This can either be the output of yupengMats, or a list with the same names as the output of yupengMats.
-//' @param path vector giving the desired path for hidden discrete states
+//' @param pmats a list of parameter matrices for the kalman filter. This can either be the output of musicModel, or a list with the same names as the output of musicModel.
+//' @param path vector giving the path for hidden discrete states
 //' @param y observations, each time point in a column
 //' 
 //' @return the negative log-likelihood
@@ -339,8 +315,6 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::cube Tt = pmats["Tt"];
   arma::cube Zt = pmats["Zt"];
   arma::cube HHt = pmats["HHt"];
-  // arma::cube Rt = pmats["Rt"];
-  // arma::cube Qt = pmats["Qt"];
   arma::cube GGt = pmats["GGt"];
   
   arma::uword n = y.n_cols;
@@ -354,12 +328,8 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   arma::uword ctvar = ct.n_slices > 1;
   arma::uword Ttvar = Tt.n_slices > 1;
   arma::uword Ztvar = Zt.n_slices > 1;
-  // arma::uword Rtvar = Rt.n_slices > 1;
-  // arma::uword Qtvar = Qt.n_slices > 1;
   arma::uword HHtvar = HHt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
-  // arma::mat R(mm,1);
-  // arma::mat Q(mm,1);
   
   arma::mat aa0 = a0.col(path(0));
   arma::mat PP0 = reshape(P0.col(path(0)), m, m);
@@ -369,13 +339,6 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
   
   for(arma::uword iter=0; iter<n; iter++){
     arma::uword s = path(iter);
-    // if(iter==0 || Rtvar || Qtvar){ 
-    //   R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
-    //   Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
-    //   R.reshape(m,m);
-    //   Q.reshape(m,m);
-    //   HHt = R * Q * R.t();
-    // }
     KFOUT step = kf1step(aa0, PP0, dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                                     ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
                                     Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1)),
@@ -400,7 +363,7 @@ double getloglike(List pmats, arma::uvec path, arma::mat y){
 //' @param sig2eps variance of the observation noise
 //' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
 //' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
-//' @param transprobs vector of 4 transition probabilities (\eqn{p_1, p_2, p_3, p_4})
+//' @param transprobs vector of 7 transition probabilities
 //' @param initialMean a vector of length 2 giving the prior tempo and the prior acceleration for when state 3 is the starting state
 //' @param initialVariance a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 3 is the starting state 
 //' 
@@ -452,7 +415,6 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   dt.tube(1,1) += mus(1);
   dt.tube(1,4) -= mus(1);
   dt.tube(1,8) -= mus(1);
-  //dt.tube(1,9) += mus(1);
   dt.tube(1,2) += mus(2);
   dt.tube(0,5) += mus(0);
   dt.tube(0,9) += mus(0);
@@ -600,8 +562,6 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   arma::uword Ttvar = Tt.n_slices > 1;
   arma::uword Ztvar = Zt.n_slices > 1;
   arma::uword HHtvar = HHt.n_slices > 1;
-  // arma::uword Rtvar = Rt.n_slices > 1;
-  // arma::uword Qtvar = Qt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
   arma::uvec particles(maxpart, arma::fill::zeros);
   arma::uvec filler = arma::regspace<arma::uvec>(0,K-1);
@@ -625,9 +585,6 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   paths(arma::span(0, CurrentPartNum - 1), 0) = newS;
   arma::uword iter = 1;
   while(iter < n){
-    // if(Rtvar || Qtvar){ 
-    //   HHt = HHcreate(Rt.slice(iter * Rtvar), Qt.slice(iter * Qtvar), m, q);
-    // }
     step = dpf(particles.head(CurrentPartNum), weights.head(CurrentPartNum), 
                               maxpart, transProbs, 
                               a0.head_cols(CurrentPartNum), P0.head_cols(CurrentPartNum),
@@ -653,8 +610,6 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
     paths(arma::span(0,CurrentPartNum-1), iter) = newS;
     iter++;
   }
-  // arma::uword best = weights.index_max();
-  // arma::urowvec bestPath = paths.row(best);
   return List::create(Named("paths") = paths,
                       Named("weights") = weights,
                       Named("LastStep") = iter++);
@@ -665,7 +620,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
 
 //' Estimate continuous states given parameters and discrete hidden states
 //' 
-//' @param pmats e.g., as output from yupengMats
+//' @param pmats e.g., as output from musicModel
 //' @param path path of discrete hidden states
 //' @param y observations
 //' 
@@ -683,8 +638,6 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   arma::cube Tt = pmats["Tt"];
   arma::cube Zt = pmats["Zt"];
   arma::cube HHt = pmats["HHt"];
-  // arma::cube Rt = pmats["Rt"];
-  // arma::cube Qt = pmats["Qt"];
   arma::cube GGt = pmats["GGt"];
   
   arma::uword n = y.n_cols;
@@ -699,13 +652,7 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   arma::uword Ttvar = Tt.n_slices > 1;
   arma::uword Ztvar = Zt.n_slices > 1;
   arma::uword HHtvar = HHt.n_slices > 1;
-  // arma::uword Rtvar = Rt.n_slices > 1;
-  // arma::uword Qtvar = Qt.n_slices > 1;
   arma::uword GGtvar = GGt.n_slices > 1;
-  // arma::mat HHt(m,m);
-  // arma::mat R(mm,1);
-  // arma::mat Q(mm,1);
-  
   
   // output storage
   arma::colvec llik = arma::zeros(n);
@@ -726,16 +673,8 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   
   // Kalman filtering
   arma::uword iter=0;
-  while(iter < n){ //issue only happens when variables are declared both in and before the loop
+  while(iter < n){
     s = path(iter);
-    // if(iter==0 || Rtvar || Qtvar){ 
-    //   R = Rt.subcube(0,s,iter*Rtvar,arma::size(mm,1,1));
-    //   Q = Qt.subcube(0,s,iter*Qtvar,arma::size(mm,1,1));
-    //   R.reshape(m,m);
-    //   Q.reshape(m,m);
-    //   HHt = R * Q * R.t();
-    // }
-    
     KFOUT step = kf1step(a00, P00, 
                          dt.subcube(0,s,iter*dtvar,arma::size(m,1,1)),
                          ct.subcube(0,s,iter*ctvar,arma::size(d,1,1)), 
@@ -773,7 +712,6 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
     Tmat.reshape(m,m);
     ahat.col(iter) = att.col(iter) + Ptt.slice(iter) * Tmat * P00 * a00;
   }
-  // iter = 0, need the estimates
   arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
   arma::mat zz = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
   zz.reshape(d,m);

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{plotStates}
 \alias{plotStates}
-\title{Title}
+\title{plots the state transition for a performance given the model parameters}
 \usage{
 plotStates(performance, performer, onset, params, particleNumber = 200,
   initialMean = c(132, 0), initialVariance = c(400, 10))
@@ -22,6 +22,9 @@ plotStates(performance, performer, onset, params, particleNumber = 200,
 
 \item{initialVariance}{}
 }
+\value{
+a ggplot2 plot
+}
 \description{
-Title
+plots the state transition for a performance given the model parameters
 }
