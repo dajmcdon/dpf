@@ -2,17 +2,20 @@
 % Please edit documentation in R/probdivergences.R
 \name{Dist}
 \alias{Dist}
-\title{Title}
+\title{create a distance matrix}
 \usage{
 Dist(x, dist_fun = H2total, returnmat = TRUE)
 }
 \arguments{
-\item{x}{}
+\item{x}{data matrix}
 
-\item{dist_fun}{}
+\item{dist_fun}{distance function}
 
-\item{returnmat}{}
+\item{returnmat}{boolean indicating whether to ensure that the return type is a matrix}
+}
+\value{
+a distance matrix
 }
 \description{
-Title
+create a distance matrix
 }

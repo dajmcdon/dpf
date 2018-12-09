@@ -35,18 +35,16 @@ KLmultinom <- function(a, b, symmetric=TRUE){
 }
 
 
-#' Title
+#' Compute the squared Hellinger distance between two gaussian distributions
 #'
-#' @param m1 
-#' @param m2 
-#' @param s1 
-#' @param s2 
-#' @param subtract1 
+#' @param m1 the mean of the first distribution
+#' @param m2 the mean of the second distribution
+#' @param s1 the standard deviation of the first distribution
+#' @param s2 the standard deviation of the second distribution
+#' @param subtract1 a boolean indicating whether the squared distance should be computed instead of one minus the squared distance
 #'
-#' @return
+#' @return the squared Hellinger distance
 #' @export
-#'
-#' @examples
 H2gauss <- function(m1, m2, s1, s2, subtract1=FALSE){
   sig1 = sqrt(s1)
   sig2 = sqrt(s2)
@@ -58,16 +56,14 @@ H2gauss <- function(m1, m2, s1, s2, subtract1=FALSE){
 }
 
 
-#' Title
+#' Compute the squared Hellinger distance between two multinomial distributions
 #'
-#' @param p 
-#' @param q 
-#' @param subtract1 
+#' @param p the probability vector for the first distribution
+#' @param q the probability vector for the second distribution
+#' @param subtract1 a boolean indicating whether the squared distance should be computed instead of one minus the squared distance
 #'
-#' @return
+#' @return the squared Hellinger distance
 #' @export
-#'
-#' @examples
 H2multinom <- function(p, q, subtract1=FALSE){
   ret = sum(sqrt(p*q))
   if(subtract1) ret = 1 - ret
@@ -77,15 +73,13 @@ H2multinom <- function(p, q, subtract1=FALSE){
 full_multinom <- function(p) c(p, 1-sum(p))
 
 
-#' Title
+#' Compute the squared Hellinger distance between two models specified by passing the parameters to musicModel
 #'
-#' @param p1 
-#' @param p2 
+#' @param p1 parameters for the first model
+#' @param p2 parameters for the second model
 #'
-#' @return
+#' @return the squared Hellinger distance
 #' @export
-#'
-#' @examples
 H2total <- function(p1, p2){
   p1 = as.vector(unlist(p1))
   p2 = as.vector(unlist(p2))
@@ -106,16 +100,14 @@ H2total <- function(p1, p2){
 }
 
 
-#' Title
+#' create a distance matrix
 #'
-#' @param x 
-#' @param dist_fun 
-#' @param returnmat 
+#' @param x data matrix
+#' @param dist_fun distance function
+#' @param returnmat boolean indicating whether to ensure that the return type is a matrix
 #'
-#' @return
+#' @return a distance matrix
 #' @export
-#'
-#' @examples
 Dist <- function(x, dist_fun=H2total, returnmat = TRUE){
   d = usedist::dist_make(x, dist_fun)
   if(returnmat) d = as.matrix(d)

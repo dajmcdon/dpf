@@ -2,17 +2,20 @@
 % Please edit documentation in R/probdivergences.R
 \name{H2multinom}
 \alias{H2multinom}
-\title{Title}
+\title{Compute the squared Hellinger distance between two multinomial distributions}
 \usage{
 H2multinom(p, q, subtract1 = FALSE)
 }
 \arguments{
-\item{p}{}
+\item{p}{the probability vector for the first distribution}
 
-\item{q}{}
+\item{q}{the probability vector for the second distribution}
 
-\item{subtract1}{}
+\item{subtract1}{a boolean indicating whether the squared distance should be computed instead of one minus the squared distance}
+}
+\value{
+the squared Hellinger distance
 }
 \description{
-Title
+Compute the squared Hellinger distance between two multinomial distributions
 }

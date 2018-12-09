@@ -2,21 +2,24 @@
 % Please edit documentation in R/probdivergences.R
 \name{H2gauss}
 \alias{H2gauss}
-\title{Title}
+\title{Compute the squared Hellinger distance between two gaussian distributions}
 \usage{
 H2gauss(m1, m2, s1, s2, subtract1 = FALSE)
 }
 \arguments{
-\item{m1}{}
+\item{m1}{the mean of the first distribution}
 
-\item{m2}{}
+\item{m2}{the mean of the second distribution}
 
-\item{s1}{}
+\item{s1}{the standard deviation of the first distribution}
 
-\item{s2}{}
+\item{s2}{the standard deviation of the second distribution}
 
-\item{subtract1}{}
+\item{subtract1}{a boolean indicating whether the squared distance should be computed instead of one minus the squared distance}
+}
+\value{
+the squared Hellinger distance
 }
 \description{
-Title
+Compute the squared Hellinger distance between two gaussian distributions
 }

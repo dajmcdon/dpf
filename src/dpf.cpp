@@ -229,8 +229,8 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 //' @param GGt a (k^2)xd matrix of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.
 //' @param yt a kxn matrix of obervations
 //' 
- //' @export 
- // [[Rcpp::export]]
+//' @export 
+// [[Rcpp::export]]
 List dpf(arma::uvec currentStates, arma::colvec w, int N,
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
