@@ -110,16 +110,21 @@ ContoR <- function(p){
 }
 
 Det <- function(P){
-    a = P[1,1]
-    b = P[1,2]
-    c = P[1,3]
-    d = P[2,1]
-    e = P[2,2]
-    f = P[2,3]
-    g = P[3,1]
-    h = P[3,2]
-    k = P[3,3]
-    return(a*(e*k - f*h) - b*(d*k - f*g) + c*(d*h - e*g))
+    if(nrow(P) == 3){
+        a = P[1,1]
+        b = P[1,2]
+        c = P[1,3]
+        d = P[2,1]
+        e = P[2,2]
+        f = P[2,3]
+        g = P[3,1]
+        h = P[3,2]
+        k = P[3,3]
+        return(a*(e*k - f*h) - b*(d*k - f*g) + c*(d*h - e*g))
+    }
+    else{
+        return(P[1,1]*P[2,2] - P[1,2]*P[2,1])
+    }
 }
 
 invmlogit_prime <- function(p){
@@ -249,48 +254,4 @@ optimal_sample <- function(y, lt, name, targetb = 0.28, targets = 0.22, initial_
     # pushover("Done!",
     #          user = "u1i3udnicjcosuaxx6615zhpivu73j", 
     #          app = "arzw55n8kkf18voqamjyer7vrk1dwq")
-}
-
-toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
-  pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14],
-                     initialMean = c(samp_mean,0), # 132 is marked tempo, 0 is unused
-                     initialVariance = c(400,10)) # sd of 20, 10 is unused
-  beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0,0,0), 
-                    pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
-                    pmats$HHt, pmats$GGt, yt, pmats$transMat, Npart)
-  if(beam$LastStep < length(lt)){
-    cat('beam$LastStep < length(lt)\n')
-    return(badvals)
-  }
-  if(all(is.na(beam$weights))){
-    cat('all weights are NA\n')
-    return(badvals)
-  }
-  states = beam$paths[which.max(beam$weights),]
-  negllike = getloglike(pmats, states, yt)# -log(P(y|params, states))
-  sgp = -1 * logStatesGivenParams(states, pmats$transMat)
-  logp = -1 * logprior(theta, samp_mean)
-  obj = negllike + logp + sgp
-  obj
-}
-
-
-# Cluster funs ------------------------------------------------------------
-
-optimizer <- function(perf, lt, Npart=200, ntries = 5, samp_mean=132, badvals=1e8){
-  yt = matrix(perf, nrow=1)
-  if(is.null(samp_mean)) samp_mean = mean(yt)
-  randos = NULL
-  if(ntries > 1) randos = rprior(ntries-1, samp_mean)
-  init_vals = rbind(prior_means(samp_mean), randos)
-  out1 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
-                   badvals=badvals,samp_mean=samp_mean,
-                   method='Nelder-Mead',
-                   control=list(trace=0, maxit=5000, badval=badvals))
-  out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
-                    badvals=badvals,samp_mean=samp_mean,
-                    method='SANN',
-                    control=list(trace=0, maxit=5000,badval=badvals))
-  out = rbind.data.frame(out1, out2)
-  out
 }

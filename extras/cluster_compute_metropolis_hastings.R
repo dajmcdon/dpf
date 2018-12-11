@@ -9,9 +9,9 @@ library(optimr) # cran version
 data(tempos)
 lt = diff(c(tempos$note_onset,61))
 source("metropolis_hastings.R")
-makeRegistry("my-mazurka02", packages=c('dpf','optimr'), 
+makeRegistry("my-mazurka03", packages=c('dpf','optimr'), 
              source = "metropolis_hastings.R",
              seed = 20181109)
-batchMap(optimizer, as.list(select(tempos, -meas_num, -note_onset, -beat)),
+batchMap(optimal_sample, as.list(select(tempos, -meas_num, -note_onset, -beat)),
          more.args = list(lt=lt, name = as.list(colnames(tempos))))
 submitJobs(resources = list(ppn=1, nodes=1, memory='16gb', walltime='24:00:00'))
