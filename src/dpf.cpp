@@ -22,7 +22,7 @@ arma::uvec SampleNoReplace(arma::uvec x, int size) {
   return(ret);
 }
 
- //[[Rcpp::export]]
+
 arma::vec resampleSubOptimal(arma::vec w, int N){
   int M = w.size();
   double tol = 1e-10;
@@ -58,7 +58,7 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   return ws;
 }
 
- //[[Rcpp::export]]
+
 arma::colvec resampleOptimal(arma::colvec w, int N){
   // no zeros no dups?? unused, doesn't seem to work
   int M = w.size();
@@ -170,7 +170,7 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   return output;
 }
 
- // [[Rcpp::export]]
+
 List kf1stepR(arma::mat a0, arma::mat P0, arma::mat dt,
               arma::mat ct, arma::mat Tt,
               arma::mat Zt, arma::mat HHt, arma::mat GGt, arma::mat yt) {
@@ -213,24 +213,6 @@ KFOUT ks1step(arma::mat r1, arma::mat N1,
 }
 
 
-
-//' Move the particles forward in time one step
-//' @param currentStates a vector of the current discrete state for each particle
-//' @param w a vector of the sampling weights for each particle
-//' @param N the maximum particle number
-//' @param transProbs a dxd matrix of transition probabilities for the discrete states
-//' @param a0 a pxN matrix of the current estimate of the state means. Each column represents a particle
-//' @param P0 a (p^2)xN state prior covariance matrix
-//' @param dt a pxd matrix of state intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.
-//' @param ct a kxd matrix of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.
-//' @param Tt a (p^2)xd matrix of state slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.
-//' @param Zt a pkxd matrix of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.
-//' @param HHt a (p^2)xd matrix of state covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.
-//' @param GGt a (k^2)xd matrix of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.
-//' @param yt a kxn matrix of obervations
-//' 
-//' @export 
- // [[Rcpp::export]]
 List dpf(arma::uvec currentStates, arma::colvec w, int N,
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
@@ -692,14 +674,15 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
 //' Performs Kalman filtering and smoothing for the switching state space model.
 //' Also works on any (potentially time varying) state space model.
 //' 
-//' @param pmats a list with componente \code{a0, P0, dt, ct, Tt, Zt, HHt, and GGt} 
+//' @param pmats a list with componente \code{a0, P0, dt, ct, Tt, Zt, HHt,} and \code{GGt} 
 //' e.g., as output from musicModel. See the details below.
 //' @param path path of discrete hidden states
 //' @param y observations
 //' 
 //' @return List with components from Kalman filter and Smoother. See details.
 //' 
-//' @details \strong{State space form:}
+//' @details
+//' \strong{State space form:}
 //' 
 //' The following notation is closest to the one of Koopman et al. The state
 //' space model is represented by the transition equation and the measurement
@@ -707,17 +690,17 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
 //' the observations, and n the number of observations. The transition equation
 //' and the measurement equation are given by \deqn{a(t + 1) = d(t) + T(t) a(t) +
 //' H(t) \eta(t)} \deqn{y(t) = c(t) + Z(t) a(t) + G(t) \epsilon(t),} where
-//' \eqn{\eta(t)} and \eqn{\epsilon_t} are iid \eqn{N(0, I_m)} and iid \eqn{N(0,
+//' \eqn{\eta(t)} and \eqn{\epsilon(t)} are iid \eqn{N(0, I_m)} and iid \eqn{N(0,
 //' I_d)}, respectively, and \eqn{\alpha(t)} denotes the state variable. The
 //' parameters admit the following dimensions:
 //' 
 //' \tabular{lll}{ \eqn{a_t \in R^m}{a[t] in R^m} \tab \eqn{d_t \in R^m}{d[t] in
 //' R^m} \tab \eqn{\eta_t \in R^m}{eta[t] in R^m} \cr \eqn{T_t \in R^{m \times
-//' m}}{d[t] in R^(m * m)} \tab \eqn{H_t \in R^{m \times m}}{d[t] in R^(m * m)}
+//' m}}{d[t] in R^{m \times m}} \tab \eqn{H_t \in R^{m \times m}}{d[t] in R^{m \times m}}
 //' \tab \cr \eqn{y_t \in R^d}{y[t] in R^d} \tab \eqn{c_t \in R^d}{c[t] in R^d}
 //' \tab \eqn{\epsilon_t \in R^d}{epsilon[t] in R^d}. \cr \eqn{Z_t \in R^{d
-//' \times m}}{Z[t] in R^(d * m)} \tab \eqn{G_t \in R^{d \times d}}{G[t] in R^(d
-//' * d)} \tab}
+//' \times m}}{Z[t] in R^{d \times m}} \tab \eqn{G_t \in R^{d \times d}}{G[t] in R^{d
+//' \times d}} \tab}
 //' 
 //' Note that \code{kalman} takes as input \code{HHt} and \code{GGt} which
 //' corresponds to \eqn{H_t H_t'}{H[t] \%*\% t(H[t])} and \eqn{G_t G_t'}{G[t]

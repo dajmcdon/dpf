@@ -4,6 +4,9 @@
 #' Kalman filters, a greedy discrete particle filter (beam search), and 
 #' functions for applying these to musical tempo analysis.
 #' 
+#' 
+#' @details 
+#' 
 #' For a concise description, see the package vignette.
 #' 
 #' The most recent version of this package is available on github, and installable

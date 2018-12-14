@@ -7,7 +7,7 @@
 kalman(pmats, path, y)
 }
 \arguments{
-\item{pmats}{a list with componente \code{a0, P0, dt, ct, Tt, Zt, HHt, and GGt} 
+\item{pmats}{a list with componente \code{a0, P0, dt, ct, Tt, Zt, HHt,} and \code{GGt} 
 e.g., as output from musicModel. See the details below.}
 
 \item{path}{path of discrete hidden states}
