@@ -2,13 +2,30 @@
 #'
 #' The dpf package provides three categories of important functions:
 #' Kalman filters, a greedy discrete particle filter (beam search), and 
-#' functions for applying these to musical tempo analysis
+#' functions for applying these to musical tempo analysis.
+#' 
+#' For a concise description, see the package vignette.
+#' 
+#' The most recent version of this package is available on github, and installable
+#' with
+#' 
+#' \code{devtools::install_github('dajmcdon/dpf', build_vignettes=TRUE)}
 #' 
 #' @section Kalman filters
-#' 
+#'
+#' \code{\link{kalman}}
+#' \code{\link{getLogLike}} 
+#'
 #' @section Beam search
 #' 
+#' \code{\link{beamSearch}}
+#' 
 #' @section Music tempo analysis
+#' 
+#' \code{\link{musicModel}}
+#' \code{\link{convert10to4}}
+#' 
+#' 
 #'
 #' @docType package
 #' @name dpf

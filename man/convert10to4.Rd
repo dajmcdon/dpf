@@ -2,7 +2,7 @@
 % Please edit documentation in R/musicfuns.R
 \name{convert10to4}
 \alias{convert10to4}
-\title{convert from the expanded ten-state notation to four-state notation}
+\title{Converts from the expanded ten-state notation to four-state notation}
 \usage{
 convert10to4(path)
 }
@@ -13,5 +13,11 @@ convert10to4(path)
 path in four-state form
 }
 \description{
-convert from the expanded ten-state notation to four-state notation
+Because our model is actually 2-Markov, we expand from 4 to 16 states. 
+But not all states can be visited, so there are only 10.
+}
+\examples{
+path = sample(1:10, 25, replace=TRUE)
+npath = convert10to4(path)
+
 }

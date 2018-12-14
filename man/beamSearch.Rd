@@ -32,8 +32,30 @@ beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
 \item{N}{the maximum particle number}
 }
 \value{
-List with components "paths", "weights", and "LastStep". "paths" is an Nxn matrix specifying the paths of each particle, "weights" is a vector giving the final sampling weight of each path, and "LastStep" is the timestep computed. "LastStep" will alway equal n unless all of the sampling weights vanish.
+List with components "paths", "weights", and "LastStep". 
+\describe{
+\item{"paths"}{is an Nxn matrix specifying the paths of each particle,}
+\item{"weights"}{is a vector giving the final sampling weight of each path,}
+\item{"LastStep"}{is the timestep computed. "LastStep" will alway equal n unless all of the sampling weights vanish.}
+}
 }
 \description{
-Greedy HMM estimation given continuous hidden states
+This function maintains a "beam" of size \code{N} representing the highest likelihood
+states up to time \code{t}. For a typical switching state space model, ML evaluation
+requires computing each of the \code{d^N} possible paths through the discrete
+state space. Beam Search greedily approximates these computations be propagating
+the most likely states at each time point.
+}
+\examples{
+data(tempos)
+theta = c(363.475,125.05,-11.81757,-34.91605,366.5073,0.519518,
+          0.212499,0.7901238,0.0989846,0.7815691,0.2194727,0.03586685,
+          0.1342895,0.2435351)
+y = matrix(tempos[,'Milkina_1970'], 1)
+lt = diff(c(tempos$note_onset, 61))
+pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
+                  c(132,0), c(400,10)) # prior means and variances on X_1
+beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0), dt, ct, Tt, Zt,
+            HHt, GGt, y, transMat, 200))
+
 }

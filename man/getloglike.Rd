@@ -2,12 +2,15 @@
 % Please edit documentation in R/RcppExports.R
 \name{getloglike}
 \alias{getloglike}
-\title{Evaluate the likelihood given parameters and discrete states}
+\title{Fast likelihood evaluation given parameters and discrete states}
 \usage{
 getloglike(pmats, path, y)
 }
 \arguments{
-\item{pmats}{a list of parameter matrices for the kalman filter. This can either be the output of musicModel, or a list with the same names as the output of musicModel.}
+\item{pmats}{a list of parameter matrices for the kalman filter. 
+This can either be the output of \code{\link{musicModel}}, or a list with 
+the same names as the output of \code{\link{musicModel}}. This list must contain
+the following elements: \code{a0, P0, dt, ct, Tt, Zt, HHt, GGt}. See the details below.}
 
 \item{path}{vector giving the path for hidden discrete states}
 
@@ -17,5 +20,34 @@ getloglike(pmats, path, y)
 the negative log-likelihood
 }
 \description{
-Evaluate the likelihood given parameters and discrete states
+This function quickly computes the (negative) log likelihood for a possibly
+time varying state-space model. The goal is to enable ML (or Bayesian) estimation
+of parameters without extra computational overhead
+}
+\details{
+\describe{
+\item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
+\item{P0}{a (p^2)xd matrix of the initial covariances of the hidden state. The j'th column corresponds to the initial covariances stored columnwise when starting in the j'th discrete state.}
+\item{dt}{a pxdxn cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+\item{ct}{a kxdx1 cube of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.}
+\item{Tt}{a (p^2)xdxn cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+\item{Zt}{a pkxdx1 cube of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.}
+\item{HHt}{a (p^2)xdxn cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+\item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
+}
+}
+\examples{
+data(tempos)
+theta = c(363.475,125.05,-11.81757,-34.91605,366.5073,0.519518,
+          0.212499,0.7901238,0.0989846,0.7815691,0.2194727,0.03586685,
+          0.1342895,0.2435351)
+y = matrix(tempos[,'Milkina_1970'], 1)
+lt = diff(c(tempos$note_onset, 61))
+pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
+                  c(132,0), c(400,10)) # prior means and variances on X_1
+beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0), dt, ct, Tt, Zt,
+            HHt, GGt, y, transMat, 200))
+bestpath = with(beam, paths[which.max(weights),])
+getlogLike(pmats, bestpath, y)
+
 }

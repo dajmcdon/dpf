@@ -2,13 +2,13 @@
 % Please edit documentation in R/RcppExports.R
 \name{musicModel}
 \alias{musicModel}
-\title{Create parameter matrices as in Gu (2017)}
+\title{Parameter matrices for our music model}
 \usage{
 musicModel(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
   initialVariance)
 }
 \arguments{
-\item{lt}{durations between successive notes in the score}
+\item{lt}{vector of durations between successive notes in the score}
 
 \item{sig2eps}{variance of the observation noise}
 
@@ -18,9 +18,9 @@ musicModel(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
 
 \item{transprobs}{vector of 7 transition probabilities}
 
-\item{initialMean}{a vector of length 2 giving the prior tempo and the prior acceleration for when state 3 is the starting state}
+\item{initialMean}{a vector of length 2 giving the prior tempo and the prior acceleration for when state 1 or 3 is the starting state}
 
-\item{initialVariance}{a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 3 is the starting state}
+\item{initialVariance}{a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 1 or 3 is the starting state}
 }
 \value{
 List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
@@ -36,5 +36,17 @@ List with components as appropriate for Kalman filtering or Beam Search. These i
 }
 }
 \description{
-Create parameter matrices as in Gu (2017)
+This function accepts a number of parameters and creates a list of matrices
+for Kalman filter evaluation. See the paper for the particular form of the model.
+}
+\examples{
+data(tempos)
+theta = c(363.475,125.05,-11.81757,-34.91605,366.5073,0.519518,
+          0.212499,0.7901238,0.0989846,0.7815691,0.2194727,0.03586685,
+          0.1342895,0.2435351)
+y = matrix(tempos[,'Milkina_1970'], 1)
+lt = diff(c(tempos$note_onset, 61))
+pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
+                  c(132,0), c(400,10))
+                  
 }
