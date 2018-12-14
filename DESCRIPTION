@@ -17,5 +17,10 @@ Imports: Rcpp (>= 0.12.10),
     ggplot2
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.1.0
-Suggests: testthat
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown,
+    prettydoc
 Encoding: UTF-8
+VignetteBuilder: knitr, rmarkdown
