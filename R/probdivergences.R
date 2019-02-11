@@ -157,6 +157,28 @@ stat_kern <- function(x, y, indices, lb = 1e-6){
   kern
 }
 
+perc_overlap <- function(a, b){
+  if(a[1] > b[2] || b[1] > a[2]) return(0)
+  da = a[2] - a[1]
+  db = b[2] - b[1]
+  os = max(a[1], b[1])
+  ol = min(a[2], b[2])
+  (ol-os) / max(da,db)
+}
+
+kill_check <- function(x, y, ind, kill = 1e-6){
+  # determine if support overlap is too small
+  xmat = x[,ind,drop=FALSE]
+  ymat = y[,ind,drop=FALSE]
+  xr = apply(xmat, 2, range)
+  yr = apply(ymat, 2, range)
+  if(any(xr[2,]-xr[1,] < kill , yr[2,]-yr[1,] < kill)) return(TRUE)
+  xr = split(xr, rep(ind, each=2))
+  yr = split(yr, rep(ind, each=2))
+  if(any(mapply(FUN=perc_overlap, xr, yr) < kill)) return(TRUE)
+  FALSE
+}
+
 #' Estimate the Hellinger divergence between two distributions
 #'
 #' @param x a sample from the first distribution (n x d)
@@ -193,7 +215,8 @@ stat_kern <- function(x, y, indices, lb = 1e-6){
 #' y = matrix(rnorm(3*1000)) %*% matrix(c(2,0,0,0,1,.5,0,.5,4),ncol=3)
 #' hellinger_kde(x, y, list(1, 2:3))
 #' @export
-hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, all = FALSE){
+hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, kill = 1e-6,
+                          all = FALSE){
   
   if(!is.list(index.list)) index.list = list(index.list)
   folds = length(index.list)
@@ -201,6 +224,7 @@ hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, all = FALSE){
   kernx = rep(1, nrow(x))
   kerny = rep(1, nrow(x))
   for(f in 1:folds){
+    if(kill_check(x,y,index.list[[f]])) return(2)
     kern = stat_kern(x, y, index.list[[f]])
     kernx = kernx * kern$x
     kerny = kerny * kern$y

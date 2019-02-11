@@ -4,7 +4,8 @@
 \alias{hellinger_kde}
 \title{Estimate the Hellinger divergence between two distributions}
 \usage{
-hellinger_kde(x, y, index.list = 1, lb = 1e-06, all = FALSE)
+hellinger_kde(x, y, index.list = 1, lb = 1e-06, kill = 1e-06,
+  all = FALSE)
 }
 \arguments{
 \item{x}{a sample from the first distribution (n x d)}
