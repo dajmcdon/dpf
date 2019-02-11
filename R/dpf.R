@@ -40,6 +40,7 @@ NULL
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats rgamma
+#' @importFrom ks kde
 NULL
 
 #' Dynamics of 46 Chopin piano recordings

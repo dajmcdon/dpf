@@ -114,3 +114,98 @@ Dist <- function(x, dist_fun=H2total, returnmat = TRUE){
   d
 }
 
+full_samp_kde <- function(x, y, indices){
+  outL = list()
+  outL$fx = kde(x[,indices], eval.points = y[,indices])
+  outL$fy = kde(y[,indices], eval.points = x[,indices])
+  outL
+}
+
+loo_kde <- function(x, fx, indices){
+  d = length(indices)
+  n = nrow(x)
+  fminus = double(n)
+  if(d==1){
+    h = fx$h
+    for(i in 1:n){
+      fminus[i] = kde(x[-i,indices], eval.points = x[i,indices], h=h)$estimate
+    }
+  } else {
+    H = fx$H
+    for(i in n){
+      fminus[i] = kde(x[-i,indices], eval.points = x[i,indices], H=H)$estimate
+    } 
+  }
+  fminus
+}
+
+stat_kern <- function(x, y, indices, lb = 1e-6){
+  fxfy = full_samp_kde(x, y, indices)
+  looX = loo_kde(x, fxfy$fx, indices)
+  looY = loo_kde(y, fxfy$fy, indices)
+  
+  kern = list()
+  kern$x = sqrt( pmax(fxfy$fx$estimate, lb) / pmax(looX, lb) )
+  kern$y = sqrt( pmax(fxfy$fy$estimate, lb) / pmax(looY, lb) )
+  
+  # fix big values
+  kern = lapply(kern, function(x) {
+    m = mean(x)
+    if(m > 1) x = x / m
+    x
+  })
+  kern
+}
+
+#' Estimate the Hellinger divergence between two distributions
+#'
+#' @param x a sample from the first distribution (n x d)
+#' @param y a sample from the second distribution (n x d)
+#' @param index.list list of columns to be used (default 1), see details
+#' @param lb lower-bound for the density truncation
+#' @param all return the kde for x and y rather than the divergence estimate
+#' 
+#' @details 
+#' 
+#' This estimates the Hellinger divergence between samples from two 
+#' distributions. The methodology implements the estimator in 
+#' "Influence Functions for Machine Learning: Nonparametric Estimators for 
+#' Entropies, Divergences and Mutual Informations" by Kandasamy, Krishnamurthy,
+#' Poczos, Wasserman, and Robins. See their Matlab functions. Here, we use only
+#' the Hellinger divergence.
+#' 
+#' Each sample (x and y) is assumed to be a matrix with n samples in d columns.
+#' The estimator can only use up to 6 dimensions jointly. The list breaks up the
+#' d dimensions into smaller collections. Generically,
+#' 
+#' \deqn{H = 2 - \int \sqrt(p_x p_y).}
+#' 
+#' If \eqn{p_x = p_{x1} p_{x2}} and \eqn{p_y = p_{y1}p_{y2}}, then 
+#' \deqn{H = 2 - \int \sqrt(p_{x1} p_{y1}) \int \sqrt(p_{x1} p_{y1}).} So, for example, to 
+#' treat the first column as independent from columns 2 and 3, use
+#' \code{index.list = list(1,2:3)}.
+#' 
+#'
+#' @return the Hellinger divergence
+#' 
+#' @examples
+#' x = matrix(rnorm(3*1000)) %*% matrix(c(1,0,0,0,2,.5,0,.5,4),ncol=3)
+#' y = matrix(rnorm(3*1000)) %*% matrix(c(2,0,0,0,1,.5,0,.5,4),ncol=3)
+#' hellinger_kde(x, y, list(1, 2:3))
+#' @export
+hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, all = FALSE){
+  
+  if(!is.list(index.list)) index.list = list(index.list)
+  folds = length(index.list)
+  
+  kernx = rep(1, nrow(x))
+  kerny = rep(1, nrow(x))
+  for(f in 1:folds){
+    kern = stat_kern(x, y, index.list[[f]])
+    kernx = kernx * kern$x
+    kerny = kerny * kern$y
+  }
+  if(all) return(list(kernx=kernx, kerny=kerny))
+  out = 2 - mean(kernx) - mean(kerny)
+  out
+}
