@@ -116,8 +116,8 @@ Dist <- function(x, dist_fun=H2total, returnmat = TRUE){
 
 full_samp_kde <- function(x, y, indices){
   outL = list()
-  outL$fx = kde(x[,indices], eval.points = y[,indices])
-  outL$fy = kde(y[,indices], eval.points = x[,indices])
+  outL$fx = ks::kde(x[,indices], binned=FALSE, eval.points = y[,indices])
+  outL$fy = ks::kde(y[,indices], binned=FALSE, eval.points = x[,indices])
   outL
 }
 
@@ -128,12 +128,14 @@ loo_kde <- function(x, fx, indices){
   if(d==1){
     h = fx$h
     for(i in 1:n){
-      fminus[i] = kde(x[-i,indices], eval.points = x[i,indices], h=h)$estimate
+      fminus[i] = ks::kde(x[-i,indices], binned=FALSE, 
+                          eval.points = x[i,indices], h=h)$estimate
     }
   } else {
     H = fx$H
     for(i in n){
-      fminus[i] = kde(x[-i,indices], eval.points = x[i,indices], H=H)$estimate
+      fminus[i] = ks::kde(x[-i,indices], binned=FALSE, 
+                          eval.points = x[i,indices], H=H)$estimate
     } 
   }
   fminus
