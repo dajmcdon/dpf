@@ -150,7 +150,7 @@ stat_kern <- function(x, y, indices, lb = 1e-6){
   
   # fix big values
   kern = lapply(kern, function(x) {
-    m = mean(x)
+    m = sum(x)
     if(m > 1) x = x / m
     x
   })
