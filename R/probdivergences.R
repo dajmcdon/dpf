@@ -128,20 +128,20 @@ loo_kde <- function(x, fx, indices){
   if(d==1){
     h = fx$h
     for(i in 1:n){
-      fminus[i] = ks::kde(x[-i,indices], binned=FALSE, 
+      fminus[i] = ks::kde(x[-i,indices],
                           eval.points = x[i,indices], h=h)$estimate
     }
   } else {
     H = fx$H
     for(i in n){
-      fminus[i] = ks::kde(x[-i,indices], binned=FALSE, 
+      fminus[i] = ks::kde(x[-i,indices],
                           eval.points = x[i,indices], H=H)$estimate
     } 
   }
   fminus
 }
 
-stat_kern <- function(x, y, indices, lb = 1e-6){
+stat_kern <- function(x, y, indices, lb = 1e-12){
   fxfy = full_samp_kde(x, y, indices)
   looX = loo_kde(x, fxfy$fx, indices)
   looY = loo_kde(y, fxfy$fy, indices)
@@ -149,13 +149,7 @@ stat_kern <- function(x, y, indices, lb = 1e-6){
   kern = list()
   kern$x = sqrt( pmax(fxfy$fx$estimate, lb) / pmax(looX, lb) )
   kern$y = sqrt( pmax(fxfy$fy$estimate, lb) / pmax(looY, lb) )
-  
-  # fix big values
-  kern = lapply(kern, function(x) {
-    m = sum(x)
-    if(m > 1) x = x / m
-    x
-  })
+
   kern
 }
 
@@ -180,6 +174,9 @@ kill_check <- function(x, y, ind, kill = 1e-6){
   if(any(mapply(FUN=perc_overlap, xr, yr) < kill)) return(TRUE)
   FALSE
 }
+
+clamp <- function(x, lb=0, ub=1) min(ub, max(lb, x))
+  
 
 #' Estimate the Hellinger divergence between two distributions
 #'
@@ -217,21 +214,19 @@ kill_check <- function(x, y, ind, kill = 1e-6){
 #' y = matrix(rnorm(3*1000)) %*% matrix(c(2,0,0,0,1,.5,0,.5,4),ncol=3)
 #' hellinger_kde(x, y, list(1, 2:3))
 #' @export
-hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, kill = 1e-6,
-                          all = FALSE){
+hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, kill = 1e-6){
   
   if(!is.list(index.list)) index.list = list(index.list)
   folds = length(index.list)
   
-  kernx = rep(1, nrow(x))
-  kerny = rep(1, nrow(x))
+  out = 2*folds
   for(f in 1:folds){
-    if(kill_check(x,y,index.list[[f]])) return(2)
-    kern = stat_kern(x, y, index.list[[f]])
-    kernx = kernx * kern$x
-    kerny = kerny * kern$y
+    if(kill_check(x,y,index.list[[f]])){
+      kern = list(x=1, y=1)  
+    } else {
+      kern = stat_kern(x, y, index.list[[f]])
+    }
+    out = out - clamp(mean(kern$x)) - clamp(mean(kern$y))
   }
-  if(all) return(list(kernx=kernx, kerny=kerny))
-  out = 2 - mean(kernx) - mean(kerny)
   out
 }
