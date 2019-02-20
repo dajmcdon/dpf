@@ -222,7 +222,7 @@ hellinger_kde <- function(x, y, index.list = 1, lb = 1e-6, kill = 1e-6){
   out = 2*folds
   for(f in 1:folds){
     if(kill_check(x,y,index.list[[f]])){
-      kern = list(x=1, y=1)  
+      kern = list(x=0, y=0)  
     } else {
       kern = stat_kern(x, y, index.list[[f]])
     }
