@@ -50,6 +50,11 @@ fill=gray!25]
 \usepackage{wasysym}
 
 
+\usepackage{booktabs}
+\renewcommand{\arraystretch}{1.2}
+
+
+
 % Bibliography
 
 
@@ -451,8 +456,8 @@ the state transition equation (specifying the nature of Markovian
 dynamics), and an initial distribution for the state: 
 \begin{equation}
 \begin{aligned}
-  y_i &= f_\theta(x_i,\epsilon_i) &
-  x_{i+1} &= g_\theta(x_i,\eta_i) &
+  y_i &= f_\theta(x_i,\epsilon_i), &
+  x_{i+1} &= g_\theta(x_i,\eta_i), &
   x_1 &\sim F,
 \end{aligned}
 \label{eq:ssmod}
@@ -512,13 +517,13 @@ $\eta_i$ normally distributed, \eqref{eq:ssmod} specializes to
   \begin{aligned}
     x_{i}&= d+T x_i + R\eta_{i}, 
     & \eta_i &\sim N(0,\ Q),     
-    &x_1 &\sim N(x_0,\ P_0).\\
+    &x_1 &\sim N(x_0,\ P_0),\\
     y_i&= c + Z x_i + \epsilon_i,     
-    & \epsilon_i &\sim N(0,\ G) \\
+    & \epsilon_i &\sim N(0,\ G), \\
   \end{aligned}
   \label{eq:lgmod}
 \end{equation}
-where the matrices $d,\ T,\ R,\ c,\ Z,$ and $G$ are allowed to depend
+where the matrices $d,\ T,\ R,\ c,\ Z,\ R,\ Q,$ and $G$ are allowed to depend
 on $\theta$ and can potentially vary (deterministically) with $i$. In this case,
 the Kalman filter, \autoref{alg:kalman} \citep[see e.g.][]{Kalman1960,Harvey1990},
 can be used to derive closed form 
@@ -534,20 +539,20 @@ given data.
     \STATE {\bf Input:} $Y$, $x_0$, $P_0$, $d,\ T,\ R,\ c,\ Z,$ and $G$
     \STATE $\ell(\theta) \leftarrow 0$ \COMMENT{Initialize the log-likelihood}
     \FOR{$i=1$ to  $n$}
-    \STATE $H = RQR'$ \COMMENT{Effective state variance}
+    \STATE $H = RQR^\top$ \COMMENT{Effective state variance}
     \STATE $\begin{aligned}\varx_{i}
       &\leftarrow d + T x_{i-1|i-1}, & P_i &\leftarrow H + T P_{i-1|i-1}
-      T'\end{aligned}$ \COMMENT{Predict current state}
+      T^\top\end{aligned}$ \COMMENT{Predict current state}
     \STATE $\begin{aligned}\widetilde{y}_i
       &\leftarrow c + Z \varx_i, & F_i &\leftarrow G + Z P_i
-      Z'\end{aligned}$ \COMMENT{Predict current observation}
+      Z^\top\end{aligned}$ \COMMENT{Predict current observation}
     \STATE $\begin{aligned}v_i&\leftarrow y_i-\widetilde{y}_i& K_i&
-      \leftarrow P_i Z' F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
+      \leftarrow P_i Z^\top F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
     Kalman gain}
     \STATE $\begin{aligned} x_{i|i}
-      &\leftarrow \varx_i + K_i v_i, & P_{i|i} &\leftarrow P_i - P_iZ'
+      &\leftarrow \varx_i + K_i v_i, & P_{i|i} &\leftarrow P_i - P_iZ^\top
       K_i\end{aligned}$ \COMMENT{Update}
-    \STATE $\ell(\theta) = \ell(\theta) -v_i'F^{-1}v_i - \log(|F_i|)$
+    \STATE $\ell(\theta) = \ell(\theta) -v_i^\top F^{-1}v_i - \log(|F_i|)$
     \ENDFOR
     \RETURN $\widetilde{Y}=\{\widetilde{y}_i\}_{i=1}^n,\ \varx=\{\varx_i\}_{i=1}^n,\
     \widetilde{X}=\{x_{i|i}\}_{i=1}^n,\ P=\{P_i\}_{i=1}^n,\
@@ -737,14 +742,15 @@ approximate speed.
 \autoref{fig:tempo-markings} shows the beginning of two Chopin piano
 compositions: the Mazurka we analyze and the Ballade No.\ 1, Op.\ 23. The initial tempo of the Mazurka is given with a metronome
 marking as well as the Italian phrase {\em Allegro ma non troppo}
-(``cheerful, but not too much''). The beginning of the Ballade is simply
+(``cheerful, but not too much''). The beginning of the Ballade is 
 marked {\em Largo}, which translates literally as ``broad'' or
-``wide''. Obviously, the metronome markings are much more exact,
+``wide'', and modified by the stylistic indication {\em pesante}
+(``heavy''). Obviously, the metronome markings are much more exact,
 though even these are often viewed as suggestions rather than
 commandments. The metronome markings in most of Beethoven's
 compositions, for example, are notoriously fast, and some scholars
 believe that his metronome (one of the first ever made) was
-inaccurate. Often, compositions will have numerous such markings later
+inaccurate~\citep{ForsenGray2013}. Often, compositions will have numerous such markings later
 in the piece of music, but these are only some of the ways that tempo
 is indicated. Composers will also indicate periods of speeding-up
 (\emph{accelerando}) or
@@ -761,14 +767,14 @@ or, perhaps more charitably, unintentional variation which the
 listener fails to perceive as ``wrong''. For instance, the example in
 \autoref{fig:short-perf} shows the beginning of the piece as performed
 by Arthur Rubinstein in a 1961 recording. 
-%\begin{figure}[t!]
-%  \centering
-%  \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
-%  \caption{The solid line shows the observed note-by-note tempo for
-%    the beginning of the Mazurka as performed by Arthur Rubinstein in
-%    1961. The dashed line indicates 132 bpm.}
-%  \label{fig:short-perf}
-%\end{figure}
+\begin{figure}[t!]
+ \centering
+ \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
+ \caption{The solid line shows the observed note-by-note tempo for
+   the beginning of the Mazurka as performed by Arthur Rubinstein in
+   1961. The dashed line indicates 132 bpm.}
+ \label{fig:short-perf}
+\end{figure}
 The solid line shows the
 actual, performed tempo, while the dashed horizontal line is placed at
 the indicated tempo of 132 bpm. The figure has three important
@@ -785,7 +791,7 @@ take liberties with these decisions, exactly the liberties we would
 like to discover. This suggests employing a switching model with a
 small number of discrete states.
 
-We use a model for $S$ on four states
+We use a Markov model for $S$ on four states
 with transition probability
 diagram given by \autoref{fig:transmat}.
 \begin{figure}[tb!]
@@ -793,39 +799,51 @@ diagram given by \autoref{fig:transmat}.
   \tikzstyle{switch}=[rectangle,
   thick, minimum size=1cm, draw=black]
   \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
-     \matrix[row sep=0.5cm,column sep=0.5cm] {
-       \node (S1) [switch] {$1$}; & \node (S2) [switch] {$2$}; \\
-       \node (S4) [switch] {$4$}; & \node (S3) [switch] {$3$}; \\
-     };
-     \path[->]
-     (S1) edge [bend right] node[midway, left]{$1-p_1-p_2$} (S4)
-     (S1) edge node[midway, above]{$p_2$} (S2)
-     (S2) edge node[midway, right]{$1-p_3$} (S3)
-     (S3) edge node[midway, above, right]{$p_4$} (S1)
-     (S4) edge [bend right] node[midway, left]{1} (S1);
-     \draw[->] (S1) to [out=90, in=180,looseness=4] node[above, left]{$p_1$} (S1);
-     \draw[->] (S2) to [out=90, in=0,looseness=4] node[above, right]{$p_3$} (S2);
-     \draw[->] (S3) to [out=270, in=0,looseness=4] node[below, right]{$1-p_4$} (S3);
+    \matrix[row sep=0.25cm,column sep=.5cm] {
+      \node (S4) [switch] {$4$}; &&&&& & \node (S22) [switch] {$2$};\\
+      &\node (S1) [switch] {$1$}; &&&& \node (S2) [switch] {$2$}; \\
+      \\ \\ \\ \\ \\ \\
+      &\node (S3) [switch] {$3$};\\
+      \node (S33) [switch] {$3$};\\
+    };
+    \path[->]
+    (S1) edge [bend left]  (S4)
+    (S4) edge [bend left] (S1)
+    (S1) edge [bend left] node [above] {$p_{12}$}(S22)
+    (S22) edge (S2)
+    (S2) edge [bend left] (S33)
+    (S1) edge [bend right] node [left] {$p_{13}$}(S33)
+    (S33) edge (S3)
+    (S3) edge [bend right] node [right] {$p_{32}$}(S22)
+    (S3) edge [loop left](S3)
+    (S2) edge [loop above] node [left] {$p_{22}$}(S2)
+    (S3) edge node [left] {$p_{31}$}(S1)
+    (S2) edge node [above] {$p_{21}$}(S1);
+   \path[->] (S1) edge [out=300,in=330,looseness=8] node [below right]
+   {$p_{11}$} (S1);
   \end{tikzpicture}
   \caption{Transition diagram. \label{fig:transmat}}
 \end{figure}
 The 4 switch states correspond to 4 different behaviors for the
 performer: (1) constant tempo, (2) speeding up, (3) slowing down, and
 (4) single note stress. As shown in the diagram, we only allow certain
-transitions for musical reasons and for estimability. The fourth
+transitions for musical reasons and for estimability. The marked
+transition probabilities are sufficient to infer the remainder. The fourth
 state, stress, corresponds to {\em tenuto}, a common feature of
 musical performance. Such stresses may be marked with a line over the
 note in question, but are more often a feature of the performer taste,
 corresponding to a longer-than-written duration of a particular
 note. Such emphases occur for a variety of musical purposes---emphasis
-of the beat in running notes\footnote{\attn{should the amount mean of stress be
-  proportional to prevailing tempo, notated duration?}}, the top of a
+of the beat in running notes, the top of a
 phrase, a ``landing point'' where a phrase ends, etc.---but are always
 within the frame of constant tempo. Thus we allow stress to occur only
 after and before notes in state 1. Furthermore, we cannot allow
-state 2 to return immediately to state 1, or else ``stress'' could
-happen through this pathway. Thus, the entire transition diagram is
-fully determined. We discuss some potential improvements at the end
+state 2 or state 3 to return immediately to state 1, or else ``stress'' could
+happen through these pathways. We impose related constraints for a transition from state 2
+to state 3 and vice versa. Essentially, transitions into these states must remain
+there before leaving. Thus, the entire transition diagram is
+fully determined. This process can  be viewed equivalently as a second
+order Markov chain. We discuss some potential improvements at the end
 of~\autoref{sec:analys-chop-mazurka}. 
 
 
@@ -848,169 +866,378 @@ constant with no acceleration: $X_{i+1} = X_i$.
 
 
 Corresponding to these configurations, the parameter
-matrices are given in \autoref{tab:parmats}
+matrices are given in \autoref{tab:parmats}.
 \begin{table}[h!]
 \centering
-\begin{tabular}[h!]{cc|ccc}
-  \hline\hline
-  \multicolumn{5}{c}{Transition equation}\\
-  \hline
-  \multicolumn{2}{c|}{Switch states} & \multicolumn{3}{c}{Parameter
+\begin{tabular}[h!]{@{}llcccc@{}}
+\toprule
+&&&\multicolumn{3}{c}{Transition equation}\\
+  \multicolumn{2}{c}{Switch states} &\phantom{a}& \multicolumn{3}{c}{parameter
                                       matrices}\\
-  $s_i$ & $s_{i-1}$ & $d$ & $T$ & $R$ \\
-  \hline
-  $S_1$ &  $S_1$ & 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
-                 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
-  $S_2$ & $S_1$ & $\begin{pmatrix} l_i\tau_i\\ \tau_i\end{pmatrix}$ 
+  \cmidrule{1-2} \cmidrule{4-6}
+  $s_i$ & $s_{i-1}$ && $d$ & $T$ & $R Q R^\top$ \\
+  \midrule
+  $1$ &  $1$ && 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
+                 & $\begin{pmatrix}0&0\\0&0\end{pmatrix}$\\
+  $2$ & $1$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pmatrix}$ 
                                     & $\begin{pmatrix} 1 & 0 \\ 0 &
                                       0 \end{pmatrix}$ 
-          & $\begin{pmatrix} 1 & l_i\\ 0 & 1 \end{pmatrix}$\\
-  $S_4$ & $S_1$ & $\begin{pmatrix}0\\\varphi_i\end{pmatrix}$ 
+        & $\sigma_{\textrm{acc}}^2\begin{pmatrix} l_i^2 & l_i\\ l_i & 1 \end{pmatrix}$\\
+  $3$ & $1$ && $\begin{pmatrix} -l_i\mu_{\textrm{acc}}\\ -\mu_{\textrm{acc}}\end{pmatrix}$ 
+                                    & $\begin{pmatrix} 1 & 0 \\ 0 &
+                                      0 \end{pmatrix}$ 
+        & $\sigma_{\textrm{acc}}^2\begin{pmatrix} l_i^2 & l_i\\ l_i & 1 \end{pmatrix}$\\
+  $4$ & $1$ && $\begin{pmatrix}0\\\mu_{\textrm{stress}}\end{pmatrix}$ 
                                      & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$
-          & $\begin{pmatrix}1&0\\0&1\end{pmatrix}$\\
-  $S_2$ & $S_2$ & 0 & $\begin{pmatrix} 1 & l_i \\ 0 & 1 \end{pmatrix}$ 
-        & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
-  $S_3$ & $S_2$ & $\begin{pmatrix} -l_i\tau_i\\ -\tau_i\end{pmatrix}$ 
+          & $\begin{pmatrix}0&0\\0&\sigma_{\textrm{stress}}^2\end{pmatrix}$\\
+  $2$ & $2$ && 0 & $\begin{pmatrix} 1 & l_i \\ 0 & 1 \end{pmatrix}$ 
+        & $\begin{pmatrix}0&0\\0&0\end{pmatrix}$\\
+  $3$ & $2$ && $\begin{pmatrix} -l_i\mu_{\textrm{acc}}\\ -\mu_{\textrm{acc}}\end{pmatrix}$ 
                                     & $\begin{pmatrix} 1 & 0 \\ 0 &
                                       0 \end{pmatrix}$ 
-          & $\begin{pmatrix} 1 & l_i\\ 0 & 1 \end{pmatrix}$\\
-  $S_1$ & $S_3$ & $\begin{pmatrix} \mu_i\\0\end{pmatrix}$ & 0
-          & $\begin{pmatrix} 1 & 0\\ 0 & 0 \end{pmatrix}$\\
-  $S_3$ & $S_3$ & 0& $\begin{pmatrix} 1 & l_i \\ 0 & 1 \end{pmatrix}$ 
-        & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
-  $S_1$ &  $S_4$ & 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
-        & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$\\
-  \hline\hline
-  \multicolumn{5}{c}{Measurement equation}\\
-  \hline
-  \multicolumn{2}{c|}{Switch states} & \multicolumn{3}{c}{Parameter
-                                      matrices}\\
-  $s_i$ && $c$ & $Z$ & $G$\\
-  \hline
-  $S_4$ & & 0 & $\begin{pmatrix} 1 & 1 \end{pmatrix}$ &
+        & $\sigma_{\textrm{acc}}^2\begin{pmatrix} l_i^2 & l_i\\ l_i & 1 \end{pmatrix}$\\
+  $1$ & $2$ && $\begin{pmatrix} \mu_{\textrm{tempo}}\\0\end{pmatrix}$ & 0
+        & $\begin{pmatrix} \sigma^2_{\textrm{tempo}} & 0\\ 0 & 0 \end{pmatrix}$\\
+  $3$ & $3$ && 0& $\begin{pmatrix} 1 & l_i \\ 0 & 1 \end{pmatrix}$ 
+        & $\begin{pmatrix}0&0\\0&0\end{pmatrix}$\\
+$2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pmatrix}$ 
+                                    & $\begin{pmatrix} 1 & 0 \\ 0 &
+                                      0 \end{pmatrix}$ 
+        & $\sigma_{\textrm{acc}}^2\begin{pmatrix} l_i^2 & l_i\\ l_i & 1 \end{pmatrix}$\\
+  $1$ & $3$ && $\begin{pmatrix} \mu_{\textrm{tempo}}\\0\end{pmatrix}$ & 0
+          & $\begin{pmatrix} \sigma^2_{\textrm{tempo}} & 0\\ 0 & 0 \end{pmatrix}$\\
+  $1$ &  $4$ && 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
+        & $\begin{pmatrix}0&0\\0&0\end{pmatrix}$\\
+\bottomrule
+&&&\multicolumn{3}{c}{Measurement equation}\\
+  \multicolumn{2}{c}{Switch states} &\phantom{a}& \multicolumn{3}{c}{parameter
+                                                    matrices}\\
+  \cmidrule{1-2} \cmidrule{4-6}
+  $s_i$ &&& $c$ & $Z$ & $G$\\
+  \midrule
+  $4$ & && 0 & $\begin{pmatrix} 1 & 1 \end{pmatrix}$ &
                                                                   $\sigma^2_\epsilon$\\
-  else && 0 & $\begin{pmatrix} 1 & 0 \end{pmatrix}$ &
+  else &&& 0 & $\begin{pmatrix} 1 & 0 \end{pmatrix}$ &
                                                                   $\sigma^2_\epsilon$\\
-  \hline\hline
+\bottomrule
 \end{tabular}
 \caption{Parameter matrices of the switching state space model.\label{tab:parmats}}
 \end{table}
-Finally, 
-\[
-Q=\begin{cases}\begin{pmatrix} \sigma^2_1 &
-    0\\0&\sigma^2_4\end{pmatrix} & (s_i,\ s_{i-1})=(S_4,\ S_1)\\
-                \begin{pmatrix} \sigma^2_3 &
-                        0\\0&\sigma^2_4\end{pmatrix} & (s_i,\ s_{i-1})=(S_1,\ S_3)\\
-\begin{pmatrix} \sigma^2_1 &
-    0\\0&\sigma^2_2\end{pmatrix} & \textrm{else}.
-\end{cases}
-\] 
 So for any performance, we want to be able to estimate
-the following parameters: $\sigma_1^2$, $\sigma_2^2$, $\sigma^2_4$,
+the following parameters: $\sigma_{\textrm{tempo}}^2$, $\sigma_{\textrm{acc}}^2$, $\sigma^2_{\textrm{stress}}$,
 $\sigma_\epsilon^2$, the probabilities of the transition matrix (there
-are 4), and vectors $\mu$, $\tau$, and $\varphi$. These last three
-will be of different lengths depending on the number of times the
-state is visited. Lastly, we have the initial state distributions
+are 7), and means $\mu_{\textrm{tempo}}$, $\mu_{\textrm{acc}}$, and $\mu_{\textrm{stress}}$. Lastly, we have the initial state distribution
 \[
-x_1\sim\begin{cases} N\left( \begin{pmatrix}\mu_1\\0\end{pmatrix}
+x_1\sim N\left( \begin{pmatrix}\mu_1\\0\end{pmatrix}
   ,\ \begin{pmatrix} \sigma^2_1 & 0\\0 & 0
-  \end{pmatrix}\right) & s_1=S_1\\
-N\left( \begin{pmatrix}\mu_1\\\tau_1\end{pmatrix}
-  ,\ \begin{pmatrix} \sigma^2_1 & 0\\0 & \sigma^2_2
-  \end{pmatrix}\right) & s_1=S_3.\end{cases}
+  \end{pmatrix}\right)\; \; \textrm{where} \; \; s_1=1.
 \]
-Importantly, this is just one way to write this
-model.
 
-\subsection{Penalized likelihood maximization}
-\label{sec:penal-likel-maxim}
 
-\subsection{Computational issues}
+\subsection{Estimation and computational issues}
 \label{sec:computational-issues}
 
-The problem with estimating a model like this is that, because the
-switch states and the continuous states are both hidden, this becomes
-an NP-hard problem. In particular, there are $4^N$ possible paths
-through the switch variables, so evaluating the likelihood at all of
-them is intractable. Thus, I implemented a particular
-approximation. The Beam Search (\autoref{alg:beamsearch}), finds
-(greedily) evaluates the most likely path through the switch
-states. Another name for the algorithm is Discrete Particle Filter
-(\texttt{dpf}). Once we have those, \texttt{getLogLike} returns the
-negative 
-loglikelihood of the data associated with that path. So for any
-configuration of parameters, we would form the matrices
-(\texttt{yupengMats}) then find the best path (\texttt{dpf}) then
-evaluate the likelihood of that path (\texttt{getLogLike}). We can
-then optimize over parameters using any variety of numerical
-optimization technique. However, when I have tried this, I always get
-infinite likelihood.
-
-For this model, the dpf is more easily specified if we make the
-measurement equation depend only on the current state and not the
-previous state. For this reason, the code uses 16 states rather than
-4. One can always change a Markov model in this way.
-
+To understand the performance decisions of individual musicians, we
+wish to simultaneously learn $\theta$, $S$, and $X$. Because the
+switch states $S$ and the continuous states $X$ are both hidden, this becomes
+an NP-hard problem. In particular, there are $4^n$ possible paths
+through the switch variables, so evaluating the likelihood to maximize
+over $\theta$ via \autoref{alg:kalman} at each path is intractable. 
+\citet{GhahramaniHinton2000} give a variational approximation to
+estimate $\theta$ without also estimating $S$, but, as our goal is to
+learn both, we use the particle filtering approximation described in
+\citep{FearnheadClifford2003}. ~\cite{WhiteleyAndrieu2010} refer to
+this algorithm as the Discrete Particle Filter, and it can be seen as
+an instance of the ``Beam Search'' optimization
+technique~\citep{Bisiani1992}. The details are given in
+\autoref{alg:dpf} but the intuition is as follows: (1) for the first
+few time points, evaluate
+one step of the Kalman filter for each possible subsequent discrete
+state and store all these values; (2) calculate weights for each path
+by updating previous weights with the likelihood and the transition probability;
+(3) continue through time until the number of stored values exceeds
+some threshold storage limit; (4) from that point forward, subselect
+the ``best'' paths using a sampling scheme.
 \begin{algorithm}[t!]
-  \caption{Beam search\label{alg:beamsearch}}
+  \caption{Discrete particle filter\label{alg:dpf}}
   \begin{algorithmic}[1]
   \STATE {\bfseries Input:}
-  Initial parameters of the matrices. Integer beam width $B$.
-  \FOR{$i=1$ {\bfseries to} $N$} 
-  \STATE (\texttt{dpf} performs 1-step of the following);
-  \STATE For each current path, calculate the 1-step likelihood for
-  moving to each potential switch (\texttt{kf1step})\;
-  \STATE Multiply the likelihood by the probability of transitioning
-  to that switch state\;
-  \STATE Multiply by the previous path weights $w$\;
-  \STATE If $\norm{w}_0>B$, resample the weights\;
-  (\texttt{resampleSubOptimal}) to get $B$ non-zero weights which
-  add to 1.\;
-  \STATE Keep only those paths corresponding to the non-zero weights\;
+  $Y$, $\theta$, $\pi_1$ probability vector over initial states
+  (paths), $B$ maximum beam width
+  \FOR{$i=1$ {\bfseries to} $n$}
+  \STATE Set $b_i=|\{\pi_i>0\}|$, the number of current paths
+  \STATE Use \autoref{alg:kalman} to calculate the 1-step likelihood
+  $\ell_i$ for each path and every potential state $s_{i+1}$ resulting in $b_i|S|$ particles
+  \STATE Set $\pi_{i+1} \leftarrow \pi_i\ell_i p_i$: multiply the path
+  probability by the likelihood and the probability of
+  transitioning. Normalize $\pi$.
+  \STATE Set $b_{i+1}=|\{\pi_{i+1}>0\}|$ . If $b_{i+1} > B$, resample the
+  weights to get $B$ non-zero weights and renormalize
   \ENDFOR
-  \STATE Return $B$ paths through the switch space along with their weights.\;
+  \STATE Return $B$ paths $\{S_b\}_{b=1}^B$ along with their weights $\pi_{n}$.
 \end{algorithmic}
 \end{algorithm}
+These paths can be
+selected greedily, retaining only the highest values to that point,
+though we use the resampling procedure of
+\citep{FearnheadClifford2003} which is designed to 
+approximate to the full discrete distribution over paths with a subset
+of support points by minimizing the mean squared
+error.
+
+\autoref{alg:dpf} returns $B$ paths along with their weights through
+the discrete state $S$ for a 
+particular parameter value $\theta$. One
+can view this as a (approximate) distribution over paths conditional
+on $\theta$. Instead, we will simply take the path with the highest
+weight for inference via penalized maximum likelihood. Thus, the
+likelihood of a particular parameter vector $\theta$ is evaluated by
+computing the best path with \autoref{alg:dpf} and then using the best
+path with \autoref{alg:kalman}.
+
+\subsection{Penalized maximum likelihood}
+\label{sec:penal-maxim-likel}
+
+Even without the latent discrete states, parameter estimation in
+state-space models is a difficult problem, often plagued by spurious
+local minima and non-identifiability. The addition of discrete states
+only exacerbates this issue. However, for the present application, we
+have reasonably strong prior information for many of the
+parameters. The three mean parameters $\mu_{\textrm{tempo}}$,
+$\mu_{\textrm{acc}}$ and $\mu_{\textrm{stress}}$ have sign
+restrictions in addition to strong information about their magnitude:
+average tempo should be around the indicated 132 bpm, the average
+amount of acceleration should probably be less than the size of a
+stress. We also have reasonably strong information about the
+probabilities of transitioning between states: self-transitions should
+be reasonably likely, long periods of speeding up are less likely than
+long periods of slowing down which are less likely than long periods
+in the constant tempo state. Because of this information, we use
+informative priors as penalties on all the parameters we
+estimate. This has the effect of introducing extra curvature to the
+optimization problem as well as conforming with musical intuition. The
+specific choices are shown in \autoref{tab:priors}. 
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}rcll@{}}
+    \toprule
+    Parameter & \phantom{a} & Distribution & Prior mean\\
+    \midrule
+    $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(40,\ 10)$ & 400 bpm$^2$\\
+    $\mu_{\textrm{tempo}}$ & $\sim$ & Gamma$(\overline{Y}^2/100,\ 100
+                                      /\overline{Y})$ & $\overline{Y}$
+                                                        bpm\\
+    $-\mu_{\textrm{acc}} $ & $\sim$ & Gamma$(15,\ 2/3)$ & 10 bpm\\
+    $-\mu_{\textrm{stress}} $ & $\sim$ & Gamma$(20,\ 2)$ & 40 bpm\\
+    $\sigma^2_{\textrm{tempo}} $ & $\sim$ & Gamma$(40,\ 10)$ & 400
+                                                               bpm$^2$\\
+    $\sigma^2_{\textrm{acc}} $ & $=$ & 1 & 1 bpm$^2$\\
+    $\sigma^2_{\textrm{stress}} $ & $=$ & 1 & 1 bpm$^2$\\
+    $p_{1\cdot}$ & $\sim$ & Dirichlet$(85,\ 5,\ 2,\ 8)$ \\
+    $p_{2\cdot}$ & $\sim$ & Dirichlet$(4,\ 10,\ 1,\ 0)$ \\
+    $p_{3\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Informative prior distributions for the music model}
+  \label{tab:priors}
+\end{table}
+We chose to fix $\sigma^2_{\textrm{acc}}$ and
+$\sigma^2_{\textrm{stress}}$ after numerical experiments suggested
+that they simply concentrated around their prior values independent of
+the other parameters.
 
 
 \section{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}
 \label{sec:analys-chop-mazurka}
 
-\begin{table}[]
-\begin{tabular}{lllllllllll}
-$\sigma_\epsilon^2$ & $\mu$ & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3^2$ & $\sigma_4^2$ & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
-49 & 103 & -25 & -32 & 517 & 904 & 336 & 0.89 & 0.06 & 0.70 & 0.62\\
-\end{tabular}
-\caption{parameter estimates for Fliere's performance}
-\label{table:fliere}
-\end{table}
+We use the model and procedures developed above to estimate the
+parameters and performance choices for all 46 recordings of Chopin's
+Mazurka. Here we describe the inferences our model allows on some
+representative performances, describe parametric clusters determined
+by our model, contrast these with some alternative approaches to music
+modelling, and discuss some difficulties we encountered.
 
-\begin{figure}
-    \includegraphics[width=\textwidth]{figs-for-paper_files/figure-latex/first-performance-1.pdf}
-    \caption{Fliere's 1977 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}
-    \label{figure:fliere}
+\subsection{Musical analysis}
+\label{sec:musical-analysis}
+
+Throughout his life, Fr\'ed\'eric Chopin, composed dozens of Mazurkas,
+of which 58 have been published. Inspired by a traditional Polish
+dance, these pieces gave Chopin an idiomatic style upon which to
+elaborate a wide variety of different compositional techniques, a
+practice German and Italian composers had employed frequently over the previous 3
+centuries (cite Burkhardt). Repetition of themes, figures, or even small motives plays
+a central role in both the traditional dance and Chopin's compositions
+as do particular rhythmic gestures (cite Kallberg), especially the
+dotted-eighth sixteenth note pattern on the first beat of a measure. 
+
+Chopin's Op.\ 68 Mazurkas are a set of four similar works, published
+posthumously in 1855. The Op.\ 68 No.\ 3, which we analyze here, was
+composed in 1830, when Chopin was 20 years old. Around this time,
+Chopin, already a piano virtuoso and accomplished composer, left his
+native Warsaw and settled in Paris, where we would remain until his
+death in 1849.
+
+This Mazurka has a rather simplistic ternary structure with two outer
+sections and a contrasting middle (ABA). The first A section is made
+up of four eight-bar phrases ($aaba$). The first phrase is echoed by the
+second phrase: they are nearly identical, with the two exceptions
+being that (1) the
+second is marked {\em piano} (soft) rather {\em forte} (strong) and (2)
+the second ends on the tonic (F major) rather than the dominant
+(C major). The fourth eight-bar phrase is an exact repetition of the
+second. The second A section is simply a repeat of the first two
+eight-bar phrases of the beginning. The intervening B section is 12
+bars long, divided into three four-bar groups. The first four bars are
+simply a repeated interval of a perfect $5^{th}$ in the left
+hand. This ostinato will continue for the whole section. The remaining
+eight measures consist of a four-bar phrase repeated twice. The second
+time differs from the first only on the final two notes, preparing the
+recapitulation of the A section.
+
+In terms of tempi, the B section is indicated to be faster, with the
+marking {\em Poco pi\`u vivo} (a little livelier). The B section ends
+with a ritardando into the following A section. The $b$ section ends
+with a {\em fermatta} in measure 24, indicating an arbitrary
+elongation while the piece
+concludes with a two-measure long {\em ritardando}. Throughout, 
+frequent markings prescribe emphasis of the third beat of each measure. This
+emphasis is also in keeping with the mazurka style, an intentional
+thwarting of the listener's expectation of first-beat emphasis.
+
+\autoref{fig:mazurka-10} shows the first ten measures of the musical
+score with annotations for the sections discussed above and the
+harmonic progression in Roman numerals below the staff. 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\textwidth]{mazurka-first-10}
+  \caption{The first ten measures of Chopin's Mazurka Op.\ 68, No.\
+    3. The harmonic progression is indicated below the staff in Roman
+    numerals. Sections are marked above the staff, e.g.\ A (a). Analysis by the authors.}
+  \label{fig:mazurka-10}
 \end{figure}
+The harmonies are standard, in fact, they are essentially the same as
+those of Pachelbel's {\em Canon}, familiar to many as ``that song
+played at weddings.'' This harmonic progression, combined with the
+rhythmic repetition suggests a further division of this section, and
+all analogous sections, into three small groupings: two two-measure
+phrases, followed by a four measure phrase.
 
-For Yakov Fliere's 1977 recording of Chopin's Mazurka Op. 68 No. 3, our model produced parameter estimates shown in \autoref{table:fliere}. This means that our model estimates Fliere's variance around his intended tempo to be 49 beats per minute, his average intended tempo to be 103 beats per minute, the average magnitude of his acceleration or deceleration to be 25 beats per minute per measure, the average amount by which he slows down when emphasizing a note to be 32 beats per minute, the variance of his accelerations and decelerations to be 517, the variance of his constant tempos to be 904 beats per minute, the variance of how much he slows down when emphasizing a note to be 336 beats per minute, and the transition probabilities as shown in \autoref{table:fliere}.
+As a performer, these harmonic, rhythmic, and structural analyses aid
+in interpretation. The performer needs to decide how to emphasize or
+deemphasize these demarcations with slight or overt tempo or dynamic
+alterations. In a live performance, she could use physical motion to
+further suggest a particular interpretation. She can choose to
+emphasize long phrases, in this 
+case, phrases of eight measures, or the shorter sub-phrases. Because
+of the repetition of similar phrases, she may choose to emphasize the
+long phrase on the first occurrence and shorter sub-phrases later on
+for variety. While the musical structure suggests such
+possible interpretations, the performer must make these choices on
+their own, and may even alter those decisions from performance to
+performance.
 
-\begin{table}[]
-\begin{tabular}{lllllllllll}
-$\sigma_\epsilon^2$ & $\mu$ & $\tau$ & $\varphi$ & $\sigma_2^2$ & $\sigma_3^2$ & $\sigma_4^2$ & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
-927 & 174 & -23 & -30 & 433 & 976 & 398 & 0.95 & 0.02 & 0.64 & 0.58\\
-\end{tabular}
-\caption{parameter estimates for Tomsic's performance}
-\label{table:tomsic}
-\end{table}
 
-\begin{figure}
-    \includegraphics[width=\textwidth]{figs-for-paper_files/figure-latex/second-performance-1.pdf}
-    \caption{Tomsic's 1995 performance. The black line is what was played, while the dots represent our fit of the intended tempo.}
-    \label{figure:tomsic}
+
+\subsection{Archetypal performances}
+\label{sec:arch-perf}
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\textwidth]{two-performances-1}
+  \caption{Inferred performer choices for two recordings. }
+  \label{fig:archetypal}
 \end{figure}
+Here we will carefully investigate how our model learns interpretive
+decisions for two rather different performances. \autoref{fig:archetypal} shows the inferred state sequence for
+recordings made by Joyce Hatto in 1993 and Sviatislav Richter in
+1976. The B section is
+shaded in gray to better illustrate the formal divisions discussed above.
 
-We can see that our model's parameters have very simple musical interpretations. By looking at the estimates produced by fitting our model we can make comparisons between different performances. For example, we can compare Fliere's performance with Tomsic's 1995 performance. The estimates of the parameters for Tomsic's performance are provided in \autoref{table:tomsic}. We can see that, compared to Fliere, Tomsic has a much larger variation in his performed tempo, and is more likely to stay in a constant tempo.
+In terms of our model, these two performers are quite different
+from each other. Hatto maintains a constant tempo carefully, remaining
+in state 1 with the exception of four periods of deceleration. All
+four periods coincide with the most significant phrase endings: at the
+end of the A section at measure 32, the end of the B section at
+measure 48, at the end of the piece, and the minor transition from
+$b\rightarrow a$ in the first A section (measure 24). According
+to our inferred model, she never accelerates or uses the transitory
+stress state.
 
-One issue in our model that the effect of states two and three can be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and $\sigma_2^2$ are large enough, it would be possible to get a negative number for the acceleration term when in state 2 or a positive number when in state three and still get a reasonably high likelihood. This could be fixed by adding a constraint on the ratio of the $\tau_t$ and $\sigma$'s 2 and 4.
+In contrast, Richter uses all four states from our model. The short
+blips of acceleration before the B section and before the
+$b \rightarrow a$ transition are slightly out of place, and are
+likely better labelled as ``constant'', but these state transitions
+describe more severe decelerations than the model's linear
+assumption would allow. Richter uses stress frequently. Some may well be
+attributable to larger variance around constant tempo (picked up as
+frequent stress rather than larger $\sigma^2_\epsilon$), but most
+correspond to interesting note emphases, for example the second beat
+of measure 20. This note is essentially a minor phrase ending, but is
+also marked in the score with a {\em sforzando} (with sudden
+emphasis). It's the first of two such occurrences in the piece, the
+second coming four measures later on the {\em fermatta}, Richter's slowest
+note in the entire piece. Richter likely chooses to make this
+prescribed emphasis with a sudden slow down in part because it takes
+place within the context of an already loud passage, precluding the
+use of extra volume.
+\begin{table}[tb]
+  \label{tab:two-perf-parm}
+  \caption{The estimated parameters for performances by Richter and
+    Hatto.}
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{@{}lrrrrrrrrrrrr@{}}
+    \toprule
+    & $\sigma^2_\epsilon$ & $\mu_{\textrm{tempo}}$
+    & $\mu_{\textrm{acc}}$ & $\mu_{\textrm{stress}}$
+    & $\sigma^2_{\textrm{tempo}}$ & $p_{11}$ & $p_{12}$ & $p_{22}$
+    & $p_{31}$ & $p_{13}$ & $p_{21}$ & $p_{32}$\\
+    \midrule
+    Richter 1976 & 426.70 & 136.33 & -11.84 & -34.82 & 439.38
+                                  & 0.85 & 0.05 & 0.74 & 0.44 & 0.02 & 0.25 & 0.17\\
+    Hatto 1993 & 405.57 & 130.36 & -13.57 & -27.93 & 408.99
+                                  & 0.94 & 0.03 & 0.82 & 0.36 & 0.01 & 0.16 & 0.19\\
+    \bottomrule
+  \end{tabular}
+  }
+\end{table}
+\autoref{tab:two-perf-parm} shows the estimated parameters for these
+two performances. Richter has larger observation variance,
+$\sigma^2_{\epsilon}$, slightly faster average tempo, lower
+acceleration, and larger stress. He also has a larger tempo variance,
+meaning that returns to state 1 can start at relatively different
+tempos. On the other hand, Hatto is much more
+likely to remain in states 1 or 2. These inferences are largely
+consistent with the visual takeaways of \autoref{fig:archetypal}. It's
+easy to see the increased variability around the ``constant tempo'' in
+Richter's performance and the higher overall tempos in both the A and
+B sections.
+
+While these two performances are quite different from each other, they
+also display some similarities. Both take a faster tempo in the B
+section versus the A sections. Both performers slow down at the end of
+the piece, at the end of the B section, immediately preceding the B section, and at the
+$b\rightarrow a$ transition.
+
+\subsection{Clustering musical performances}
+\label{sec:clust-music-perf}
+
+To better understand how all the 46 performances relate to each other,
+we applied parametric clustering using the eleven-dimensional vector
+of estimated parameters. Because the estimated parameters lead to data
+distributions, we use the squared Hellinger distance to relate
+performances. For densities $f$ and $g$ which are absolutely
+continuous with respect to the dominating measure $\lambda$,
+\begin{align*}
+H^2(f,g) &= \frac{1}{2}\int \left(\sqrt{f(x)} - \sqrt{g(x)}\right)^2
+           d\lambda(x) = 1-\int \sqrt{f(x)g(x)}d\lambda(x)\\
+  &= 1-\int \sqrt{f_1(x_1)g_1(x_1)}d\lambda(x_1) \int \sqrt{f_2(x_2)g_2(x_2)}d\lambda(x_2),
+\end{align*}
+if $f(x)=f_1(x_1)f_2(x_2)$
+and $g(x)=g_1(x_1)g_2(x_2)$.
+
+
+% One issue in our model that the effect of states two and three can be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and $\sigma_2^2$ are large enough, it would be possible to get a negative number for the acceleration term when in state 2 or a positive number when in state three and still get a reasonably high likelihood. This could be fixed by adding a constraint on the ratio of the $\tau_t$ and $\sigma$'s 2 and 4.
 
 \section{Discussion}
 \label{sec:discussion}
