@@ -23,7 +23,6 @@ Dmats <- function(pvec, precisions = list(
   stopifnot((L <-length(precisions))==length(params), L==length(dirs))
   Ds = list()
   for(l in 1:L){
-    print(dirs[l])
     if(!dirs[l]){
       M = pvec[, params[[l]], drop=FALSE]
     } else {
@@ -34,7 +33,6 @@ Dmats <- function(pvec, precisions = list(
       distance_fcn = function(x,y) dist_calc(x,y, prec = precisions[[l]])
       )
   }
-  print(length(Ds))
   Ds = lapply(Ds, as.matrix)
   Ds = lapply(Ds, function(x) x/max(x))
   Ds

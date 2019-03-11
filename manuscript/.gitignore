@@ -5,3 +5,6 @@
 *.log
 *.out
 *.log
+musicManuscript.out
+musicManuscript.aux
+musicManuscript.log

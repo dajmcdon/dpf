@@ -76,6 +76,8 @@ fill=gray!25]
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Expect}[1]{\E\left[#1\right]}
 \newcommand{\Var}[1]{\mathbb{V}\left[#1\right]}
+\newcommand{\indicator}[1]{\boldsymbol{1}\left(#1\right)}
+
 
 \begin{document}
 
@@ -1033,9 +1035,9 @@ specific choices are shown in \autoref{tab:priors}.
                                                                bpm$^2$\\
     $\sigma^2_{\textrm{acc}} $ & $=$ & 1 & 1 bpm$^2$\\
     $\sigma^2_{\textrm{stress}} $ & $=$ & 1 & 1 bpm$^2$\\
-    $p_{1\cdot}$ & $\sim$ & Dirichlet$(85,\ 5,\ 2,\ 8)$ \\
-    $p_{2\cdot}$ & $\sim$ & Dirichlet$(4,\ 10,\ 1,\ 0)$ \\
-    $p_{3\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$ \\
+    $p_{1,\cdot}$ & $\sim$ & Dirichlet$(85,\ 5,\ 2,\ 8)$ \\
+    $p_{2,\cdot}$ & $\sim$ & Dirichlet$(4,\ 10,\ 1,\ 0)$ \\
+    $p_{3,\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$ \\
     \bottomrule
   \end{tabular}
   \caption{Informative prior distributions for the music model}
@@ -1043,8 +1045,7 @@ specific choices are shown in \autoref{tab:priors}.
 \end{table}
 We chose to fix $\sigma^2_{\textrm{acc}}$ and
 $\sigma^2_{\textrm{stress}}$ after numerical experiments suggested
-that they simply concentrated around their prior values independent of
-the other parameters.
+that they were poorly identified from the data.
 
 
 \section{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}
@@ -1120,7 +1121,7 @@ those of Pachelbel's {\em Canon}, familiar to many as ``that song
 played at weddings.'' This harmonic progression, combined with the
 rhythmic repetition suggests a further division of this section, and
 all analogous sections, into three small groupings: two two-measure
-phrases, followed by a four measure phrase.
+phrases, followed by a four-measure phrase.
 
 As a performer, these harmonic, rhythmic, and structural analyses aid
 in interpretation. The performer needs to decide how to emphasize or
@@ -1131,7 +1132,7 @@ emphasize long phrases, in this
 case, phrases of eight measures, or the shorter sub-phrases. Because
 of the repetition of similar phrases, she may choose to emphasize the
 long phrase on the first occurrence and shorter sub-phrases later on
-for variety. While the musical structure suggests such
+for variety, for example. While the musical structure suggests such
 possible interpretations, the performer must make these choices on
 their own, and may even alter those decisions from performance to
 performance.
@@ -1149,7 +1150,7 @@ performance.
   \label{fig:archetypal}
 \end{figure}
 Here we will carefully investigate how our model learns interpretive
-decisions for two rather different performances. \autoref{fig:archetypal} shows the inferred state sequence for
+decisions for three rather different performances. \autoref{fig:archetypal} shows the inferred state sequence for
 recordings made by Joyce Hatto in 1993 and Sviatislav Richter in
 1976. The B section is
 shaded in gray to better illustrate the formal divisions discussed above.
@@ -1182,6 +1183,7 @@ prescribed emphasis with a sudden slow down in part because it takes
 place within the context of an already loud passage, precluding the
 use of extra volume.
 \begin{table}[tb]
+  \centering
   \label{tab:two-perf-parm}
   \caption{The estimated parameters for performances by Richter and
     Hatto.}
@@ -1196,7 +1198,10 @@ use of extra volume.
     Richter 1976 & 426.70 & 136.33 & -11.84 & -34.82 & 439.38
                                   & 0.85 & 0.05 & 0.74 & 0.44 & 0.02 & 0.25 & 0.17\\
     Hatto 1993 & 405.57 & 130.36 & -13.57 & -27.93 & 408.99
-                                  & 0.94 & 0.03 & 0.82 & 0.36 & 0.01 & 0.16 & 0.19\\
+                                  & 0.94 & 0.03 & 0.82 & 0.36 & 0.01 &
+                                                                       0.16 & 0.19\\
+    Cortot 1951 & 403.71 & 182.84 & -21.43 & -45.67
+    & 460.82 & 0.92 & 0.02 & 0.71 & 0.34 & 0.03 & 0.23 & 0.09\\
     \bottomrule
   \end{tabular}
   }
@@ -1219,22 +1224,205 @@ section versus the A sections. Both performers slow down at the end of
 the piece, at the end of the B section, immediately preceding the B section, and at the
 $b\rightarrow a$ transition.
 
+Alfred Cortot's 1951 performance is displayed
+in~\autoref{fig:cortot}. Both in terms of the parametric model we
+propose, and if we simply compare the vectors of note-by-note tempos
+(discussed in more detail below), this performance is an
+outlier. Cortot never uses the deceleration state, and he remains in
+constant tempo for the entirety of both A sections. While the model
+describes his performance well, it also illustrates a deficiency of
+this approach: Cortot, more than any other performer, has large
+contrasts between the A and B sections. His A section is the slowest
+of all 46 recordings at around 64 bpm, half the marked
+tempo. The next slowest is Maryla Jonas's recording at around 84
+bpm. Meanwhile, his B section is among the fastest of all the
+recordings and contains the fastest individual note. Additionally,
+there is stunningly little tempo variability in his A sections, but
+dramatic variation in the B section coupled with frequent uses of the
+acceleration and emphasis states. Taken together, Cortot's performance
+may be better described by estimating our model separately on the two sections.
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=.9\textwidth]{cortot-performance-1}
+  \caption{Inferred performance choices for Alfred Cortot's 1951
+    recording.}
+  \label{fig:cortot}
+\end{figure}
+
 \subsection{Clustering musical performances}
 \label{sec:clust-music-perf}
 
 To better understand how all the 46 performances relate to each other,
 we applied parametric clustering using the eleven-dimensional vector
-of estimated parameters. Because the estimated parameters lead to data
-distributions, we use the squared Hellinger distance to relate
-performances. For densities $f$ and $g$ which are absolutely
-continuous with respect to the dominating measure $\lambda$,
-\begin{align*}
-H^2(f,g) &= \frac{1}{2}\int \left(\sqrt{f(x)} - \sqrt{g(x)}\right)^2
-           d\lambda(x) = 1-\int \sqrt{f(x)g(x)}d\lambda(x)\\
-  &= 1-\int \sqrt{f_1(x_1)g_1(x_1)}d\lambda(x_1) \int \sqrt{f_2(x_2)g_2(x_2)}d\lambda(x_2),
-\end{align*}
-if $f(x)=f_1(x_1)f_2(x_2)$
-and $g(x)=g_1(x_1)g_2(x_2)$.
+of estimated parameters. Because the estimated parameters are of
+different scales, have different domains, and can covary, we treat
+them differentially. To calculate distances between the mean and
+variance parameters, $\sigma^2_\epsilon$, $\mu_{\textrm{tempo}}$,
+$\mu_{\textrm{acc}}$, $\mu_{\textrm{stress}}$, and
+$\sigma^2_{\textrm{tempo}}$ we simply use Euclidean distance on each
+individually. In the cases of the probabilities, we use weighted
+Euclidean distance in the prior precision. For example, for
+$p_{1\cdot}$, we calculate
+\[
+d\left(p_{1\cdot},\ p'_{1\cdot}\right) = (p_{1\cdot}-p'_{1\cdot})^\top
+  \Omega (p_{1\cdot}-p'_{1\cdot}),
+\]
+where
+\[
+  \Omega^{-1}_{ij} := \Sigma_{ij} :=
+  \alpha_0^{-2}(\alpha_0+1)^{-1}\left(\alpha_i\alpha_0 \delta_{ij}
+    - \alpha_i\alpha_j\right),
+\]
+is the covariance matrix of the Dirichlet distribution with
+$\alpha_0=\sum_i\alpha_i$ and $\delta_{ij}$ the indicator that
+$i=j$. We then standardize each individual distance matrix to have a
+maximum distance of 1 and add them together. As such, the distance
+between any two performances can be no larger than 8.
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.45\linewidth]{parametric-clusters-1}
+  \includegraphics[width=.45\linewidth]{parametric-clusters-2}
+  \caption{Distance matrix using estimated model parameters. Left: the
+    matrix for all 46 parameters. Right: The same matrix with
+    ``outlying'' performances removed and a dendrogram from hierarchical
+    clustering.}
+  \label{fig:dmats}
+\end{figure}
+\autoref{fig:dmats} shows the distance matrix calculated from the
+estimated parameters for all 46 performances (left) and the same
+matrix with ``outlying'' performances removed (right). To determine
+outlying performances, we calculated the distance to the third nearest
+performance. We then removed those performances that exceeded a
+threshold, meaning that the nearest similar performances were ``far
+away''. This screening left 25 performances. We used hierarchical
+clustering on these 25 performances, trying between two and five
+clusters. The remaining 21 were grouped together as ``other''. The
+right panel of \autoref{fig:dmats} displays this subset along with a
+dendrogram and four clusters.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\linewidth]{clust-densities-sub2-1}
+  \caption{Cluster densities for Markov transition probabilities.}
+  \label{fig:clust-density-tp}
+\end{figure}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\linewidth]{clust-densities-sub1-1}
+  \caption{Cluster densities for mean and variance parameters.}
+  \label{fig:clust-density-mv}
+\end{figure}
+The first cluster corresponds to performances which are reasonably
+staid. The emphasis state is rarely visited with the performer tending
+to stay in the constant tempo state with periods of slowing down at
+the ends of phrases. Acceleration is never used. Such state
+preferences are clearly inferred by the model as shown in, e.g. the
+top row of \autoref{fig:clust-density-tp}. Furthermore, these
+performances have relatively low average tempos, and not much
+difference between the A and B sections. Joyce Hatto's performance
+shown in \autoref{fig:archetypal} is typical of this cluster.
+
+Recordings in the second
+cluster tend to transition quickly between states, especially constant
+tempo and slowing down accompanied by frequent transitory
+emphases. The probability of remaining in state 1 is the lowest for
+this cluster while the probability of entering state 2 from state 1 is
+the highest. The acceleration state is visited only rarely. Four of
+the most similar performances are in this cluster, shown in
+\autoref{fig:similar}, along with Richter's 1976 recording.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\linewidth]{similar-perfs-1}
+  \caption{Four similar performances, all in the second cluster.}
+  \label{fig:similar}
+\end{figure}
+
+Cluster three is somewhat like cluster one in that performers tend to
+stay in state 1 for long periods of time, but they transition more
+quickly from state 3 back to state 1. They also use state 4 frequently
+whereas cluster one
+did not. They also tend to have very large tempo
+contrasts between the A and B sections.
+Cluster four has both faster average tempos and more variability from one period of
+constant tempo to the next. State 4 is rare, with fast constant tempo
+changes that persist for small amounts of time tending to reflect note
+emphases.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.45\linewidth]{raw-data-clusters-1}
+  \caption{Distance matrix and dendrogram calculated using the
+    note-by-note tempo vector for each recording.}
+  \label{fig:raw-data-clusters}
+\end{figure}
+Comparing our clusters to those we would find from simply clustering
+the distances between note-by-note tempo vectors reveals a number of
+differences. The four recordings in \autoref{fig:similar} would be
+spread across three different clusters, for example, as would our
+cluster one. On the other hand, both metrics see Cortot's recording as a
+strong outlier, and clustering by tempo vectors often (somewhat
+miraculously) group recordings by the same pianist together: both
+recordings by Smidowicz, three of the four recordings by Rubinstein,
+both recordings by Hatto.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\linewidth]{rubinstein-perfs-1}
+  \caption{The four recordings by Arthur Rubinstein. Our clustering
+    puts the 1952 and 1961 recordings in clusters one and two while
+    leaving the others out. Clustering by tempo vector separates 1952
+    from the other three.}
+  \label{fig:rubinstein}
+\end{figure}
+\autoref{fig:rubinstein} shows all four Rubinstein recordings. The
+1939 recording is rather odd in that the fourth 8 measures of the opening
+A section is so slow relative to the rest. The variability in the 1966
+recording nearly obscures the contrast between the B section and the
+surrounding A sections. These two recordings are nonetheless clustered
+together by the tempo vectors. Our method on the other hand, puts both
+in the ``other'' grouping. The estimated parameters for these four
+performances are shown in the bottom half of
+\autoref{tab:similar-different-perf}. The top half shows the
+parameters for the four similar performances in
+\autoref{fig:similar}. There is much larger variability across
+Rubinstein's recordings, as we would expect.
+\begin{table}[tb]
+  \centering
+  \label{tab:similar-different-perf}
+  \caption{The estimated parameters for the four similar performances
+    in Cluster Two and those for all four by Arthur Rubinstein.}
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{@{}lrrrrrrrrrrrr@{}}
+    \toprule
+    & $\sigma^2_\epsilon$ & $\mu_{\textrm{tempo}}$
+    & $\mu_{\textrm{acc}}$ & $\mu_{\textrm{stress}}$
+    & $\sigma^2_{\textrm{tempo}}$ & $p_{11}$ & $p_{12}$ & $p_{22}$
+    & $p_{31}$ & $p_{13}$ & $p_{21}$ & $p_{32}$\\
+    \midrule
+    Wasowski 1980 & 414.99 & 132.00 & -10.00 & -40.00
+    & 425.00 & 0.85 & 0.05 & 0.67 & 0.34 & 0.02 & 0.26 & 0.20\\
+    Shebanova 2002 & 439.98 & 132.00 & -10.00 & -40.00
+    & 400.02 & 0.85 & 0.05 & 0.67 & 0.33 & 0.02 & 0.27 & 0.20\\
+    Luisada 1991 & 494.33 & 127.80 & -10.24 & -32.56
+    & 411.63 & 0.84 & 0.10 & 0.71 & 0.35 & 0.01 & 0.26 & 0.19\\
+    Milkina 1970 & 435.25 & 136.38 & -9.68 & -40.02 & 400.01
+                                  & 0.87 & 0.05 & 0.68 & 0.33 & 0.02 &
+                                                                       0.26 & 0.21\\
+    \midrule
+    Rubinstein 1939 & 520.32 & 145.26 & -7.89 & -50.82
+    & 345.64 & 0.89 & 0.02 & 0.83 & 0.56 & 0.05 & 0.13 & 0.16\\
+    Rubinstein 1952 & 481.13 & 128.13 & -7.76 & -17.59
+    & 409.30 & 0.93 & 0.04 & 0.68 & 0.32 & 0.01 & 0.28 & 0.19\\
+    Rubinstein 1961 & 434.23 & 139.17 & -8.34 & -35.08
+    & 355.00 & 0.90 & 0.06 & 0.56 & 0.46 & 0.01 & 0.41 & 0.19\\
+    Rubinstein 1966 & 380.95 & 127.24 & -8.80 & -42.28
+    & 473.69 & 0.87 & 0.07 & 0.36 & 0.34 & 0.01 & 0.61 & 0.20\\
+    \bottomrule
+  \end{tabular}
+  }
+\end{table}
+
 
 
 % One issue in our model that the effect of states two and three can be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and $\sigma_2^2$ are large enough, it would be possible to get a negative number for the acceleration term when in state 2 or a positive number when in state three and still get a reasonably high likelihood. This could be fixed by adding a constraint on the ratio of the $\tau_t$ and $\sigma$'s 2 and 4.

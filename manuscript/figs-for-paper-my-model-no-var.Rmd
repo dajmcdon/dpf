@@ -72,7 +72,7 @@ dend_perf = hc_perf %>% as.dendrogram
 
 ```{r parametric-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
 #hc_parm = hc_parm+diag(1e-12,nrow(hc_parm))
-subs = apply(hc_parm,1,quantile,probs=.05) < .35
+subs = apply(hc_parm,1,quantile,probs=4/46) < .35#.45
 #subs = rowMeans(hc_parm) < .95#.968
 sDmat = hc_parm[subs,subs]
 nclusts = 4
@@ -96,9 +96,10 @@ heatmap.2(
   key=FALSE
 )
 sdends = sDmat %>% as.dist %>% hclust %>% as.dendrogram
-if(colorthem) sdends = sdends %>% set('labels_col', value=fivecolors[1:nclusts], k=nclusts) %>%
+if(colorthem) sdends = sdends %>% 
+  set('labels_col', value=fivecolors[c(4,3,1,2)], k=nclusts) %>%
   set('branches_lty', 1) %>%
-  set('branches_k_color', value=fivecolors[1:nclusts], k=nclusts)
+  set('branches_k_color', value=fivecolors[c(4,3,1,2)], k=nclusts)
 heatmap.2(sDmat,
           Rowv = sdends, Colv = sdends,
           symm=TRUE,
@@ -153,8 +154,8 @@ heatmap.2(as.matrix(percentize(dist(perfs))),
 ```{r clust-densities, fig.height=8,fig.width=6.5}
 lab_lookup = c("sigma[epsilon]^2", "mu[tempo]",
                "mu[acc]", "mu[stress]", "sigma[tempo]^2",
-               "p[11]", "p[12]", "p[31]","p[13]",
-               "p[21]","p[32]","p[22]")
+               "p[1*','*1]", "p[1*','*2]", "p[3*','*1]","p[1*','*3]",
+               "p[2*','*1]","p[3*','*2]","p[2*','*2]")
                #sig2acc="sigma^2[acc]",sig2stress="sigma^2[stress]"
                #)
 ttt = pvec_all %>% gather(key='parameter',value='value',-clust,-performer)
@@ -180,7 +181,7 @@ ttt %>% filter(parameter %in% lab_lookup[1:5]) %>%
 ```
 
 ```{r clust-densities-sub2, fig.height=6.5,fig.width=8}
-ttt %>% filter(parameter %in% lab_lookup[6:11]) %>%
+ttt %>% filter(parameter %in% lab_lookup[6:12]) %>%
   ggplot(aes(x=value, fill=clust)) +
   geom_density(alpha=.75,adjust=1.75) +
   facet_wrap(~parameter,scales='free',
@@ -219,15 +220,17 @@ perfcols = viridis_pal(begin=.2)(nlevels(plots$state))
 ```
 
 ```{r clust-1, fig.height=9, fig.width=6}
+perfshapes = c(16,17,15,3)
 ggplot(filter(plots, clust=='1')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  scale_color_manual(values=perfcols[c(1,2,4)]) +
+  scale_shape_manual(values=perfshapes[c(1,2,4)]) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3) #+
 ```
@@ -238,10 +241,12 @@ ggplot(filter(plots, clust=='2')) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  scale_color_manual(values=perfcols)+#[c(1,2,4)]) +
+  scale_shape_manual(values=perfshapes)+#[c(1,2,4)]) +
+  theme(legend.position = 'bottom', 
+        legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol = 3) #+
 ```
@@ -252,10 +257,12 @@ ggplot(filter(plots, clust=='3')) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  scale_color_manual(values=perfcols[c(1,2,4)]) +
+  scale_shape_manual(values=perfshapes[c(1,2,4)]) +
+  theme(legend.position = 'bottom', 
+        legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3) #+
 ```
@@ -266,10 +273,11 @@ ggplot(filter(plots, clust=='4')) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  scale_color_manual(values=perfcols)+#[c(1,2,4)]) +
+  scale_shape_manual(values=perfshapes)+#[c(1,2,4)]) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3) #+
 ```
@@ -281,10 +289,10 @@ ggplot(filter(plots, clust=='other')) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3) #+
 ```
@@ -300,10 +308,10 @@ ggplot(filter(plots, performer == 'Richter 1976')) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
  # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
@@ -318,8 +326,28 @@ ggplot(filter(plots, performer == 'Hatto 1993')) +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
   geom_point(aes(x=measure, y=inferred, color=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  scale_color_manual(values=perfcols[c(1,2)]) +
+  scale_shape_manual(values=perfshapes[c(1,2)]) +
+  theme(legend.position = 'bottom', 
+        legend.title = element_blank(),
+        strip.text = element_text(hjust = 0)) +
+  facet_wrap(~performer) #+
+  # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
+  # scale_color_manual(values = fivecolors)
+```
+
+```{r cortot-performance}
+ggplot(filter(plots, performer == 'Cortot 1951')) + 
+  geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
+              aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
+              fill = 'gray90', color = 'gray90') +
+  geom_line(aes(x=measure, y=tempo), color='gray40') +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
+  # scale_color_brewer(palette='Set1') +
+  scale_color_manual(values=perfcols[c(1,3,4)]) +
+  scale_shape_manual(values=perfshapes[c(1,3,4)]) +
+  theme(legend.position = 'bottom', 
+        legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
@@ -337,16 +365,20 @@ filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
   geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
-  theme(legend.position = 'right', legend.title = element_blank(),
+  theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,nrow = 2) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
 
+
+
 ```{r two-perfs-parameters}
-kable(pvec_ml[c('Richter 1976','Hatto 1993'),],digits = 2,format = 'latex')
+kable(pvec_ml[c('Richter 1976','Hatto 1993','Cortot 1951'),],
+      digits = 2, format = 'latex')
 ```
+
 
 
 # Different smoothing
@@ -395,16 +427,16 @@ filter(spline_music , performer %in% c('Richter 1976','Hatto 1993')) %>%
 # Similar performances 
 
 ```{r similar-perfs,fig.height=6}
-similar = c('Wasowski 1980','Shebanova 2002','Smith 1975','Milkina 1970')
+similar = c('Wasowski 1980','Shebanova 2002','Luisada 1991','Milkina 1970')
 ggplot(filter(plots, performer %in% similar)) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
+  theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,nrow=2) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
@@ -421,7 +453,7 @@ ggplot(filter(plots, performer %in% similar)) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'none', legend.title = element_blank(),
@@ -431,6 +463,13 @@ ggplot(filter(plots, performer %in% similar)) +
   # scale_color_manual(values = fivecolors)
 ```
 
+```{r similar-rubin-parameters}
+kable(pvec_ml[c(
+  'Wasowski 1980','Shebanova 2002','Luisada 1991','Milkina 1970',
+  'Rubinstein 1939', 'Rubinstein 1952',
+  'Rubinstein 1961','Rubinstein 1966'),],
+      digits = 2, format = 'latex')
+```
 
 
 # Bad estimation
