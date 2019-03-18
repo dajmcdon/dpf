@@ -77,18 +77,18 @@ The remaining functions in `dpf-package` are created for our in-progress manuscr
 ```{r music-preprocessing}
 library(dpf)
 data(tempos) # load observed tempos of this and many other performances
-theta = c(363.475,125.05,-11.81757,-34.91605,366.5073,
-              0.519518,0.212499,0.7901238,0.0989846,0.7815691,
-              0.2194727,0.03586685,0.1342895,0.2435351)
+theta = c(426.69980736, 136.33213703, -11.84256691, -34.82234559, 
+          439.37886221, 1, 1, 0.84916635, 0.04611644, 0.74119571,
+          0.43966082, 0.02116317, 0.24513563, 0.17253254)
 # parameters estimated offline
 lt = diff(c(tempos$note_onset,61)) # notated durations
 ```
 
 ```{r code-illustration, echo=TRUE}
-y = matrix(tempos[,'Milkina_1970'], 1)
+y = matrix(tempos$Richter_1976, 1)
 pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
                    c(132,0), c(400,10)) # prior means and variances on X_1
-beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0), dt, ct, Tt, Zt,
+beam = with(pmats, beamSearch(a0, P0, c(1,rep(0,9)), dt, ct, Tt, Zt,
                   HHt, GGt, y, transMat, 200))
 bestpath = with(beam, paths[which.max(weights),])
 kal = kalman(pmats, bestpath, y)
@@ -96,20 +96,8 @@ kal = kalman(pmats, bestpath, y)
 
 
 This figure shows the observed note-by-note speed of the recording (black line) and the estimated discrete states (colored dots). The musical form is in three sections (ABA). The contrasting "B" section is marked with a grey area.
-```{r plot-our-model,fig.align='center'}
-library(ggplot2)
-ss = factor(convert10to4(bestpath), labels = 
-              c('constant tempo', 'decelerating','accelerating','stress'))
-plotdf = data.frame(measure = tempos$note_onset, tempo = c(y), 
-                  inferred = c(kal$ests), state = ss)
-ggplot(plotdf) + 
-  geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
-              aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='black') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
-  scale_color_brewer(palette='Spectral') + theme_minimal(base_family = 'Times') +
-  theme(legend.position = 'bottom', legend.title = element_blank())
+```{r plot-our-model, fig.align='center'}
+plotStates('Richter_1976', theta, tempos$Richter_1976, tempos$note_onset)
 ```
 
 ## Installation

@@ -14,21 +14,6 @@
 #' 
 #' \code{devtools::install_github('dajmcdon/dpf', build_vignettes=TRUE)}
 #' 
-#' @section Kalman filters
-#'
-#' \code{\link{kalman}}
-#' \code{\link{getLogLike}} 
-#'
-#' @section Beam search
-#' 
-#' \code{\link{beamSearch}}
-#' 
-#' @section Music tempo analysis
-#' 
-#' \code{\link{musicModel}}
-#' \code{\link{convert10to4}}
-#' 
-#' 
 #'
 #' @docType package
 #' @name dpf
@@ -36,11 +21,9 @@ NULL
 
 #' @useDynLib dpf
 #' @import ggplot2
-#' @importFrom usedist dist_make
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats rgamma
-#' @importFrom ks kde
 NULL
 
 #' Dynamics of 46 Chopin piano recordings

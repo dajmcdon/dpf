@@ -41,10 +41,10 @@ for Kalman filter evaluation. See the paper for the particular form of the model
 }
 \examples{
 data(tempos)
-theta = c(363.475,125.05,-11.81757,-34.91605,366.5073,0.519518,
-          0.212499,0.7901238,0.0989846,0.7815691,0.2194727,0.03586685,
-          0.1342895,0.2435351)
-y = matrix(tempos[,'Milkina_1970'], 1)
+theta = c(426.69980736, 136.33213703, -11.84256691, -34.82234559, 
+          439.37886221, 1, 1, 0.84916635, 0.04611644, 0.74119571, 
+          0.43966082, 0.02116317, 0.24513563, 0.17253254)
+y = matrix(tempos[,'Richter_1976'], 1)
 lt = diff(c(tempos$note_onset, 61))
 pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
                   c(132,0), c(400,10))

@@ -1,8 +1,8 @@
 Package: dpf
 Type: Package
 Title: Discrete particle filtering
-Version: 0.2
-Date: 2018-06-15
+Version: 0.3
+Date: 2019-03-15
 Authors@R: c(
     person("McBride", "Michael", email = "michmcbr@iu.edu", role = "cre"),
     person("Daniel", "McDonald", email = "dajmcdon@indiana.edu", role = "aut"))
@@ -16,7 +16,7 @@ Depends: R (>= 2.10)
 Imports: 
     Rcpp (>= 0.12.10),
     ggplot2,
-    ks
+    stats
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 6.1.1
 Suggests: 

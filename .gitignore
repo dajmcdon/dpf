@@ -16,3 +16,4 @@ example-articles/
 *.out
 *.log
 *.aux
+extras/deprecated/

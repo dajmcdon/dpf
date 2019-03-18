@@ -2,29 +2,35 @@
 % Please edit documentation in R/plots.R
 \name{plotStates}
 \alias{plotStates}
-\title{plots the state transition for a performance given the model parameters}
+\title{Plots the observed tempo and estimated discrete states given parameters.}
 \usage{
-plotStates(performance, performer, onset, params, particleNumber = 200,
+plotStates(performance, params, y, onset, particleNumber = 200,
   initialMean = c(132, 0), initialVariance = c(400, 10))
 }
 \arguments{
-\item{performance}{}
+\item{performance}{The named performance, e.g. 'Richter_1976'. See \code{names(tempos)}.}
 
-\item{performer}{}
+\item{params}{A vector of parameters of length 14. No checks are performed.}
 
-\item{onset}{}
+\item{y}{A vector of tempos.}
 
-\item{params}{}
+\item{onset}{A vector of note onset times.}
 
-\item{particleNumber}{}
+\item{particleNumber}{Number of particles for \code{beamSearch()}. Default is 200.}
 
-\item{initialMean}{}
+\item{initialMean}{Mean for the first note in constant tempo. Length 2. Default is (132,0).}
 
-\item{initialVariance}{}
-}
-\value{
-a ggplot2 plot
+\item{initialVariance}{Variance for the first note in constant tempo. Length 2. Default is (400,0).}
 }
 \description{
-plots the state transition for a performance given the model parameters
+Plots the observed tempo and estimated discrete states given parameters.
+}
+\examples{
+params = c(426.69980736, 136.33213703, -11.84256691, -34.82234559, 
+          439.37886221, 1, 1, 0.84916635, 0.04611644, 0.74119571, 
+          0.43966082, 0.02116317, 0.24513563, 0.17253254)
+data(tempos)
+y = tempos[,'Richter_1976']
+onset = tempos$note_onset
+plotStates('Richter_1976', params, y, onset)
 }

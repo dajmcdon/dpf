@@ -1,3 +1,5 @@
+# Source functions for clustering dirichlet parameters
+
 dirichlet_precision <- function(alpha) {
   a0 = sum(alpha)
   A = - tcrossprod(alpha)

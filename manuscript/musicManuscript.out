@@ -4,7 +4,12 @@
 \BOOKMARK [2][-]{subsection.2.1}{Data and preprocessing}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.2}{Switching state-space models}{section.2}% 5
 \BOOKMARK [2][-]{subsection.2.3}{A model for tempo decisions}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.4}{Penalized likelihood maximization}{section.2}% 7
-\BOOKMARK [2][-]{subsection.2.5}{Computational issues}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.4}{Estimation and computational issues}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.5}{Penalized maximum likelihood}{section.2}% 8
 \BOOKMARK [1][-]{section.3}{Analysis of Chopin's Mazurka Op. 68 No. 3}{}% 9
-\BOOKMARK [1][-]{section.4}{Discussion}{}% 10
+\BOOKMARK [2][-]{subsection.3.1}{Musical analysis}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Archetypal performances}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.3}{Clustering musical performances}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.4}{Alternative smoothers}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.5}{Problems with the model and estimation}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Discussion}{}% 15

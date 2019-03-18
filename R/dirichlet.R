@@ -4,6 +4,9 @@
 #' @param n number of observations
 #' @param K number of components
 #' @param alpha vector of parameters. Must be positive. These functions are not vectorized over alpha.
+#' @param log for \code{ddirichlet()} TRUE (the default) gives the log density
+#' @param normalize for \code{ddirichlet()} FALSE (the default) gives the density
+#' without the normalizing constant
 #'
 #' @return \code{ddirichlet} gives the density on the log scale, unnormalized by default. \code{rdirichlet} generates random variates.
 #' 

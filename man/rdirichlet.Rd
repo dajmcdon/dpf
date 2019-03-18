@@ -17,6 +17,11 @@ ddirichlet(x, alpha, log = TRUE, normalize = FALSE)
 \item{alpha}{vector of parameters. Must be positive. These functions are not vectorized over alpha.}
 
 \item{x}{vector of probabilities supported on the K-1 simplex. ddirichlet is vectorized over x.}
+
+\item{log}{for \code{ddirichlet()} TRUE (the default) gives the log density}
+
+\item{normalize}{for \code{ddirichlet()} FALSE (the default) gives the density
+without the normalizing constant}
 }
 \value{
 \code{ddirichlet} gives the density on the log scale, unnormalized by default. \code{rdirichlet} generates random variates.

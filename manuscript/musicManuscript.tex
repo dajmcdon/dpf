@@ -140,7 +140,7 @@ instruction, discovering listening preferences, and analyzing performances.
 
 \spacingset{1.45} % DON'T change the spacing!
 
-% \tableofcontents
+\tableofcontents
 
 
 
@@ -176,8 +176,8 @@ songs. However, most of this work has focused on the analysis of more popular
 and more profitable genres of music---pop, rock, country---as opposed
 to classical music. 
 
-Western classical music, classical music for short, is a subcategory
-of music whose boundaries are occasionally difficult to define. But
+Western classical music is a subcategory
+whose boundaries are occasionally difficult to define. But
 the distinction is of great importance when it comes to the analysis
 which we undertake here. Leonard Bernstein, the great composer,
 conductor and pianist, gave the following characterization in one of his famous
@@ -219,214 +219,83 @@ recording of Beethoven's Fifth Symphony or Herbert von Karajan's and
 to articulate why.
 
 
-
-Musical recordings are complex data files that describe the intensity and onset time
-for every keystroke made by the performer. Matching this data to a
-musical score, removing incorrect notes, anticipating note onsets for
-automated accompaniment, comparing diverse performances, and
-discovering the relationship between performer choice and listener
-enjoyment all require ``smoothing'' the performance data so as to find
-low-dimensional structure. Statistical
-techniques like smoothing splines presume small changes in a
-derivative. 
-But musical performances do not conform to these assumptions because tempo and
-dynamic interpretations rely on the juxtaposition of local smoothness
-with sudden changes and emphases to create listener interest. It is
-exactly the parts of a performance that are poorly described by
-statistical smoothers that render a performance
-interesting. Furthermore, many of these inflections are notated by the
-composer or are implicit in performance practice developed over
-centuries of musical expressivity. Consequently, regularization that
-incorporates domain knowledge leads to better statistical and
-empirical results~\citep{McDonald2016}. 
-
-\begin{figure}
+In this paper, we develop a statistical model for some of the
+decisions that a musician must make for classical music
+interpretations. We focus on how the musician modulates
+{\it tempo}, or speed, over the course of a recording. 
+\begin{figure}[t]
   \centering
-  %\includegraphics[width=0.75\textwidth]{hattoSplines.pdf}
-  \caption{The tempo (beats/minute) of a 2003 recording attributed to Joyce
-    Hatto.}
-  \label{fig:music}
+  \includegraphics[width=.9\linewidth]{richter-1}
+  \caption{Note-by-note tempos for a recording of Chopin's Mazurka
+    Op.\ 68 No.\ 3 by Sviatislav Richter. The solid line are the
+    observed tempos, while the dots represent inferred tempo states
+    from our model. }
+  \label{fig:richter}
 \end{figure}
-\autoref{fig:music}
-shows (blue dots) the note-by-note tempo of a 2003 recording
-attributed to Joyce Hatto. Splines with
-equally spaced knots (orange/dotted) are too smooth, and choosing locations
-to duplicate knots manually (red/dashed)
-to coincide with musical phrase endings works better. The solid green line 
-shows a learned musical pattern from a Markov Switching
-state-space model we developed which can
-automatically learn tempo emphases (for example, near measure 40),
-where the performer plays individual notes slightly slower than the
-prevailing tempo, and automatically discover phrases
-without purposeful knot 
-duplication. Interestingly, such musical analyses can help to compare
-performances---it was discovered in 2006 that this
-particular recording was actually made in 1988 by Eugen
-%Indjic~\citep{CookSapp2009}. 
+\autoref{fig:richter} shows the tempo in beats-per-minute (b.p.m.) of
+a recording made by Sviatislav Richter of Chopin's Mazurka Op.\ 68
+No.\ 3. The solid line shows the actual tempo at which he plays each
+note, while the colored points correspond to our model's inferences
+for his actual intentions. Some of this intent is prescribed  by
+Chopin in his music, but the extent to which Richter observes Chopin's
+indications makes his recording different from those of other
+pianists. It is these differences that we hope to understand.
+We present an algorithm for
+performing likelihood inference, estimate our model using a large
+collection of recordings of the same composition, and demonstrate how
+the model is able to recover performer intentions, and how they relate
+to standard musical analysis.
 
 \subsection{Related work}
-One of the biggest reasons for having an off-line score-to-MIDI
-alignment is to create data sets for quantitatively studying music
-performance, which is a research area that receives much attention. To
-name a few, N.P. Todd has a series of works on computational modeling
-of timing and dynamics [Tod85] [Tod89] [Tod92], B.H. Repp has a series
-of research efforts on comparing different performances of the same
-music from different performers [Rep90] [Rep92] [Rep95]. S. Flossmann
-and G. Widmer have a series of studies on machine learning and
-rendering expressive performances [WFG09] [FGG+10] [FW11] [FGW13]. We
-also have a series of studies on performance interpretation parsing
-[GR12] [GR13]. All of these studies need data sets of MIDI
-performances with ground truth. 
+\label{sec:related-work}
 
-The existing MIDI data sets with ground truth are limited and some are
-copy- righted [FGG+10]. Also, none of these data are create solely
-with a score-performance alignment program because automated
-score-performance often contain many errors [FW11]. Researchers need
-data sets to explore the alignment algorithms. But without a good
-alignment algorithm it is often very hard to create enough data sets. 
 
-Online alignment:
-As opposed to the off-line version, on-line alignment doesn’t have
-access to “future data”. It processes performance actions in real-time
-as they are acquired. This version of alignment is often referred to
-as score following. [OLS03] has an annotated bibliography detailing
-the works of score following. Some of the recent developments can be
-found at [RG09] [Con10] [NTS14].
-
-One of the most direct applications of score following is automatic
-music accom- paniment. Active research on this topic continued for
-over two decades since the simultaneous premier of the first two such
-systems at the ICMC in 1984 [Dan84] [Ver84]. These systems seek to
-provide a flexible accompaniment to a live soloist that follows
-expressive timing and other performance nuances exhibited by the
-soloist.
  
-While there are some impressive successes for monophonic instruments
-in highly challenging domains [OLS03] [Rap04], a reliable
-accompaniment system for classical piano concerto for acoustic piano
-signal still pose challenges due to the high polyphony nature of the
-music [SOS04]. Some variant of HMM is used in recent development of
-audio score following for piano. But such research still calls for
-further development [CC14]. 
+The vast majority of work at the intersection of statistics or machine
+learning and classical music analysis has focused on a handful of tasks,
+most notably structure analysis, music generation, and score
+alignment.
 
-Frequency of errors in piano:
-Even with highly skilled pianists, these errors occur far more often
-than one may expect. There are studies in which the error rate could
-go up to 10\%, even for highly skilled pianists [FGG+10]. Section
-4.3.1 discusses the error rate in detail. 
+Analysis of musical structure and its relationships with interpretation
+forms the basis of music theory, and hence constitutes the core of standard
+conservatory curricula, along with history and performance. Automatically learning musical structures
+from performances without expert input has become more relevant
+recently. \citet{RenDunson2010} use Dirichlet process models to identify
+similar sections of individual classical music
+performances. \citet{RobertsEngel2018} use variational autoencoders to
+learn long-term structure with an explicit goal toward improved
+automatic music composition.
 
-Expressive timing:
-Although most approaches in the literature mainly focus on using the
-pitch informa- tion while dealing with notes in chronological order
-[Dan84] [PL92] [BBZ93] [Lar93], it has been shown that the IOIs
-between note clusters can also be useful in solving the alignment
-problem [Van95] [GM11]. Expressive timing is the deviation of inter-
-onset intervals from the written score [PVdS93]. It is one of the most
-important contributions that musicians give to bring music to life.
+Computer music generation and composition has a long
+history~\citep{SturmBen-Tal2019,Boulanger-LewandowskiBengio2012,Collins2016,Ariza2005,FlossmannGrachten2013}.
+It is actively investigated, especially using deep
+learning~\citep{HadjeresPachet2017}, and has become commercially
+relevant for advertising and video games through companies like
+Aiva (\url{aiva.ai}), and Melodrive (\url{melodrive.com}). Google has
+developed the Magenta project to enable open-source music
+composition~\citep{RobertsHawthorne2018}.
 
-[Ros92b] conducted an experiment on rhythmic tolerance. He observed
-that the listeners are expecting the IOIs to be close to their nominal
-lengths using the tempo marking, and the IOIs with same nominal length
-have an asymmetric distribution. Based on these observations, [Van95]
-proposes an online alignment system that mainly uses timing
-information. In this system, several recent IOIs are stored to compute
-a local average tempo. If the next IOI falls within a range determined
-by the average tempo, the system makes a match. A pitch-matching
-algorithm is used only when a match cannot be found. Despite its
-simplicity, this system shows its robustness when incorrect pitches
-are played at the expected time. The author shows reasonable results
-without using much pitch information. This can be seen as a strong
-indication that the timing information could be useful in a
-score-alignment system. [GM11] adopted the idea of using a local tempo
-model in an off-line matching algorithm. In this multi-pass alignment
-algorithm, unexpected IOIs computed from the local tempo are used to
-identify inserted notes. 
+The score alignment
+problem matches live or recorded performances to the musical score, a necessary
+processing step for any type of automated analysis. On-line alignment processes
+audio waveforms in real-time 
+and is sometimes called score
+following~\citep{DannenbergRaphael2006,Cont2010,ContSchwarz2007,ArztWidmer2015}. Audio
+matched to the score can then be used as an input for automated
+musical accompaniment~\citep{Raphael2010,Vercoe1985,Dannenberg1985}.
+Given recorded accompaniment, these systems seek to
+modulate playback in response to a live soloist who both makes
+interpretive timing decisions and mistakes. Off-line alignment~\citep{Earis2007} can be
+used for simply analyzing the recordings, as we do here, or for
+generating features that describe the
+performance~\citep{ThickstunHarchaoui2017}, possibly for later analysis
+in recommender
+systems~\citep{McFeeLanckriet2011,OordDieleman2013}. For an overview
+of these and related goals in music information retrieval, see
+~\citet{schedl2014music}.
 
 
-Modeling tempo:
-Although the efforts in music modeling using quantitative methods have
-been increas- ing over the past two decades [Tod89] [DH94] [WG04]
-[GW11] [GK14], there are still very few modeling assumption that can
-be translated into familiar musical meaning. For example, we may be
-able to get the loudness of every note played by a pianist, but it is
-different from the term dynamic used by musicians, which is often
-referred to as a loudness trend over a group of notes. Similarly, when
-musicians talk about tempo, they usually mean changes happening over a
-period of time rather than the something related to the time
-difference of two consecutive notes they played. 
 
-Utility of having a model:
-One of the most straightforward applications is performance
-visualization. Music is communicated through sound. From the hearing
-point of view, the information we have direct access to at any given
-time is very limited – the sound we are hearing at the moment, which
-derives its meaning from context. Thus, it is time consuming for us to
-“browse” a performance using our ears since we have to listen as the
-music plays. Visualization is a tool to transform the sound into an
-image so that we can utilize our eyes to explore information within a
-certain time period at once. It opens a whole new world to describe,
-analyze and compare music. Also, visualization is often an interesting
-and rewarding experience for musicians while reviewing their
-performances. It provides a very different perspective for musicians
-to see what they have done or compare side by side with other
-performance of the same music.
-
-Most music visualization research focuses on analyzing music structure
-such as pattern and repetition [LNS07] [PK08] [WB10]. These
-visualization systems research and identify the structure of
-music. They provide tools for listeners to navigate through music
-quickly. 
-
-In the area of creating music, musicians have a long standing interest
-in improving and creating performances that aim towards
-perfection. Before the appearance of recording, the only way to
-improve a performance is to play it again. If someone wants a perfect
-performance, it has to be played perfectly – from the first note to
-the last note. With the development of recording technology, it became
-possible to splice sections of performances together. If there is an
-unsatisfactory part in a recording, it can be replaced. Thus, a
-performance can be improved and perfected section by section. But the
-convenience comes with a price: it is often not easy to make the
-splicing inaudible. Subtle things such as the sound change caused by
-different humidity levels, the slight inconsistency of articulation,
-the different dynamics from different takes and the different tempo
-variation from different takes could affect the quality of
-splicing. Also, the whole work flow is very labor intensive and can
-only be done by trial and error. But to this day, splicing is still
-one of the most commonly used techniques for improving recordings of
-performances. 
-
-With the development of computer technology, there is a growing
-interest in gen- erating performances that can match the level of a
-trained musician. Most existing rendering systems are rule-based or
-case-based. Such systems often include extracting and applying rules
-with preset parameters [SUZ03] [HBHK04] [FBS06]. The weak- ness of
-rule-based or case-based systems is that it is still debatable whether
-we can find a set of rules/cases that can cover what it takes to make
-a meaningful music. There are also several statistical approaches
-[FW11] [WFG09]. These approaches use statistical methods to train a
-note by note performance model from a large quantity of data (e.g. a
-complete recording of Chopin piano works from a reproducing
-piano). However, compared to the heavy parametrization of these
-models, the data sets are not as big as they looks. Thus, overfitting
-could occur in these models. 
-
-An accompaniment system can benefit from such a low-dimensional
-representation too. A traditional accompaniment system seeks to create
-a flexible accompaniment to a live soloist that follows the player
-[Dan84] [Rap03] [CEGJ12]. Most existing systems use the same following
-strategy to keep up with the soloist throughout a single piece. This
-could inevitably result in overfitting the soloist’s performance and
-failing to understand the player’s real intentions. Good following
-requires a deeper understanding of the performers’ intention, thus
-separating signal from noise. A low-dimensional representation
-provides a higher-level view of the music, which has the potential to
-recognize the different musical characters in different sections of a
-piece (e.g. the tempo of a section recognized as ritardando is
-expected to slow down gradually while the tempo is not expected to
-vary a lot in a section recognized as steady tempo). Different
-following strategies can be adapted to better follow performance
-within sections provided by such a representation. 
 
 \begin{itemize}
 \item We want to model tempo and dynamic decisions.
@@ -442,13 +311,25 @@ within sections provided by such a representation.
 
 \subsection{Data and preprocessing}
 
+In this paper, we examine note-by-note tempos for 46 recordings of
+Chopin's Mazurka Op.\ 68, No.3. The data are part of a large
+collection of the complete Chopin Mazurkas and other recordings
+collected and analyzed by the Center for the History and Analysis of
+Recorded Music (CHARM) in the United Kingdom~\citep{CHARM-site}. The
+recordings were processed using the note-onset detection algorithm
+developed in~\citep{Earis2007} and are available for
+download~\citep{Earis2009}. We use the data for ``all rhythmic
+events'', which includes the time of each note attack as well as it's
+relative loudness. For the sake of reproducibility, we have included
+this data in our R package.
+
 \subsection{Switching state-space models}
 
 State-space models define the probability distribution of a time 
 series $Y$ by reference to some imagined, hidden state, $X$. In
-particular, the observation at a particular time $t$ is assumed to be
+particular, the observation at a particular time $i$ is assumed to be
 independent of past and future observations conditional on the state
-at time $t$. Coupled with temporal dependence for $X$---most
+at time $i$. Coupling with temporal dependence for $X$---most
 frequently obeying the Markov property---induces a temporal model for
 the observations.  The most general form of a state-space model is
 then characterized by the 
@@ -465,7 +346,7 @@ dynamics), and an initial distribution for the state:
 \label{eq:ssmod}
 \end{equation}
 where $\epsilon_i$ are $\eta_i$ are marginally independent and
-identically distributed (IID) as well as mutually independent. Both
+identically distributed  as well as mutually independent. Both
 $y_i$ and $x_i$ can be (generally) vector-valued, though in our
 application, $y_i$ will be univariate. The
 vector $\{y_i\}_{i=1}^n$ is observed, and the goal is to make
@@ -517,7 +398,7 @@ In the case where $f_\theta$ and $g_\theta$ are linear with $\epsilon_i$ and
 $\eta_i$ normally distributed, \eqref{eq:ssmod} specializes to
 \begin{equation}
   \begin{aligned}
-    x_{i}&= d+T x_i + R\eta_{i}, 
+    x_{i+1}&= d+T x_i + R\eta_{i}, 
     & \eta_i &\sim N(0,\ Q),     
     &x_1 &\sim N(x_0,\ P_0),\\
     y_i&= c + Z x_i + \epsilon_i,     
@@ -525,7 +406,7 @@ $\eta_i$ normally distributed, \eqref{eq:ssmod} specializes to
   \end{aligned}
   \label{eq:lgmod}
 \end{equation}
-where the matrices $d,\ T,\ R,\ c,\ Z,\ R,\ Q,$ and $G$ are allowed to depend
+where the matrices $d,\ T,\ c,\ Z,\ R,\ Q,$ and $G$ are allowed to depend
 on $\theta$ and can potentially vary (deterministically) with $i$. In this case,
 the Kalman filter, \autoref{alg:kalman} \citep[see e.g.][]{Kalman1960,Harvey1990},
 can be used to derive closed form 
@@ -578,6 +459,7 @@ $\{y_j\}_{j=1}^i$: $\varx_i=\Expect{x_i\given y_1\ldots,y_i}$ and
 $P_i=\Var{x_i\given y_1,\ldots,y_i}$. To
 incorporate all future observations into these estimates, the Kalman
 smoother is required.
+
 \begin{algorithm}[t!]
   \begin{singlespace}
   \caption{Kalman smoother (Rauch-Tung-Striebel): estimate $\hat{X}$ conditional on
@@ -599,6 +481,7 @@ smoother is required.
   \end{algorithmic}
 \end{singlespace}
 \end{algorithm}
+
 There are many different smoother algorithms tailored for different
 applications. \autoref{alg:kalman-smoother}, due
 to~\citet{RauchStriebel1965}, is often referred to as the classical
@@ -627,8 +510,8 @@ when the times of discontinuity are unknown.
 To remedy this deficiency, one can use a switching state-space
 model as shown in \autoref{fig:switchss}. Here, we assume $S$ is a
 hidden, discrete process with Markovian dynamics. Then, the value of
-the hidden state at time $t$, $s_i=k$ say, can determine the evolution of
-the continuous model at time $t$. The graphical model in
+the hidden state at time $i$, $s_i=k$ say, can determine the evolution of
+the continuous model at time $i$. The graphical model in
 \autoref{fig:switchss} gives the conditional independence properties
 we will use in our model for musical interpretation, but this
 represents just one of many possibilities. Switching state-space models have a long
@@ -640,7 +523,7 @@ overview of the history, typography, and algorithmic developments can
 be found in~\citep{GhahramaniHinton2000}. In \eqref{eq:lgmod}, the
 parameter matrices were not time varying. In our switching model, we
 allow the switch states $s_i, s_{i-1}$, along with the parameter
-vector $\theta$, to determine the specific dynamics at time $t$:
+vector $\theta$, to determine the specific dynamics at time $i$:
 \begin{equation}
   \begin{aligned}
     x_1 &\sim N(x_0,\ P_0),\\
@@ -729,7 +612,7 @@ matrices govern the evolution of the system.
 In musical scores, tempi (the Italian plural of {\em tempo}) may be
 marked at various points throughout a piece of music. The
 beginning can be either explicit, with a metronome marking to
-indicate the number of beats per minute (bpm), and/or with some words
+indicate the number of beats per minute (b.p.m.), and/or with some words
 (e.g. Adagio, Presto, Langsam, Sprightly) which indicate an
 approximate speed. 
 \begin{figure}[t!]
@@ -774,13 +657,13 @@ by Arthur Rubinstein in a 1961 recording.
  \includegraphics[width=.9\linewidth]{small-rubinstein-1961-1}
  \caption{The solid line shows the observed note-by-note tempo for
    the beginning of the Mazurka as performed by Arthur Rubinstein in
-   1961. The dashed line indicates 132 bpm.}
+   1961. The dashed line indicates 132 b.p.m.}
  \label{fig:short-perf}
 \end{figure}
 The solid line shows the
 actual, performed tempo, while the dashed horizontal line is placed at
-the indicated tempo of 132 bpm. The figure has three important
-lessons: (1) actual tempo varies around intended tempo; (2) 132 bpm is
+the indicated tempo of 132 b.p.m. The figure has three important
+lessons: (1) actual tempo varies around intended tempo; (2) 132 b.p.m. is
 not necessarily the tempo a performer will choose despite the
 indication; and (3) performers have other tempo intentions which are
 not marked, like the pronounced slow-down in measures 7--8.
@@ -824,7 +707,8 @@ diagram given by \autoref{fig:transmat}.
    \path[->] (S1) edge [out=300,in=330,looseness=8] node [below right]
    {$p_{11}$} (S1);
   \end{tikzpicture}
-  \caption{Transition diagram. \label{fig:transmat}}
+  \caption{Transition diagram. The four states are: constant tempo
+    (1), deceleration (2), acceleration (3), and emphasis (4).\label{fig:transmat}}
 \end{figure}
 The 4 switch states correspond to 4 different behaviors for the
 performer: (1) constant tempo, (2) speeding up, (3) slowing down, and
@@ -849,8 +733,8 @@ order Markov chain. We discuss some potential improvements at the end
 of~\autoref{sec:analys-chop-mazurka}. 
 
 
-Our data gives $y_i$ as the observed tempo (in bpm) of the note (or
-chord) of the $i^{th}$ note onset in Chopin's Mazurka Op.\ No.\ 3. The
+Our data gives $y_i$ as the observed tempo (in b.p.m.) of the note (or
+chord) of the $i^{th}$ note onset in Chopin's Mazurka Op.\ 68 No.\ 3. The
 hidden continuous variable ($X_i$) is 
 taken to be a two component vector with the first component being the
 prevailing tempo and the second the amount of acceleration. The amount, or
@@ -862,7 +746,8 @@ measure contains three quarter notes. In more complicated
 music with changing time signatures or instances where the notation
 doesn't necessarily correspond with the time signature, more care
 would be required. The observed tempo is already normalized to account
-for variable note durations. When the performer is in state 1 (or
+for variable note durations, but the intentional tempo and its
+variance should be proportional to $l_i$. When the performer is in state 1 (or
 transits in and out of state 4), we take the prevailing tempo as
 constant with no acceleration: $X_{i+1} = X_i$. 
 
@@ -1008,7 +893,7 @@ have reasonably strong prior information for many of the
 parameters. The three mean parameters $\mu_{\textrm{tempo}}$,
 $\mu_{\textrm{acc}}$ and $\mu_{\textrm{stress}}$ have sign
 restrictions in addition to strong information about their magnitude:
-average tempo should be around the indicated 132 bpm, the average
+average tempo should be around the indicated 132 b.p.m., the average
 amount of acceleration should probably be less than the size of a
 stress. We also have reasonably strong information about the
 probabilities of transitioning between states: self-transitions should
@@ -1025,16 +910,16 @@ specific choices are shown in \autoref{tab:priors}.
     \toprule
     Parameter & \phantom{a} & Distribution & Prior mean\\
     \midrule
-    $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(40,\ 10)$ & 400 bpm$^2$\\
+    $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(40,\ 10)$ & 400 b.p.m.$^2$\\
     $\mu_{\textrm{tempo}}$ & $\sim$ & Gamma$(\overline{Y}^2/100,\ 100
                                       /\overline{Y})$ & $\overline{Y}$
-                                                        bpm\\
-    $-\mu_{\textrm{acc}} $ & $\sim$ & Gamma$(15,\ 2/3)$ & 10 bpm\\
-    $-\mu_{\textrm{stress}} $ & $\sim$ & Gamma$(20,\ 2)$ & 40 bpm\\
+                                                        b.p.m.\\
+    $-\mu_{\textrm{acc}} $ & $\sim$ & Gamma$(15,\ 2/3)$ & 10 b.p.m.\\
+    $-\mu_{\textrm{stress}} $ & $\sim$ & Gamma$(20,\ 2)$ & 40 b.p.m.\\
     $\sigma^2_{\textrm{tempo}} $ & $\sim$ & Gamma$(40,\ 10)$ & 400
-                                                               bpm$^2$\\
-    $\sigma^2_{\textrm{acc}} $ & $=$ & 1 & 1 bpm$^2$\\
-    $\sigma^2_{\textrm{stress}} $ & $=$ & 1 & 1 bpm$^2$\\
+                                                               b.p.m.$^2$\\
+    $\sigma^2_{\textrm{acc}} $ & $=$ & 1 & 1 b.p.m.$^2$\\
+    $\sigma^2_{\textrm{stress}} $ & $=$ & 1 & 1 b.p.m.$^2$\\
     $p_{1,\cdot}$ & $\sim$ & Dirichlet$(85,\ 5,\ 2,\ 8)$ \\
     $p_{2,\cdot}$ & $\sim$ & Dirichlet$(4,\ 10,\ 1,\ 0)$ \\
     $p_{3,\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$ \\
@@ -1184,7 +1069,6 @@ place within the context of an already loud passage, precluding the
 use of extra volume.
 \begin{table}[tb]
   \centering
-  \label{tab:two-perf-parm}
   \caption{The estimated parameters for performances by Richter and
     Hatto.}
   \resizebox{\linewidth}{!}{%
@@ -1204,7 +1088,8 @@ use of extra volume.
     & 460.82 & 0.92 & 0.02 & 0.71 & 0.34 & 0.03 & 0.23 & 0.09\\
     \bottomrule
   \end{tabular}
-  }
+}
+\label{tab:two-perf-parm}
 \end{table}
 \autoref{tab:two-perf-parm} shows the estimated parameters for these
 two performances. Richter has larger observation variance,
@@ -1215,7 +1100,7 @@ tempos. On the other hand, Hatto is much more
 likely to remain in states 1 or 2. These inferences are largely
 consistent with the visual takeaways of \autoref{fig:archetypal}. It's
 easy to see the increased variability around the ``constant tempo'' in
-Richter's performance and the higher overall tempos in both the A and
+Richter's performance and the faster overall tempos in both the A and
 B sections.
 
 While these two performances are quite different from each other, they
@@ -1233,9 +1118,9 @@ constant tempo for the entirety of both A sections. While the model
 describes his performance well, it also illustrates a deficiency of
 this approach: Cortot, more than any other performer, has large
 contrasts between the A and B sections. His A section is the slowest
-of all 46 recordings at around 64 bpm, half the marked
+of all 46 recordings at around 64 b.p.m., half the marked
 tempo. The next slowest is Maryla Jonas's recording at around 84
-bpm. Meanwhile, his B section is among the fastest of all the
+b.p.m. Meanwhile, his B section is among the fastest of all the
 recordings and contains the fastest individual note. Additionally,
 there is stunningly little tempo variability in his A sections, but
 dramatic variation in the B section coupled with frequent uses of the
@@ -1363,7 +1248,7 @@ differences. The four recordings in \autoref{fig:similar} would be
 spread across three different clusters, for example, as would our
 cluster one. On the other hand, both metrics see Cortot's recording as a
 strong outlier, and clustering by tempo vectors often (somewhat
-miraculously) group recordings by the same pianist together: both
+miraculously) groups recordings by the same pianist together: both
 recordings by Smidowicz, three of the four recordings by Rubinstein,
 both recordings by Hatto.
 \begin{figure}[t]
@@ -1389,9 +1274,9 @@ parameters for the four similar performances in
 Rubinstein's recordings, as we would expect.
 \begin{table}[tb]
   \centering
-  \label{tab:similar-different-perf}
   \caption{The estimated parameters for the four similar performances
-    in Cluster Two and those for all four by Arthur Rubinstein.}
+    in Cluster Two and those for all four by Arthur Rubinstein.
+    \label{tab:similar-different-perf}}
   \resizebox{\linewidth}{!}{%
   \begin{tabular}{@{}lrrrrrrrrrrrr@{}}
     \toprule
@@ -1424,6 +1309,101 @@ Rubinstein's recordings, as we would expect.
 \end{table}
 
 
+\subsection{Alternative smoothers}
+\label{sec:altern-smooth}
+
+Our model is just one type of smoothing one could imagine using to
+find low-dimensional structure for the vector of note-by-note
+tempos. Alternative statistical techniques are common, and examining
+how they compare with our method helps to illuminate some of its
+benefits. The most obvious alternative is to use smoothing
+splines~\citep{CravenWahba1978,Wahba1990} though total-variation
+denoising or trend filtering \citep{KimKoh2009,Tibshirani2014} are
+other reasonable alternatives.
+These statistical techniques perform smoothing by encouraging small
+changes in derivatives (smoothing splines) or bounded total variation
+(trend filtering). 
+But musical performances do not conform to these assumptions because tempo and
+dynamic interpretations rely on the juxtaposition of local smoothness
+with sudden changes and emphases to create listener interest. It is
+exactly the parts of a performance that are poorly described by
+statistical smoothers that render a performance
+interesting. Furthermore, as discussed above, many of these
+inflections are notated by the 
+composer or are implicit in performance practice developed over
+centuries of musical expressivity. Consequently, smoothing that
+incorporates domain knowledge leads to better statistical and
+empirical results.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\linewidth]{alternative-smoothers-1}
+  \caption{Smoothing with splines and musical models}
+  \label{fig:splines}
+\end{figure}
+
+\autoref{fig:splines}
+shows the note-by-note tempo of Richter's 1976 recording. Splines with
+equally spaced knots are shown in yellow. We use generalized cross
+validation~\citep{GolubHeath1979} to select the number of knots (one
+knot per measure). The red line shows a regression spline fewer knots,
+but whose locations were chosen
+manually
+to coincide with the musical phrase endings discussed in
+\autoref{sec:musical-analysis}. Knots at phrase endings were
+duplicated up to four times to allow for discontinuities. The blue line 
+shows the estimated smooth tempo from our model (the same as in
+\autoref{fig:archetypal}), which
+automatically learns note emphases and discovers phrases
+without purposeful knot duplication. The regression spline with
+equally spaced knots undersmooths in constant tempo areas in an
+attempt to capture sudden emphases and dramatic changes in others. The spline
+with informed knot choice does much better, picking up the periods of
+deceleration at the ends of phrases. Our model learns these behaviors
+on its own while also capturing individual emphases that are missed in
+the musical analysis but are idiosyncratic to Richter's playing. It is
+also more parsimonious to musical interpretation, inferring constant
+tempo periods rather than resulting in smoothly varying tempos in
+stable periods, such as measures 1--16.
+
+\subsection{Problems with the model and estimation}
+\label{sec:problems-with-model}
+
+While our model of musical decision making yields interesting insights
+into performance practice most of the time, it also suffers from some
+deficiencies. As discussed above in reference to Alfred Cortot's
+recording, the assumption that all parameters are stable over the
+entire piece may not always be accurate. The $\mu_{\textrm{tempo}}$
+parameter especially, should be estimated separately in different
+sections. This problem will only be compounded in more complex music
+with many contrasting sections. A related issue is the current form
+for the slowing down and speeding up sections. Our model assumes that
+both occur linearly, with a constant decrease of $\mu_{\textrm{acc}}$
+b.p.m. An ability to slow increasingly as one remains in the state may
+improve the model fit.
+
+There is nothing intrinsic to the model which forces states two,
+three, or four to always go in the correct direction. If for example,
+$\mu_{\textrm{acc}}$ is small in magnitude relative to
+$\sigma^2_{\textrm{acc}}$, an acceleration could be learned as time
+spent in state two but with large positive errors. For this piece, the
+penalties help to avoid such occurrences, but this aspect of the
+Gaussian state-space model could be improved by enforcing non-Gaussian
+behavior. Or course, such constraints would complicate likelihood
+evaluation since the Kalman filter could no longer be used. Relatedly,
+our model produced objectively incorrect inferences on two performances.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\linewidth]{bad-model-1}
+  \caption{Estimation errors on two performances.}
+  \label{fig:bad-model}
+\end{figure}
+\autoref{fig:bad-model} shows two performances where the estimated
+path failed to transition to a new constant tempo state at the
+recapitulation of the A section. In both cases, the resulting path
+stands out dramatically, remaining in the much faster constant tempo
+state from the B section with overly frequent emphases. Both of these
+performances were clustered as ``other''. Both of these performances
+are quite volatile which makes estimation difficult.
 
 % One issue in our model that the effect of states two and three can be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and $\sigma_2^2$ are large enough, it would be possible to get a negative number for the acceleration term when in state 2 or a positive number when in state three and still get a reasonably high likelihood. This could be fixed by adding a constraint on the ratio of the $\tau_t$ and $\sigma$'s 2 and 4.
 
@@ -1431,7 +1411,49 @@ Rubinstein's recordings, as we would expect.
 \label{sec:discussion}
 
 
+Musical interpretation is the most important factor 
+in determining whether or not concertgoers enjoy a classical performance. Every
+performance includes mistakes---intonation issues, a lost note, an
+unpleasant sound---but these are all easily forgotten (or unnoticed) when a performer
+engages her audience, imbuing a piece with novel emotional content
+beyond the vague instructions inscribed on the printed page. While music teachers use
+imagery or heuristic guidelines to motivate interpretive decisions, combining these
+vague instructions to create a convincing performance remains the domain
+of the performer, subject to the whims of the moment, technical
+fluency, and taste.
 
+In this paper, we develop a statistical model for tempo to elucidate performance
+decisions from classical music recordings. We present an algorithm for
+performing likelihood inference, estimate our model using a large
+collection of recordings of the same composition, and demonstrate how
+the model is able to recover performer intentions, and how they relate
+to standard musical analysis. While our methods perform well, our
+analysis reveals a number of avenues for future work an
+improvement. For the piano, apart from tempo decisions, the performer
+can also control dynamics differentially. Similar techniques to those
+employed here could be used to describe levels of loudness, and
+creating a model that combined both is desirable. Pianists have
+relatively few variables under their control for interpretation:
+tempo, dynamics, and pedalling. On the other had, string players have
+many more. Bowing decisions, fingerings, vibrato, broken chords are
+all important tools which are difficult to learn from a recording, let
+alone describe with a simple statistical model. Significant work would
+be required to generalize our techniques to more detailed
+interpretative analysis. On the other hand, focusing simply on tempo
+can be useful with solo performances or with larger
+ensembles. Examining more complex genres---sonatas, string quartets,
+symphonies---would also be interesting for future work.
+
+Another avenue we wish to pursue in the future is to examine how our
+model's implications may be useful for teaching students. Can we
+estimate it quickly to provide immediate feedback to novice pianists?
+In this paper, we used a dataset in which the note-by-note tempos were
+annotated by experienced musicians. Combining our model with existing
+approaches to solving the note-score alignment problem
+\citep{LangFreitas2005,Raphael2002,DannenbergRaphael2006}, perhaps to
+their benefit would be the first step. Together, this could produce an
+immediate graphical representation that students and teachers could
+use to evaluate and improve their practice.
 
 \bigskip
 \begin{center}
@@ -1442,13 +1464,20 @@ Rubinstein's recordings, as we would expect.
 
 \item[R-package ``dpf'':] R-package containing code to perform the
   methods described in the article. The package also contains all data
-  sets used as examples in the article. (GNU zipped tar)
+  sets used as examples in the article. (GNU zipped tar, also on
+  Github)
+  
+\item[Source code:] Additional R code necessary to reproduce all
+  analyses and graphics. (GNU zipped tar)
+
+\item[Appendix:] Supplement with additional graphics for our clusters
+  and analysis of all 46 recordings. (PDF)
 
 \end{description}
 
 
 
 
-\bibliographystyle{agsm}
+\bibliographystyle{plainnat}
 \bibliography{AllReferences}
 \end{document}

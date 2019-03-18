@@ -1,3 +1,5 @@
+# Source file for prior and likelihood functions. Not needed separately.
+
 logprior <- function(theta, samp_mean=132){
   p1s = c(theta[c(8,9)], 1-sum(theta[c(8,9,12)]), theta[12])
   p2s = c(theta[10], 1-sum(theta[c(10,13)]), theta[13])
@@ -12,8 +14,7 @@ logprior <- function(theta, samp_mean=132){
   p1 = ddirichlet(p1s, alpha=c(85,5,8,2))
   p22 = ddirichlet(p2s, alpha=c(10,1,4))
   p31 = ddirichlet(p3s, alpha=c(5,7,3))
-  lp = sum(sig2eps, mu1, 
-           mu2, mu3, #sig2obs, 
+  lp = sum(sig2eps, mu1, mu2, mu3, 
            sig2tempo, #sig2acc, sig2stress, 
            p1, p22, p31)
   lp
@@ -64,7 +65,7 @@ logStatesGivenParams <- function(states,transProbs){
 
 toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
   theta = c(theta[1:5],1,1,theta[6:12])
-  pmats = yupengMats(lt, theta[1], theta[2:4], theta[5:7], theta[8:14],
+  pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14],
                      initialMean = c(samp_mean,0), # 132 is marked tempo, 0 is unused
                      initialVariance = c(400,10)) # sd of 20, 10 is unused
   beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0,0,0), 

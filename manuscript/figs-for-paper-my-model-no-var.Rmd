@@ -34,16 +34,9 @@ fivecolors = viridis(5, option='plasma',begin=.2)[c(1,4,2,5,3)] #brewer.pal(5,'S
 library(dendextend)
 ```
 
-# Suggested order
 
-1. Parameter interpretation in Fliere
-2. Using parameters to examine two different performances
-3. Clustering performances (compare the clusters)
-    a. what can we say about the parameters of each cluster? what is different about them?
-4. Similar performances (Rubinstein)
-5. Model issues
 
-# Short tempo
+# Short tempo figure
 
 ```{r small-rubinstein-1961,out.width="5in", out.height="2in", fig.width=7.5,fig.height=3}
 ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
@@ -69,6 +62,7 @@ dend_perf = hc_perf %>% as.dendrogram
 
 
 
+## Distance matrix from parameters
 
 ```{r parametric-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
 #hc_parm = hc_parm+diag(1e-12,nrow(hc_parm))
@@ -128,6 +122,8 @@ levels(pvec_all$clust) = c(levels(pvec_all$clust),'other')
 pvec_all$clust[is.na(pvec_all$clust)] = 'other'
 ```
 
+## Distance matrix from raw data
+
 ```{r raw-data-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
 heatmap.2(as.matrix(percentize(dist(perfs))),
           Rowv = dend_perf, Colv = dend_perf, 
@@ -171,7 +167,8 @@ ttt %>%
 ```
 
 ```{r clust-densities-sub1, fig.height=4,fig.width=8}
-ttt %>% filter(parameter %in% lab_lookup[1:5]) %>%
+ttt %>% filter(parameter %in% lab_lookup[1:5],
+               clust != 'other') %>%
   ggplot(aes(x=value, fill=clust)) +
   geom_density(alpha=.75,adjust=1.75) +
   facet_wrap(~parameter,scales='free',
@@ -181,7 +178,8 @@ ttt %>% filter(parameter %in% lab_lookup[1:5]) %>%
 ```
 
 ```{r clust-densities-sub2, fig.height=6.5,fig.width=8}
-ttt %>% filter(parameter %in% lab_lookup[6:12]) %>%
+ttt %>% filter(parameter %in% lab_lookup[6:12],
+               clust != 'other') %>%
   ggplot(aes(x=value, fill=clust)) +
   geom_density(alpha=.75,adjust=1.75) +
   facet_wrap(~parameter,scales='free',
@@ -212,12 +210,17 @@ for(i in 1:nrow(pvec_ml)){
 plots = bind_rows(plots)
 plots$performer = rep(pvec_all$performer, each=length(y))
 plots$clust = rep(pvec_all$clust, each=length(y))
-plots$state = as.factor(plots$state)
+plots$state = as.factor(plots$state) 
+plots = plots %>% mutate(
+  state=factor(state,labels=c('constant','decel','accel','stress'))
+  )
 perfcols = viridis_pal(begin=.2)(nlevels(plots$state))
 # plots$pointx = 10
 # plots$pointy = 400
 # deunderscore = function(x) gsub('_',' ',x)
 ```
+
+## Cluster 1
 
 ```{r clust-1, fig.height=9, fig.width=6}
 perfshapes = c(16,17,15,3)
@@ -235,6 +238,8 @@ ggplot(filter(plots, clust=='1')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
+## Cluster 2
+
 ```{r clust-2, fig.height=9, fig.width=6}
 ggplot(filter(plots, clust=='2')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
@@ -250,6 +255,8 @@ ggplot(filter(plots, clust=='2')) +
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol = 3) #+
 ```
+
+## Cluster 3
 
 ```{r clust-3, fig.height=9, fig.width=6}
 ggplot(filter(plots, clust=='3')) + 
@@ -267,6 +274,8 @@ ggplot(filter(plots, clust=='3')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
+## Cluster 4
+
 ```{r clust-4, eval=TRUE, fig.height=9, fig.width=6}
 ggplot(filter(plots, clust=='4')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
@@ -282,6 +291,7 @@ ggplot(filter(plots, clust=='4')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
+## Cluster "other"
 
 ```{r clust-other, fig.height=9, fig.width=6}
 ggplot(filter(plots, clust=='other')) + 
@@ -299,10 +309,10 @@ ggplot(filter(plots, clust=='other')) +
 
 
 
+## Individual performances
 
 
-
-```{r first-performance}
+```{r richter}
 ggplot(filter(plots, performer == 'Richter 1976')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -318,7 +328,7 @@ ggplot(filter(plots, performer == 'Richter 1976')) +
   # scale_color_manual(values = fivecolors)
 ```
 
-```{r second-performance}
+```{r hatto}
 ggplot(filter(plots, performer == 'Hatto 1993')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -354,9 +364,8 @@ ggplot(filter(plots, performer == 'Cortot 1951')) +
   # scale_color_manual(values = fivecolors)
 ```
 
-```{r two-performances,fig.height=6}
+```{r two-performances,fig.height=4}
 filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
-  mutate(state=factor(state, labels=c('constant','decel','accel','stress'))) %>%
   ggplot() + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -367,12 +376,12 @@ filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow = 2) #+
+  facet_wrap(~performer,nrow = 1) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
 
-
+## Parameter table
 
 ```{r two-perfs-parameters}
 kable(pvec_ml[c('Richter 1976','Hatto 1993','Cortot 1951'),],
@@ -399,7 +408,7 @@ B1 = bs(tempos$note_onset, knots = all.knots, intercept = TRUE,Boundary.knots = 
 spline_music = plots %>% group_by(performer) %>% 
   mutate(preds_smooth = fitted(lm(tempo~B-1)), 
          preds_music = fitted(lm(tempo~B1-1)))
-filter(spline_music , performer %in% c('Richter 1976','Hatto 1993')) %>%
+filter(spline_music , performer %in% c('Richter 1976')) %>%
   gather(key='key',value = 'value', -tempo, 
          -measure, -state, -performer, -clust) %>%
   ggplot() + 
@@ -408,12 +417,11 @@ filter(spline_music , performer %in% c('Richter 1976','Hatto 1993')) %>%
               fill = 'gray90', color = 'gray90', show.legend = FALSE) +
   geom_point(aes(x=measure, y=tempo), color='gray40', show.legend = FALSE) +
   geom_line(aes(x=measure, y=value, color=key)) + 
-  # scale_color_brewer(palette='Set1') +
-  scale_color_viridis_d(option = 'plasma') +
-  #scale_color_manual(values=fivecolors[3:5]) +
+  scale_color_viridis_d(option = 'plasma',
+                        labels=c('music model','musical spline','regression spline')) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer) #+
+  facet_wrap(~performer,nrow=2) #+
   # geom_rect(aes(xmin=pointx-2.5, xmax=pointx+2.5,
   #               ymin=pointy-2.5,ymax=pointy+2.5,fill=clust), 
   #           show.legend = FALSE,
@@ -487,13 +495,3 @@ ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) +
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer)
 ```
-
-# Problems with the model
-
-* Problem with retransitioning to state 1
-* states 2 and 3 aren't constrained to always decrease/increase, only in mean
-* state 4 may not always emphasize a slow down
-* previous 2 have to do with Gaussian assumptions
-* necessity for strong priors
-* but priors are on parameters, not on path (how would we want this to change?)
-

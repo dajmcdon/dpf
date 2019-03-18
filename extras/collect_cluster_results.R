@@ -1,5 +1,8 @@
+#2. This short script collects all parameter estimates from the cluster 
+# (or local) when run via cluster_analysis_my_model.R
+
 library(batchtools)
-loadRegistry('mazurka3', writeable=TRUE)
+loadRegistry('my-mazurka-no-var', writeable=TRUE)
 
 getStatus()
 
