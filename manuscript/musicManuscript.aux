@@ -17,15 +17,13 @@
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \citation{DrorKoenigstein2012}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}}
-\newlabel{sec:introduction}{{1}{2}{Introduction}{section.1}{}}
 \citation{Bernstein2005}
-\citation{RenDunson2010}
-\citation{RobertsEngel2018}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{3}{section.1}}
+\newlabel{sec:introduction}{{1}{3}{Introduction}{section.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Note-by-note tempos for a recording of Chopin's Mazurka Op.\ 68 No.\ 3 by Sviatislav Richter. The solid line are the observed tempos, while the dots represent inferred tempo states from our model. }}{4}{figure.1}}
 \newlabel{fig:richter}{{1}{4}{Note-by-note tempos for a recording of Chopin's Mazurka Op.\ 68 No.\ 3 by Sviatislav Richter. The solid line are the observed tempos, while the dots represent inferred tempo states from our model}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Related work}{4}{subsection.1.1}}
-\newlabel{sec:related-work}{{1.1}{4}{Related work}{subsection.1.1}{}}
+\citation{RenDunson2010}
+\citation{RobertsEngel2018}
 \citation{SturmBen-Tal2019,Boulanger-LewandowskiBengio2012,Collins2016,Ariza2005,FlossmannGrachten2013}
 \citation{HadjeresPachet2017}
 \citation{RobertsHawthorne2018}
@@ -35,95 +33,98 @@
 \citation{ThickstunHarchaoui2017}
 \citation{McFeeLanckriet2011,OordDieleman2013}
 \citation{schedl2014music}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Related work}{5}{subsection.1.1}}
+\newlabel{sec:related-work}{{1.1}{5}{Related work}{subsection.1.1}{}}
 \citation{CHARM-site}
 \citation{Earis2007}
 \citation{Earis2009}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Materials and methods}{6}{section.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data and preprocessing}{6}{subsection.2.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Switching state-space models}{6}{subsection.2.2}}
-\newlabel{eq:ssmod}{{1}{6}{Switching state-space models}{equation.2.1}{}}
 \citation{Kalman1960,Harvey1990}
-\citation{RauchStriebel1965}
-\citation{AndersonMoore1979}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces State-space model. Filled objects are observed, circles indicate that both hidden and observed states are continuous.}}{7}{figure.2}}
 \newlabel{fig:ssmod}{{2}{7}{State-space model. Filled objects are observed, circles indicate that both hidden and observed states are continuous}{figure.2}{}}
-\newlabel{alg:kalman}{{1}{7}{Switching state-space models}{algorithm.1}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Kalman filter: estimate $x_i$ conditional on $\{y_j\}_{j=1}^i$, for all $i=1,\ldots  ,n$ and calculate the log likelihood for $\theta $}}{7}{algorithm.1}}
+\newlabel{eq:ssmod}{{1}{7}{Switching state-space models}{equation.2.1}{}}
 \newlabel{eq:lgmod}{{2}{7}{Switching state-space models}{equation.2.2}{}}
+\citation{RauchStriebel1965}
+\citation{AndersonMoore1979}
 \citation{DurbinKoopman2001}
 \citation{DurbinKoopman1997,Fuh2006,Kitagawa1987,Kitagawa1996}
 \citation{KoyamaPerez-Bolde2010,AndrieuDoucet2010}
+\newlabel{alg:kalman}{{1}{8}{Switching state-space models}{algorithm.1}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Kalman filter: estimate $x_i$ conditional on $\{y_j\}_{j=1}^i$, for all $i=1,\ldots  ,n$ and calculate the log likelihood for $\theta $}}{8}{algorithm.1}}
+\newlabel{alg:kalman-smoother}{{2}{8}{Switching state-space models}{algorithm.2}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Kalman smoother (Rauch-Tung-Striebel): estimate $\setbox \z@ \hbox {\frozen@everymath \@emptytoks \mathsurround \z@ $\textstyle X$}\mathaccent "0362{X}$ conditional on $Y$}}{8}{algorithm.2}}
 \citation{KimNelson1998,Kim1994,Hamilton2011}
 \citation{FoxSudderth2011}
 \citation{PattersonThomas2008,BlockJonsen2011}
 \citation{GhahramaniHinton2000}
-\newlabel{alg:kalman-smoother}{{2}{8}{Switching state-space models}{algorithm.2}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Kalman smoother (Rauch-Tung-Striebel): estimate $\setbox \z@ \hbox {\frozen@everymath \@emptytoks \mathsurround \z@ $\textstyle X$}\mathaccent "0362{X}$ conditional on $Y$}}{8}{algorithm.2}}
 \citation{ForsenGray2013}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous.}}{9}{figure.3}}
-\newlabel{fig:switchss}{{3}{9}{Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous}{figure.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}A model for tempo decisions}{9}{subsection.2.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous.}}{10}{figure.3}}
+\newlabel{fig:switchss}{{3}{10}{Switching state space model. Filled objects are observed, rectangles are discrete, and circles are continuous}{figure.3}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The beginning of two Chopin piano compositions: the Mazurka we analyze is on the left while the Ballade No.\ 1, Op.\ 23 is on the right.}}{10}{figure.4}}
 \newlabel{fig:tempo-markings}{{4}{10}{The beginning of two Chopin piano compositions: the Mazurka we analyze is on the left while the Ballade No.\ 1, Op.\ 23 is on the right}{figure.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces The solid line shows the observed note-by-note tempo for the beginning of the Mazurka as performed by Arthur Rubinstein in 1961. The dashed line indicates 132 b.p.m.}}{10}{figure.5}}
-\newlabel{fig:short-perf}{{5}{10}{The solid line shows the observed note-by-note tempo for the beginning of the Mazurka as performed by Arthur Rubinstein in 1961. The dashed line indicates 132 b.p.m}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Transition diagram. The four states are: constant tempo (1), deceleration (2), acceleration (3), and emphasis (4).}}{11}{figure.6}}
-\newlabel{fig:transmat}{{6}{11}{Transition diagram. The four states are: constant tempo (1), deceleration (2), acceleration (3), and emphasis (4)}{figure.6}{}}
+\citation{GuRaphael2012}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces The solid line shows the observed note-by-note tempo for the beginning of the Mazurka as performed by Arthur Rubinstein in 1961. The dashed line indicates 132 b.p.m.}}{11}{figure.5}}
+\newlabel{fig:short-perf}{{5}{11}{The solid line shows the observed note-by-note tempo for the beginning of the Mazurka as performed by Arthur Rubinstein in 1961. The dashed line indicates 132 b.p.m}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Transition diagram. The four states are: constant tempo (1), deceleration (2), acceleration (3), and emphasis (4).}}{12}{figure.6}}
+\newlabel{fig:transmat}{{6}{12}{Transition diagram. The four states are: constant tempo (1), deceleration (2), acceleration (3), and emphasis (4)}{figure.6}{}}
 \citation{GhahramaniHinton2000}
 \citation{FearnheadClifford2003}
 \citation{WhiteleyAndrieu2010}
 \citation{Bisiani1992}
 \citation{FearnheadClifford2003}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter matrices of the switching state space model.}}{13}{table.1}}
-\newlabel{tab:parmats}{{1}{13}{Parameter matrices of the switching state space model}{table.1}{}}
-\newlabel{alg:dpf}{{3}{14}{Estimation and computational issues}{algorithm.3}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Discrete particle filter}}{14}{algorithm.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Estimation and computational issues}{14}{subsection.2.4}}
-\newlabel{sec:computational-issues}{{2.4}{14}{Estimation and computational issues}{subsection.2.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Informative prior distributions for the music model}}{15}{table.2}}
-\newlabel{tab:priors}{{2}{15}{Informative prior distributions for the music model}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Estimation and computational issues}{13}{subsection.2.4}}
+\newlabel{sec:computational-issues}{{2.4}{13}{Estimation and computational issues}{subsection.2.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter matrices of the switching state space model.}}{14}{table.1}}
+\newlabel{tab:parmats}{{1}{14}{Parameter matrices of the switching state space model}{table.1}{}}
+\newlabel{alg:dpf}{{3}{15}{Estimation and computational issues}{algorithm.3}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Discrete particle filter}}{15}{algorithm.3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Penalized maximum likelihood}{15}{subsection.2.5}}
 \newlabel{sec:penal-maxim-likel}{{2.5}{15}{Penalized maximum likelihood}{subsection.2.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Informative prior distributions for the music model}}{16}{table.2}}
+\newlabel{tab:priors}{{2}{16}{Informative prior distributions for the music model}{table.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{16}{section.3}}
 \newlabel{sec:analys-chop-mazurka}{{3}{16}{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}{section.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Musical analysis}{16}{subsection.3.1}}
 \newlabel{sec:musical-analysis}{{3.1}{16}{Musical analysis}{subsection.3.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces The first ten measures of Chopin's Mazurka Op.\ 68, No.\ 3. The harmonic progression is indicated below the staff in Roman numerals. Sections are marked above the staff, e.g.\ A (a). Analysis by the authors.}}{17}{figure.7}}
-\newlabel{fig:mazurka-10}{{7}{17}{The first ten measures of Chopin's Mazurka Op.\ 68, No.\^^M3. The harmonic progression is indicated below the staff in Roman numerals. Sections are marked above the staff, e.g.\ A (a). Analysis by the authors}{figure.7}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Inferred performer choices for two recordings. }}{18}{figure.8}}
-\newlabel{fig:archetypal}{{8}{18}{Inferred performer choices for two recordings}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces The first ten measures of Chopin's Mazurka Op.\ 68, No.\ 3. The harmonic progression is indicated below the staff in Roman numerals. Sections are marked above the staff, e.g.\ A (a). Analysis by the authors.}}{18}{figure.7}}
+\newlabel{fig:mazurka-10}{{7}{18}{The first ten measures of Chopin's Mazurka Op.\ 68, No.\^^M3. The harmonic progression is indicated below the staff in Roman numerals. Sections are marked above the staff, e.g.\ A (a). Analysis by the authors}{figure.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Archetypal performances}{18}{subsection.3.2}}
 \newlabel{sec:arch-perf}{{3.2}{18}{Archetypal performances}{subsection.3.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces The estimated parameters for performances by Richter and Hatto.}}{19}{table.3}}
-\newlabel{tab:two-perf-parm}{{3}{19}{The estimated parameters for performances by Richter and Hatto}{table.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Inferred performance choices for Alfred Cortot's 1951 recording.}}{20}{figure.9}}
-\newlabel{fig:cortot}{{9}{20}{Inferred performance choices for Alfred Cortot's 1951 recording}{figure.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Clustering musical performances}{20}{subsection.3.3}}
-\newlabel{sec:clust-music-perf}{{3.3}{20}{Clustering musical performances}{subsection.3.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Distance matrix using estimated model parameters. Left: the matrix for all 46 parameters. Right: The same matrix with ``outlying'' performances removed and a dendrogram from hierarchical clustering.}}{21}{figure.10}}
-\newlabel{fig:dmats}{{10}{21}{Distance matrix using estimated model parameters. Left: the matrix for all 46 parameters. Right: The same matrix with ``outlying'' performances removed and a dendrogram from hierarchical clustering}{figure.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Cluster densities for Markov transition probabilities.}}{22}{figure.11}}
-\newlabel{fig:clust-density-tp}{{11}{22}{Cluster densities for Markov transition probabilities}{figure.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Cluster densities for mean and variance parameters.}}{23}{figure.12}}
-\newlabel{fig:clust-density-mv}{{12}{23}{Cluster densities for mean and variance parameters}{figure.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Inferred performer choices for two recordings. }}{19}{figure.8}}
+\newlabel{fig:archetypal}{{8}{19}{Inferred performer choices for two recordings}{figure.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces The estimated parameters for performances by Richter and Hatto.}}{20}{table.3}}
+\newlabel{tab:two-perf-parm}{{3}{20}{The estimated parameters for performances by Richter and Hatto}{table.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Inferred performance choices for Alfred Cortot's 1951 recording.}}{21}{figure.9}}
+\newlabel{fig:cortot}{{9}{21}{Inferred performance choices for Alfred Cortot's 1951 recording}{figure.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Clustering musical performances}{21}{subsection.3.3}}
+\newlabel{sec:clust-music-perf}{{3.3}{21}{Clustering musical performances}{subsection.3.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Distance matrix using estimated model parameters. Left: the matrix for all 46 parameters. Right: The same matrix with ``outlying'' performances removed and a dendrogram from hierarchical clustering.}}{22}{figure.10}}
+\newlabel{fig:dmats}{{10}{22}{Distance matrix using estimated model parameters. Left: the matrix for all 46 parameters. Right: The same matrix with ``outlying'' performances removed and a dendrogram from hierarchical clustering}{figure.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Cluster densities for Markov transition probabilities.}}{23}{figure.11}}
+\newlabel{fig:clust-density-tp}{{11}{23}{Cluster densities for Markov transition probabilities}{figure.11}{}}
 \citation{CravenWahba1978,Wahba1990}
 \citation{KimKoh2009,Tibshirani2014}
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Four similar performances, all in the second cluster.}}{24}{figure.13}}
-\newlabel{fig:similar}{{13}{24}{Four similar performances, all in the second cluster}{figure.13}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Distance matrix and dendrogram calculated using the note-by-note tempo vector for each recording.}}{25}{figure.14}}
-\newlabel{fig:raw-data-clusters}{{14}{25}{Distance matrix and dendrogram calculated using the note-by-note tempo vector for each recording}{figure.14}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Alternative smoothers}{25}{subsection.3.4}}
-\newlabel{sec:altern-smooth}{{3.4}{25}{Alternative smoothers}{subsection.3.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces The estimated parameters for the four similar performances in Cluster Two and those for all four by Arthur Rubinstein. }}{25}{table.4}}
-\newlabel{tab:similar-different-perf}{{4}{25}{The estimated parameters for the four similar performances in Cluster Two and those for all four by Arthur Rubinstein}{table.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Cluster densities for mean and variance parameters.}}{24}{figure.12}}
+\newlabel{fig:clust-density-mv}{{12}{24}{Cluster densities for mean and variance parameters}{figure.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Alternative smoothers}{24}{subsection.3.4}}
+\newlabel{sec:altern-smooth}{{3.4}{24}{Alternative smoothers}{subsection.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Four similar performances, all in the second cluster.}}{25}{figure.13}}
+\newlabel{fig:similar}{{13}{25}{Four similar performances, all in the second cluster}{figure.13}{}}
 \citation{GolubHeath1979}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Problems with the model and estimation}{26}{subsection.3.5}}
-\newlabel{sec:problems-with-model}{{3.5}{26}{Problems with the model and estimation}{subsection.3.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{27}{section.4}}
-\newlabel{sec:discussion}{{4}{27}{Discussion}{section.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Distance matrix and dendrogram calculated using the note-by-note tempo vector for each recording.}}{26}{figure.14}}
+\newlabel{fig:raw-data-clusters}{{14}{26}{Distance matrix and dendrogram calculated using the note-by-note tempo vector for each recording}{figure.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces The estimated parameters for the four similar performances in Cluster Two and those for all four by Arthur Rubinstein. }}{26}{table.4}}
+\newlabel{tab:similar-different-perf}{{4}{26}{The estimated parameters for the four similar performances in Cluster Two and those for all four by Arthur Rubinstein}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Problems with the model and estimation}{27}{subsection.3.5}}
+\newlabel{sec:problems-with-model}{{3.5}{27}{Problems with the model and estimation}{subsection.3.5}{}}
 \citation{LangFreitas2005,Raphael2002,DannenbergRaphael2006}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{28}{section.4}}
+\newlabel{sec:discussion}{{4}{28}{Discussion}{section.4}{}}
 \bibstyle{plainnat}
-\bibdata{AllReferences}
+\bibdata{chopinrefs}
 \bibcite{CHARM-site}{{1}{2009}{{CHA}}{{}}}
 \bibcite{AndersonMoore1979}{{2}{1979}{{Anderson and Moore}}{{}}}
 \bibcite{AndrieuDoucet2010}{{3}{2010}{{Andrieu et~al.}}{{Andrieu, Doucet, and Holenstein}}}
@@ -151,33 +152,34 @@
 \bibcite{Fuh2006}{{25}{2006}{{Fuh}}{{}}}
 \bibcite{GhahramaniHinton2000}{{26}{2000}{{Ghahramani and Hinton}}{{}}}
 \bibcite{GolubHeath1979}{{27}{1979}{{Golub et~al.}}{{Golub, Heath, and Wahba}}}
-\bibcite{HadjeresPachet2017}{{28}{2017}{{Hadjeres et~al.}}{{Hadjeres, Pachet, and Nielsen}}}
-\bibcite{Hamilton2011}{{29}{2011}{{Hamilton}}{{}}}
-\bibcite{Harvey1990}{{30}{1990}{{Harvey}}{{}}}
-\bibcite{Kalman1960}{{31}{1960}{{Kalman}}{{}}}
-\bibcite{Kim1994}{{32}{1994}{{Kim}}{{}}}
-\bibcite{KimNelson1998}{{33}{1998}{{Kim and Nelson}}{{}}}
-\bibcite{KimKoh2009}{{34}{2009}{{Kim et~al.}}{{Kim, Koh, Boyd, and Gorinevsky}}}
-\bibcite{Kitagawa1987}{{35}{1987}{{Kitagawa}}{{}}}
-\bibcite{Kitagawa1996}{{36}{1996}{{Kitagawa}}{{}}}
-\bibcite{KoyamaPerez-Bolde2010}{{37}{2010}{{Koyama et~al.}}{{Koyama, P{\'e}rez-Bolde, Shalizi, and Kass}}}
-\bibcite{LangFreitas2005}{{38}{2005}{{Lang and Freitas}}{{}}}
-\bibcite{McFeeLanckriet2011}{{39}{2011}{{McFee and Lanckriet}}{{}}}
-\bibcite{PattersonThomas2008}{{40}{2008}{{Patterson et~al.}}{{Patterson, Thomas, Wilcox, Ovaskainen, and Matthiopoulos}}}
-\bibcite{Raphael2010}{{41}{2010}{{Raphael}}{{}}}
-\bibcite{Raphael2002}{{42}{2002}{{Raphael}}{{}}}
-\bibcite{RauchStriebel1965}{{43}{1965}{{Rauch et~al.}}{{Rauch, Striebel, and Tung}}}
-\bibcite{RenDunson2010}{{44}{2010}{{Ren et~al.}}{{Ren, Dunson, Lindroth, and Carin}}}
-\bibcite{RobertsEngel2018}{{45}{2018{a}}{{Roberts et~al.}}{{Roberts, Engel, Raffel, Hawthorne, and Eck}}}
-\bibcite{RobertsHawthorne2018}{{46}{2018{b}}{{Roberts et~al.}}{{Roberts, Hawthorne, and Simon}}}
-\bibcite{schedl2014music}{{47}{2014}{{Schedl et~al.}}{{Schedl, G{\'o}mez, Urbano, et~al.}}}
-\bibcite{SturmBen-Tal2019}{{48}{2019}{{Sturm et~al.}}{{Sturm, Ben-Tal, Monaghan, Collins, Herremans, Chew, Hadjeres, Deruty, and Pachet}}}
-\bibcite{ThickstunHarchaoui2017}{{49}{2017}{{Thickstun et~al.}}{{Thickstun, Harchaoui, and Kakade}}}
-\bibcite{Tibshirani2014}{{50}{2014}{{Tibshirani}}{{}}}
-\bibcite{OordDieleman2013}{{51}{2013}{{van~den Oord et~al.}}{{van~den Oord, Dieleman, and Schrauwen}}}
-\bibcite{Vercoe1985}{{52}{1984}{{Vercoe}}{{}}}
-\bibcite{Wahba1990}{{53}{1990}{{Wahba}}{{}}}
-\bibcite{WhiteleyAndrieu2010}{{54}{2010}{{Whiteley et~al.}}{{Whiteley, Andrieu, and Doucet}}}
+\bibcite{GuRaphael2012}{{28}{2012}{{Gu and Raphael}}{{}}}
+\bibcite{HadjeresPachet2017}{{29}{2017}{{Hadjeres et~al.}}{{Hadjeres, Pachet, and Nielsen}}}
+\bibcite{Hamilton2011}{{30}{2011}{{Hamilton}}{{}}}
+\bibcite{Harvey1990}{{31}{1990}{{Harvey}}{{}}}
+\bibcite{Kalman1960}{{32}{1960}{{Kalman}}{{}}}
+\bibcite{Kim1994}{{33}{1994}{{Kim}}{{}}}
+\bibcite{KimNelson1998}{{34}{1998}{{Kim and Nelson}}{{}}}
+\bibcite{KimKoh2009}{{35}{2009}{{Kim et~al.}}{{Kim, Koh, Boyd, and Gorinevsky}}}
+\bibcite{Kitagawa1987}{{36}{1987}{{Kitagawa}}{{}}}
+\bibcite{Kitagawa1996}{{37}{1996}{{Kitagawa}}{{}}}
+\bibcite{KoyamaPerez-Bolde2010}{{38}{2010}{{Koyama et~al.}}{{Koyama, P{\'e}rez-Bolde, Shalizi, and Kass}}}
+\bibcite{LangFreitas2005}{{39}{2005}{{Lang and Freitas}}{{}}}
+\bibcite{McFeeLanckriet2011}{{40}{2011}{{McFee and Lanckriet}}{{}}}
+\bibcite{PattersonThomas2008}{{41}{2008}{{Patterson et~al.}}{{Patterson, Thomas, Wilcox, Ovaskainen, and Matthiopoulos}}}
+\bibcite{Raphael2010}{{42}{2010}{{Raphael}}{{}}}
+\bibcite{Raphael2002}{{43}{2002}{{Raphael}}{{}}}
+\bibcite{RauchStriebel1965}{{44}{1965}{{Rauch et~al.}}{{Rauch, Striebel, and Tung}}}
+\bibcite{RenDunson2010}{{45}{2010}{{Ren et~al.}}{{Ren, Dunson, Lindroth, and Carin}}}
+\bibcite{RobertsEngel2018}{{46}{2018{a}}{{Roberts et~al.}}{{Roberts, Engel, Raffel, Hawthorne, and Eck}}}
+\bibcite{RobertsHawthorne2018}{{47}{2018{b}}{{Roberts et~al.}}{{Roberts, Hawthorne, and Simon}}}
+\bibcite{schedl2014music}{{48}{2014}{{Schedl et~al.}}{{Schedl, G{\'o}mez, Urbano, et~al.}}}
+\bibcite{SturmBen-Tal2019}{{49}{2019}{{Sturm et~al.}}{{Sturm, Ben-Tal, Monaghan, Collins, Herremans, Chew, Hadjeres, Deruty, and Pachet}}}
+\bibcite{ThickstunHarchaoui2017}{{50}{2017}{{Thickstun et~al.}}{{Thickstun, Harchaoui, and Kakade}}}
+\bibcite{Tibshirani2014}{{51}{2014}{{Tibshirani}}{{}}}
+\bibcite{OordDieleman2013}{{52}{2013}{{van~den Oord et~al.}}{{van~den Oord, Dieleman, and Schrauwen}}}
+\bibcite{Vercoe1985}{{53}{1984}{{Vercoe}}{{}}}
+\bibcite{Wahba1990}{{54}{1990}{{Wahba}}{{}}}
+\bibcite{WhiteleyAndrieu2010}{{55}{2010}{{Whiteley et~al.}}{{Whiteley, Andrieu, and Doucet}}}
 \@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces The four recordings by Arthur Rubinstein. Our clustering puts the 1952 and 1961 recordings in clusters one and two while leaving the others out. Clustering by tempo vector separates 1952 from the other three.}}{35}{figure.15}}
 \newlabel{fig:rubinstein}{{15}{35}{The four recordings by Arthur Rubinstein. Our clustering puts the 1952 and 1961 recordings in clusters one and two while leaving the others out. Clustering by tempo vector separates 1952 from the other three}{figure.15}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Smoothing with splines and musical models}}{36}{figure.16}}

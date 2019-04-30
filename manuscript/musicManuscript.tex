@@ -79,6 +79,7 @@ fill=gray!25]
 \newcommand{\indicator}[1]{\boldsymbol{1}\left(#1\right)}
 
 
+
 \begin{document}
 
 \if1\blind
@@ -88,10 +89,18 @@ fill=gray!25]
     The authors gratefully acknowledge
     support from the National Science Foundation (grants DMS-1407439
     and DMS-1753171).}\hspace{.2cm}\\ 
-    Department of Statistics, Indiana University\\
-    and\\
+    Department of Statistics, Indiana University
+    \and
     Michael McBride\\
-    Department of Statistics, Indiana University}
+    Department of Statistics, Indiana University
+    \and
+    Yupeng Gu\\
+    Department of Informatics, Indiana University
+    \and
+    Christopher Raphael\\
+    Department of Computer Science, Indiana University
+  }
+  
 \maketitle
 } \fi
 
@@ -123,7 +132,7 @@ fluency, and taste. In this
 research, we use data from the CHARM Mazurka Project---forty-six professional
 recordings of Chopin's Mazurka Op.\ 63 No.\ 3 by consumate artists---with the goal of
 elucidating musically interpretable performance decisions. Using information on the
-tempo the recordings, we apply functional data
+inter-onset intervals of the note attacks in the recordings, we apply functional data
 analysis techniques enriched with prior information gained from music
 theory to discover relevant features and perform hierarchical
 clustering. The resulting clusters suggest methods for informing music
@@ -159,7 +168,7 @@ instruction, discovering listening preferences, and analyzing performances.
   \href{https://www.tandfonline.com/action/authorSubmission?journalCode=uasa20&page=instructions}{here}
   for the author instructions.}
 
-In recent years, statistical analysis of recorded music has
+Statistical analysis of the musical contentent of recordings has
 become more and more important to academics and industry. Online
 music services like Pandora, Last.fm, Spotify, and others rely on
 recommendation systems to suggest potentially interesting or related
@@ -232,14 +241,21 @@ interpretations. We focus on how the musician modulates
     from our model. }
   \label{fig:richter}
 \end{figure}
-\autoref{fig:richter} shows the tempo in beats-per-minute (b.p.m.) of
+\autoref{fig:richter} shows the tempo\footnote{Technically, by
+  ``tempo'', we mean the ratio of musical time to clock time as $0.25$
+  beats $/$ $0.1$ seconds $=$ 150 beats per minute. A musician would
+  likely think of ``tempo'' more broadly as something like a ``typical
+  speed regime'' akin to the ``constant tempo'' state we use in our
+  decision model below. We will not generally distinguish between
+  these two interpretations and use the more succinct ``tempo''.}
+  in beats-per-minute (b.p.m.) of
 a recording made by Sviatislav Richter of Chopin's Mazurka Op.\ 68
 No.\ 3. The solid line shows the actual tempo at which he plays each
 note, while the colored points correspond to our model's inferences
 for his actual intentions. Some of this intent is prescribed  by
 Chopin in his music, but the extent to which Richter observes Chopin's
 indications makes his recording different from those of other
-pianists. It is these differences that we hope to understand.
+pianists. It is these differences that we hope to capture and understand.
 We present an algorithm for
 performing likelihood inference, estimate our model using a large
 collection of recordings of the same composition, and demonstrate how
@@ -296,7 +312,7 @@ of these and related goals in music information retrieval, see
 
 
 
-
+\attn{What do we do?}
 \begin{itemize}
 \item We want to model tempo and dynamic decisions.
 \item We want a musician to understand what the parameters mean.
@@ -325,8 +341,8 @@ this data in our R package.
 
 \subsection{Switching state-space models}
 
-State-space models define the probability distribution of a time 
-series $Y$ by reference to some imagined, hidden state, $X$. In
+State-space models define the probability distribution of a continuous
+time series $Y$ by reference to some imagined, continuous hidden state, $X$. In
 particular, the observation at a particular time $i$ is assumed to be
 independent of past and future observations conditional on the state
 at time $i$. Coupling with temporal dependence for $X$---most
@@ -645,9 +661,10 @@ Absent instructions from the composer, performers generally maintain
 (or try to maintain) a steady tempo, and this assumption plays a major
 role in our model of tempo decisions. Of course, a normal human being
 never plays precisely like a 
-metronome, although they may try quite hard to do so. The actual
-tempo is therefore best viewed as stochastic, the sum of an
-intentional, constant component, plus noise representing inaccuracy
+metronome, although they may try quite hard to do so. The observed
+ratio of musical time to clock time
+is therefore best viewed as stochastic, the sum of an
+intentional, constant tempo, plus noise representing inaccuracy
 or, perhaps more charitably, unintentional variation which the
 listener fails to perceive as ``wrong''. For instance, the example in
 \autoref{fig:short-perf} shows the beginning of the piece as performed
@@ -663,7 +680,7 @@ by Arthur Rubinstein in a 1961 recording.
 The solid line shows the
 actual, performed tempo, while the dashed horizontal line is placed at
 the indicated tempo of 132 b.p.m. The figure has three important
-lessons: (1) actual tempo varies around intended tempo; (2) 132 b.p.m. is
+lessons: (1) observed speed varies around intended tempo; (2) 132 b.p.m.\ is
 not necessarily the tempo a performer will choose despite the
 indication; and (3) performers have other tempo intentions which are
 not marked, like the pronounced slow-down in measures 7--8.
@@ -676,7 +693,8 @@ take liberties with these decisions, exactly the liberties we would
 like to discover. This suggests employing a switching model with a
 small number of discrete states.
 
-We use a Markov model for $S$ on four states
+Similar to~\citep{GuRaphael2012}, we propose a Markov model for $S$ on four
+states for four different performance behaviors. Our model has transition
 with transition probability
 diagram given by \autoref{fig:transmat}.
 \begin{figure}[tb!]
@@ -1022,6 +1040,10 @@ possible interpretations, the performer must make these choices on
 their own, and may even alter those decisions from performance to
 performance.
 
+
+
+\attn{maybe a short section here claiming the parameter reduced/smoothed/parsed version is a valid representation of the original recording? could use some audio examples if possible
+or maybe just use the results in the 2012 ISMIR paper saying "based on a user study conducted in ISMIR 2012 paper, the "smoothed" versions are not clearly distinguishable from the original recording}
 
 
 \subsection{Archetypal performances}
@@ -1479,5 +1501,5 @@ use to evaluate and improve their practice.
 
 
 \bibliographystyle{plainnat}
-\bibliography{AllReferences}
+\bibliography{chopinrefs}
 \end{document}
