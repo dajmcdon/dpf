@@ -1,9 +1,30 @@
 ---
-title: "Mazurka paper figures"
-author: "DJM"
-date: "2/22/2019"
-output: pdf_document
+title: Supplemental material for _Markov-switching State Space Models for Uncovering Musical Interpretation_
+
+# to produce blinded version set to 1
+blinded: 1
+
+authors: 
+- name: Daniel J. McDonald
+  thanks: Daniel J. McDonald is Associate Professor, Department of Statistics, Indiana University, Bloomington, IN 47405 (e-mail \email{dajmcdon@indiana.edu}); Michael McBride is Undergraduate, Department of Statistics, Indiana University, Bloomington, IN 47405 (e-mail \email{michmcbr@iu.edu}); Yupeng Gu is Postdoctoral Researcher, Department of Informatics, Indiana University, Bloomington, IN 47405 (e-mail \email{yupeng.gu@gmail.com}); and Christopher Raphael is Professor, School of Informatics, Computing, and Engineering, Indiana University, Bloomington, IN 47405 (e-mail \email{craphael@indiana.edu}); This work was partially supported by the National Science Foundation Grants DMS-1407439 and DMS-1753171 (to DJM) and Grant IIS-1526473 (to CR).
+- name: Michael McBride
+- name: Yupeng Gu
+- name: Christopher Raphael
+  
+
+bibliography: chopinrefs.bib
+output: 
+  pdf_document:
+    fig_width: 6
+    fig_height: 3.5
+    fig_caption: true
+    keep_tex: true
+    template: suppl-template.tex
+    includes:
+      in_header: suppl-chopin.sty
 ---
+
+
 
 ```{r setup, echo=FALSE, message=FALSE, results='hide'}
 library(dpf)
@@ -11,6 +32,7 @@ library(knitr)
 library(splines)
 opts_chunk$set(message=FALSE, warning=FALSE, cache=TRUE, 
                autodep = TRUE, echo=FALSE,
+               include=FALSE,
                #out.width ="6in",out.height="3in",
                fig.path = 'gfx/',
                fig.width = 6, fig.height = 3, 
@@ -18,7 +40,7 @@ opts_chunk$set(message=FALSE, warning=FALSE, cache=TRUE,
 library(gplots)
 library(tidyverse)
 library(heatmaply)
-load("../extras/mazurkaResultsNoVar2.Rdata") 
+load("../extras/mazurkaResults.Rdata") 
 source("dirichlet_precision.R")
 
 pvec_ml = pvec_ml %>% select(-value,-fevals,-gevals,-convergence) %>%
@@ -35,8 +57,70 @@ library(dendextend)
 ```
 
 
+# Algorithms
 
-# Short tempo figure
+
+For completeness, we include here concise descriptions of the Kalman filter and smoother we employ as inputs to our main algorithm. The filter is given in \autoref{alg:kalman}.
+\begin{algorithm}
+  \caption{Kalman filter: estimate $x_i$ conditional on
+    $\{y_j\}_{j=1}^i$, for all $i=1,\ldots,n$ and calculate the log likelihood
+    for $\theta$\label{alg:kalman}}
+  \begin{algorithmic}
+    \STATE {\bf Input:} $Y$, $x_0$, $P_0$, $d,\ T,\ c,\ Z,$ and $G$
+    \STATE $\ell(\theta) \leftarrow 0$ \COMMENT{Initialize the log-likelihood}
+    \FOR{$i=1$ to  $n$}
+    \STATE $\begin{aligned}\varx_{i}
+      &\leftarrow d + T x_{i-1|i-1}, & P_i &\leftarrow Q + T P_{i-1|i-1}
+      T^\top\end{aligned}$ \COMMENT{Predict current state}
+    \STATE $\begin{aligned}\widetilde{y}_i
+      &\leftarrow c + Z \varx_i, & F_i &\leftarrow G + Z P_i
+      Z^\top\end{aligned}$ \COMMENT{Predict current observation}
+    \STATE $\begin{aligned}v_i&\leftarrow y_i-\widetilde{y}_i& K_i&
+      \leftarrow P_i Z^\top F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
+    Kalman gain}
+    \STATE $\begin{aligned} x_{i|i}
+      &\leftarrow \varx_i + K_i v_i, & P_{i|i} &\leftarrow P_i - P_iZ^\top
+      K_i\end{aligned}$ \COMMENT{Update}
+    \STATE $\ell(\theta) = \ell(\theta) -v_i^\top F^{-1}v_i - \log(|F_i|)$
+    \ENDFOR
+    \RETURN $\widetilde{Y}=\{\widetilde{y}_i\}_{i=1}^n,\ \varx=\{\varx_i\}_{i=1}^n,\
+    \widetilde{X}=\{x_{i|i}\}_{i=1}^n,\ P=\{P_i\}_{i=1}^n,\
+    \widetilde{P}=\{P_{i|i}\}_{i=1}^n,\ \ell(\theta)$
+  \end{algorithmic}
+\end{algorithm}
+
+To
+incorporate all future observations into these estimates, the Kalman
+smoother is required. There are many different smoother algorithms tailored for different
+applications. \autoref{alg:kalman-smoother}, due
+to \citet{RauchStriebel1965}, is often referred to as the classical
+fixed-interval smoother \citep{AndersonMoore1979}. It produces only
+the unconditional expectations of the hidden state
+$\hat{x}_i=\Expect{x_i\given y_1,\ldots,y_n}$ for the sake of
+computational speed. This version is more appropriate for inference in
+the type of switching models we discuss in the manuscript.
+
+\begin{algorithm}
+  \caption{Kalman smoother (Rauch-Tung-Striebel): estimate $\hat{X}$ conditional on
+    $Y$\label{alg:kalman-smoother}} 
+  \begin{algorithmic}
+    \STATE {\bf Input:} $\varx$, $\widetilde{X}$, $P$, $\widetilde{P}$,
+    $T,$ $c$, $Z$.
+    \STATE $t=n$,
+    \STATE $\hat{x}_{n}\leftarrow \widetilde{x}_n$, 
+    \WHILE{$t>1$}
+    \STATE $\hat{y}_i \leftarrow c + Z\hat{x}_i,$
+    \COMMENT{Predict observation vector}
+    \STATE $\begin{aligned} e &\leftarrow \hat{x}_i -
+      \varx_i, & V &\leftarrow P_i^{-1}\end{aligned}$,
+    \STATE $t\leftarrow i-1$, \COMMENT{Increment}
+    \STATE $\hat{x}_i = \widetilde{x}_i + \widetilde{P}_i T Ve $ 
+    \ENDWHILE
+    \RETURN $\widehat{Y}=\{\hat{y}_i\}_{i=1}^n, \hat{X}=\{\hat{x}_i\}_{i=1}^n$
+  \end{algorithmic}
+\end{algorithm}
+
+
 
 ```{r small-rubinstein-1961,out.width="5in", out.height="2in", fig.width=7.5,fig.height=3}
 ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
@@ -47,7 +131,6 @@ ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
   geom_hline(yintercept = 132, linetype='dashed')
 ```
 
-# Comparing clusters
 
 ```{r clustering-processing}
 perfs = tempos[,-c(1:3)] %>% as.matrix %>% t
@@ -62,12 +145,10 @@ dend_perf = hc_perf %>% as.dendrogram
 
 
 
-## Distance matrix from parameters
-
 ```{r parametric-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
 #hc_parm = hc_parm+diag(1e-12,nrow(hc_parm))
-subs = apply(hc_parm,1,quantile,probs=4/46) < .35#.45
-#subs = rowMeans(hc_parm) < .95#.968
+othercut = .35
+subs = apply(hc_parm,1,quantile,probs=4/46) < othercut
 sDmat = hc_parm[subs,subs]
 nclusts = 4
 colorthem = TRUE
@@ -122,9 +203,11 @@ levels(pvec_all$clust) = c(levels(pvec_all$clust),'other')
 pvec_all$clust[is.na(pvec_all$clust)] = 'other'
 ```
 
-## Distance matrix from raw data
+# Distance matrix from raw data
 
-```{r raw-data-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
+In \autoref{sec:clust-music-perf} of the manuscript, we present results for clustering performances using the low-dimensional vector of performance specific parameters learned for our model. An alternative approach is to simply use the raw data, in this case, 231 individual note-by-note instantaneous speeds measured in beats per minute. In \autoref{fig:raw-data-clusters} we show the result of this analysis. A comparison between this clustering and that given by our model is discussed in some detail in the manuscript.
+
+```{r raw-data-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in",include=TRUE,fig.cap="This figure presents a heatmap and hierarchical clustering based only on the note-by-note onset timings for each of the 46 recordings.",fig.pos="b"}
 heatmap.2(as.matrix(percentize(dist(perfs))),
           Rowv = dend_perf, Colv = dend_perf, 
           symm=TRUE,
@@ -145,7 +228,6 @@ heatmap.2(as.matrix(percentize(dist(perfs))),
 
 ```
 
-# Cluster densities
 
 ```{r clust-densities, fig.height=8,fig.width=6.5}
 lab_lookup = c("sigma[epsilon]^2", "mu[tempo]",
@@ -191,6 +273,8 @@ ttt %>% filter(parameter %in% lab_lookup[6:12],
 
 # Plotting performances
 
+In \autoref{sec:clust-music-perf} discussed 4 distinct clusters of the 46 performances as well as an "other" category of relatively unique interpretations. Figures \ref{fig:clust-1} to \ref{fig:clust-other} display the note-by-note tempos along with the inferred interpretive decisions for all performances by clustering. Here we include some of the discussion of these clusters from the main text to clarify the figures.
+
 ```{r all-perfs, fig.width=6.5,fig.height=9}
 plots = vector("list", 4)
 lt = diff(c(tempos$note_onset, 61))
@@ -220,9 +304,16 @@ perfcols = viridis_pal(begin=.2)(nlevels(plots$state))
 # deunderscore = function(x) gsub('_',' ',x)
 ```
 
-## Cluster 1
+The first cluster (\autoref{fig:clust-1}) corresponds to performances which are reasonably
+staid. The emphasis state is rarely visited with the performer tending
+to stay in the constant tempo state with periods of slowing down at
+the ends of phrases. Acceleration is never used. Such state
+preferences are clearly inferred by the model as shown in, e.g., the
+top row of \autoref{fig:clust-density-tp}. Furthermore, these
+performances have relatively low average tempos, and not much
+difference between the A and B sections.
 
-```{r clust-1, fig.height=9, fig.width=6}
+```{r clust-1, fig.height=8.75, fig.width=6,include=TRUE, fig.cap="Performances in the first cluster."}
 perfshapes = c(16,17,15,3)
 ggplot(filter(plots, clust=='1')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
@@ -238,9 +329,14 @@ ggplot(filter(plots, clust=='1')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
-## Cluster 2
+Recordings in the second
+cluster (\autoref{fig:clust-2}) tend to transition quickly between states, especially constant
+tempo and slowing down accompanied by frequent transitory
+emphases. The probability of remaining in state 1 is the lowest for
+this cluster while the probability of entering state 2 from state 1 is
+the highest. The acceleration state is visited only rarely.
 
-```{r clust-2, fig.height=9, fig.width=6}
+```{r clust-2, fig.height=8.75, fig.width=6,include=TRUE, fig.cap="Performances in the second cluster."}
 ggplot(filter(plots, clust=='2')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -256,9 +352,14 @@ ggplot(filter(plots, clust=='2')) +
   facet_wrap(~performer,ncol = 3) #+
 ```
 
-## Cluster 3
+Cluster three (\autoref{fig:clust-3}) is somewhat like cluster one in that performers tend to
+stay in state 1 for long periods of time, but they transition more
+quickly from state 3 back to state 1. They also use state 4 frequently
+whereas cluster one
+did not. They also tend to have very large tempo
+contrasts between the A and B sections.
 
-```{r clust-3, fig.height=9, fig.width=6}
+```{r clust-3, fig.height=6, fig.width=6,include=TRUE, fig.cap="Performances in the third cluster."}
 ggplot(filter(plots, clust=='3')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -274,9 +375,13 @@ ggplot(filter(plots, clust=='3')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
-## Cluster 4
+Cluster four (\autoref{fig:clust-4}) has both faster average tempos and more variability from one period of
+constant tempo to the next. State 4 is rare, with fast constant tempo
+changes that persist for small amounts of time tending to reflect note
+emphases.
 
-```{r clust-4, eval=TRUE, fig.height=9, fig.width=6}
+
+```{r clust-4, eval=TRUE, fig.height=6, fig.width=6,include=TRUE, fig.cap="Performances in the fourth cluster."}
 ggplot(filter(plots, clust=='4')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -291,9 +396,9 @@ ggplot(filter(plots, clust=='4')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
-## Cluster "other"
+The remaining performances are relatively different from all other performances (\autoref{fig:clust-other}. If the distance to the third closest performances exceeded `r othercut`, then the performance was grouped with "other". Essentially, these recordings had at most one similar recording while the four other clusters contained at least `r min(table(pvec_all$clust))`.
 
-```{r clust-other, fig.height=9, fig.width=6}
+```{r clust-other, fig.height=8.75, fig.width=6,include=TRUE, fig.cap="Performances in the ``other'' cluster."}
 ggplot(filter(plots, clust=='other')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -309,7 +414,7 @@ ggplot(filter(plots, clust=='other')) +
 
 
 
-## Individual performances
+
 
 
 ```{r richter}
@@ -381,7 +486,6 @@ filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
   # scale_color_manual(values = fivecolors)
 ```
 
-## Parameter table
 
 ```{r two-perfs-parameters}
 kable(pvec_ml[c('Richter 1976','Hatto 1993','Cortot 1951'),],
@@ -390,9 +494,6 @@ kable(pvec_ml[c('Richter 1976','Hatto 1993','Cortot 1951'),],
 
 
 
-# Different smoothing
-
-Try splines, replicating knots, l1tf?
 
 ```{r alternative-smoothers}
 nsplines = 64 # 1 knot per bar plus boundary
@@ -432,7 +533,6 @@ filter(spline_music , performer %in% c('Richter 1976')) %>%
 
 
 
-# Similar performances 
 
 ```{r similar-perfs,fig.height=6}
 similar = c('Wasowski 1980','Shebanova 2002','Luisada 1991','Milkina 1970')
@@ -451,7 +551,6 @@ ggplot(filter(plots, performer %in% similar)) +
   # scale_color_manual(values = fivecolors)
 ```
 
-# Rubinstein contrast
 
 ```{r rubinstein-perfs, fig.height=6}
 similar = c('Rubinstein 1939', 'Rubinstein 1952',
@@ -480,7 +579,6 @@ kable(pvec_ml[c(
 ```
 
 
-# Bad estimation
 
 ```{r bad-model}
 ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) + 
@@ -488,7 +586,7 @@ ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) +
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
               fill = 'gray90', color = 'gray90') +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'none', legend.title = element_blank(),

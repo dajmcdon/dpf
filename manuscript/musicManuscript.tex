@@ -54,6 +54,10 @@ fill=gray!25]
 \renewcommand{\arraystretch}{1.2}
 
 
+% \usepackage{xr}
+% \externaldocument{music-supplement}
+
+
 
 % Bibliography
 
@@ -77,7 +81,7 @@ fill=gray!25]
 \newcommand{\Expect}[1]{\E\left[#1\right]}
 \newcommand{\Var}[1]{\mathbb{V}\left[#1\right]}
 \newcommand{\indicator}[1]{\boldsymbol{1}\left(#1\right)}
-
+\newcommand{\email}[1]{\href{mailto:#1}{#1}}
 
 
 \begin{document}
@@ -85,22 +89,26 @@ fill=gray!25]
 \if1\blind
 {
 \title{Markov-switching State Space Models for Uncovering Musical Interpretation}
-\author{Daniel J. McDonald\thanks{
-    The authors gratefully acknowledge
-    support from the National Science Foundation (grants DMS-1407439
-    and DMS-1753171).}\hspace{.2cm}\\ 
-    Department of Statistics, Indiana University
+\author{Daniel J. McDonald\thanks{Daniel J.\ McDonald is Associate
+    Professor, Department of Statistics, Indiana University,
+    Bloomington, IN 47405 (e-mail: \email{dajmcdon@indiana.edu});
+    Michael McBride is Undergraduate, Department of Statistics, Indiana University,
+    Bloomington, IN 47405 (e-mail: \email{michmcbr@iu.edu});
+    Yupeng Gu is Postdoctoral Researcher, Department of Informatics, Indiana University,
+    Bloomington, IN 47405 (e-mail: \email{yupeng.gu@gmail.com});
+    and Christopher Raphael is Professor, School of Informatics,
+    Computing, and Engineering, Indiana University,
+    Bloomington, IN 47405 (e-mail: \email{craphael@indiana.edu}); 
+    This work was partially supported by 
+    the National Science Foundation Grants DMS-1407439
+    and DMS-1753171 (to DJM) and Grant IIS-1526473 (to CR).}
     \and
-    Michael McBride\\
-    Department of Statistics, Indiana University
+    Michael McBride
     \and
-    Yupeng Gu\\
-    Department of Informatics, Indiana University
+    Yupeng Gu
     \and
-    Christopher Raphael\\
-    Department of Computer Science, Indiana University
+    Christopher Raphael
   }
-  
 \maketitle
 } \fi
 
@@ -440,40 +448,42 @@ $\eta_i$ normally distributed, \eqref{eq:ssmod} specializes to
 \end{equation}
 where the matrices $d,\ T,\ c,\ Z,\ Q,$ and $G$ are allowed to depend
 on $\theta$ and can potentially vary (deterministically) with $i$. In this case,
-the Kalman filter, \autoref{alg:kalman} \citep[see e.g.][]{Kalman1960,Harvey1990},
+the Kalman filter, %\autoref{alg:kalman}
+\citep[see e.g.,][]{Kalman1960,Harvey1990},
 can be used to derive closed form 
 solutions for the conditional
 distributions of the states and to calculate the likelihood of $\theta$
-given data. 
-\begin{algorithm}[t!]
-  \begin{singlespace}
-  \caption{Kalman filter: estimate $x_i$ conditional on
-    $\{y_j\}_{j=1}^i$, for all $i=1,\ldots,n$ and calculate the log likelihood
-    for $\theta$\label{alg:kalman}}
-  \begin{algorithmic}
-    \STATE {\bf Input:} $Y$, $x_0$, $P_0$, $d,\ T,\ c,\ Z,$ and $G$
-    \STATE $\ell(\theta) \leftarrow 0$ \COMMENT{Initialize the log-likelihood}
-    \FOR{$i=1$ to  $n$}
-    \STATE $\begin{aligned}\varx_{i}
-      &\leftarrow d + T x_{i-1|i-1}, & P_i &\leftarrow Q + T P_{i-1|i-1}
-      T^\top\end{aligned}$ \COMMENT{Predict current state}
-    \STATE $\begin{aligned}\widetilde{y}_i
-      &\leftarrow c + Z \varx_i, & F_i &\leftarrow G + Z P_i
-      Z^\top\end{aligned}$ \COMMENT{Predict current observation}
-    \STATE $\begin{aligned}v_i&\leftarrow y_i-\widetilde{y}_i& K_i&
-      \leftarrow P_i Z^\top F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
-    Kalman gain}
-    \STATE $\begin{aligned} x_{i|i}
-      &\leftarrow \varx_i + K_i v_i, & P_{i|i} &\leftarrow P_i - P_iZ^\top
-      K_i\end{aligned}$ \COMMENT{Update}
-    \STATE $\ell(\theta) = \ell(\theta) -v_i^\top F^{-1}v_i - \log(|F_i|)$
-    \ENDFOR
-    \RETURN $\widetilde{Y}=\{\widetilde{y}_i\}_{i=1}^n,\ \varx=\{\varx_i\}_{i=1}^n,\
-    \widetilde{X}=\{x_{i|i}\}_{i=1}^n,\ P=\{P_i\}_{i=1}^n,\
-    \widetilde{P}=\{P_{i|i}\}_{i=1}^n,\ \ell(\theta)$
-  \end{algorithmic}
-\end{singlespace}
-\end{algorithm}
+given data. For completeness, we have included the Kalman filter in
+the Supplementary Material.% as \autoref{alg:kalman}.
+% \begin{algorithm}[t!]
+%   \begin{singlespace}
+%   \caption{Kalman filter: estimate $x_i$ conditional on
+%     $\{y_j\}_{j=1}^i$, for all $i=1,\ldots,n$ and calculate the log likelihood
+%     for $\theta$\label{alg:kalman}}
+%   \begin{algorithmic}
+%     \STATE {\bf Input:} $Y$, $x_0$, $P_0$, $d,\ T,\ c,\ Z,$ and $G$
+%     \STATE $\ell(\theta) \leftarrow 0$ \COMMENT{Initialize the log-likelihood}
+%     \FOR{$i=1$ to  $n$}
+%     \STATE $\begin{aligned}\varx_{i}
+%       &\leftarrow d + T x_{i-1|i-1}, & P_i &\leftarrow Q + T P_{i-1|i-1}
+%       T^\top\end{aligned}$ \COMMENT{Predict current state}
+%     \STATE $\begin{aligned}\widetilde{y}_i
+%       &\leftarrow c + Z \varx_i, & F_i &\leftarrow G + Z P_i
+%       Z^\top\end{aligned}$ \COMMENT{Predict current observation}
+%     \STATE $\begin{aligned}v_i&\leftarrow y_i-\widetilde{y}_i& K_i&
+%       \leftarrow P_i Z^\top F^{-1}\end{aligned}$ \COMMENT{Forecast error and 
+%     Kalman gain}
+%     \STATE $\begin{aligned} x_{i|i}
+%       &\leftarrow \varx_i + K_i v_i, & P_{i|i} &\leftarrow P_i - P_iZ^\top
+%       K_i\end{aligned}$ \COMMENT{Update}
+%     \STATE $\ell(\theta) = \ell(\theta) -v_i^\top F^{-1}v_i - \log(|F_i|)$
+%     \ENDFOR
+%     \RETURN $\widetilde{Y}=\{\widetilde{y}_i\}_{i=1}^n,\ \varx=\{\varx_i\}_{i=1}^n,\
+%     \widetilde{X}=\{x_{i|i}\}_{i=1}^n,\ P=\{P_i\}_{i=1}^n,\
+%     \widetilde{P}=\{P_{i|i}\}_{i=1}^n,\ \ell(\theta)$
+%   \end{algorithmic}
+% \end{singlespace}
+% \end{algorithm}
 
 % However, in many applications, researchers are not so
 % lucky. For nonlinear  or non-Gaussian models, approximate solutions
@@ -483,7 +493,8 @@ given data.
 % filter and~\citet{KoyamaPerez-Bolde2010}
 % and~\citet{DejongDharmarajan2009a} for improvements).
 
-While \autoref{alg:kalman} returns the likelihood for $\theta$, 
+While the Kalman filter %\autoref{alg:kalman}
+returns the likelihood for $\theta$, 
 $\varx_i$ and $P_i$ represent the mean and variance of the conditional distribution
 of the unobserved component given only the observations
 $\{y_j\}_{j=1}^i$: $\varx_i=\Expect{x_i\given y_1\ldots,y_i}$ and
@@ -491,36 +502,38 @@ $P_i=\Var{x_i\given y_1,\ldots,y_i}$. To
 incorporate all future observations into these estimates, the Kalman
 smoother is required.
 
-\begin{algorithm}[t!]
-  \begin{singlespace}
-  \caption{Kalman smoother (Rauch-Tung-Striebel): estimate $\hat{X}$ conditional on
-    $Y$\label{alg:kalman-smoother}} 
-  \begin{algorithmic}
-    \STATE {\bf Input:} $\varx$, $\widetilde{X}$, $P$, $\widetilde{P}$,
-    $T,$ $c$, $Z$.
-    \STATE $t=n$,
-    \STATE $\hat{x}_{n}\leftarrow \widetilde{x}_n$, 
-    \WHILE{$t>1$}
-    \STATE $\hat{y}_i \leftarrow c + Z\hat{x}_i,$
-    \COMMENT{Predict observation vector}
-    \STATE $\begin{aligned} e &\leftarrow \hat{x}_i -
-      \varx_i, & V &\leftarrow P_i^{-1}\end{aligned}$,
-    \STATE $t\leftarrow i-1$, \COMMENT{Increment}
-    \STATE $\hat{x}_i = \widetilde{x}_i + \widetilde{P}_i T Ve $ 
-    \ENDWHILE
-    \RETURN $\widehat{Y}=\{\hat{y}_i\}_{i=1}^n, \hat{X}=\{\hat{x}_i\}_{i=1}^n$
-  \end{algorithmic}
-\end{singlespace}
-\end{algorithm}
+% \begin{algorithm}[t!]
+%   \begin{singlespace}
+%   \caption{Kalman smoother (Rauch-Tung-Striebel): estimate $\hat{X}$ conditional on
+%     $Y$\label{alg:kalman-smoother}} 
+%   \begin{algorithmic}
+%     \STATE {\bf Input:} $\varx$, $\widetilde{X}$, $P$, $\widetilde{P}$,
+%     $T,$ $c$, $Z$.
+%     \STATE $t=n$,
+%     \STATE $\hat{x}_{n}\leftarrow \widetilde{x}_n$, 
+%     \WHILE{$t>1$}
+%     \STATE $\hat{y}_i \leftarrow c + Z\hat{x}_i,$
+%     \COMMENT{Predict observation vector}
+%     \STATE $\begin{aligned} e &\leftarrow \hat{x}_i -
+%       \varx_i, & V &\leftarrow P_i^{-1}\end{aligned}$,
+%     \STATE $t\leftarrow i-1$, \COMMENT{Increment}
+%     \STATE $\hat{x}_i = \widetilde{x}_i + \widetilde{P}_i T Ve $ 
+%     \ENDWHILE
+%     \RETURN $\widehat{Y}=\{\hat{y}_i\}_{i=1}^n, \hat{X}=\{\hat{x}_i\}_{i=1}^n$
+%   \end{algorithmic}
+% \end{singlespace}
+% \end{algorithm}
 
 There are many different smoother algorithms tailored for different
-applications. \autoref{alg:kalman-smoother}, due
+applications. %\autoref{alg:kalman-smoother} (Supplementary Material),
+The smoother we use, due
 to~\citet{RauchStriebel1965}, is often referred to as the classical
 fixed-interval smoother~\citep{AndersonMoore1979}. It produces only
 the unconditional expectations of the hidden state
 $\hat{x}_i=\Expect{x_i\given y_1,\ldots,y_n}$ for the sake of
 computational speed. This version is more appropriate for inference in
-the type of switching models we discuss below.
+the type of switching models we discuss below. We again provide this
+algorithm in the Supplementary Material.
 
 
 Linear Gaussian state-space models can be made quite flexible
@@ -643,7 +656,7 @@ In musical scores, tempi (the Italian plural of {\em tempo}) may be
 marked at various points throughout a piece of music. The
 beginning can be either explicit, with a metronome marking to
 indicate the number of beats per minute (b.p.m.), and/or with some words
-(e.g. Adagio, Presto, Langsam, Sprightly) which indicate an
+(e.g., Adagio, Presto, Langsam, Sprightly) which indicate an
 approximate speed. 
 \begin{figure}[t!]
   \centering
@@ -785,12 +798,13 @@ constant with no acceleration: $X_{i+1} = X_i$.
 
 
 Corresponding to these configurations, the parameter
-matrices are given in \autoref{tab:parmats}.
-\begin{table}[h!]
+matrices are given in \autoref{tab:parmats} (transition equation) and
+\autoref{tab:parmats2} (measurement equation).
+\begin{table}
 \centering
 \begin{tabular}[h!]{@{}llcccc@{}}
 \toprule
-&&&\multicolumn{3}{c}{Transition equation}\\
+%&&&\multicolumn{3}{c}{Transition equation}\\
   \multicolumn{2}{c}{Switch states} &\phantom{a}& \multicolumn{3}{c}{parameter
                                       matrices}\\
   \cmidrule{1-2} \cmidrule{4-6}
@@ -827,8 +841,16 @@ $2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pma
           & $\begin{pmatrix} \sigma^2_{\textrm{tempo}} & 0\\ 0 & 0 \end{pmatrix}$\\
   $1$ &  $4$ && 0 & $\begin{pmatrix}1&0\\0&0\end{pmatrix}$ 
         & $\begin{pmatrix}0&0\\0&0\end{pmatrix}$\\
-\bottomrule
-&&&\multicolumn{3}{c}{Measurement equation}\\
+  \bottomrule
+\end{tabular}
+\caption{Parameter matrices of the transition equation for the switching state space model.\label{tab:parmats}}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}[h!]{@{}llcccc@{}}
+\toprule
+%&&&\multicolumn{3}{c}{Measurement equation}\\
   \multicolumn{2}{c}{Switch states} &\phantom{a}& \multicolumn{3}{c}{parameter
                                                     matrices}\\
   \cmidrule{1-2} \cmidrule{4-6}
@@ -840,7 +862,7 @@ $2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pma
                                                                   $\sigma^2_\epsilon$\\
 \bottomrule
 \end{tabular}
-\caption{Parameter matrices of the switching state space model.\label{tab:parmats}}
+\caption{Parameter matrices of the measurement equation for the switching state space model.\label{tab:parmats2}}
 \end{table}
 So for any performance, we want to be able to estimate
 the following parameters: $\sigma_{\textrm{tempo}}^2$, $\sigma_{\textrm{acc}}^2$, $\sigma^2_{\textrm{stress}}$,
@@ -898,7 +920,7 @@ wish to simultaneously learn $\theta$, $S$, and $X$. Because the
 switch states $S$ and the continuous states $X$ are both hidden, this becomes
 an NP-hard problem. In particular, there are $4^n$ possible paths
 through the switch variables, so evaluating the likelihood to maximize
-over $\theta$ via \autoref{alg:kalman} at each path is intractable. 
+over $\theta$ via the Kalman filter at each path is intractable. 
 \citet{GhahramaniHinton2000} give a variational approximation to
 estimate $\theta$ without also estimating $S$, but, as our goal is to
 learn both, we use the particle filtering approximation described in
@@ -922,7 +944,8 @@ the ``best'' paths using a sampling scheme.
   (paths), $B$ maximum beam width
   \FOR{$i=1$ {\bfseries to} $n$}
   \STATE Set $b_i=|\{\pi_i>0\}|$, the number of current paths
-  \STATE Use \autoref{alg:kalman} to calculate the 1-step likelihood
+  \STATE Use %\autoref{alg:kalman}
+  the Kalman filter to calculate the 1-step likelihood
   $\ell_i$ for each path and every potential state $s_{i+1}$ resulting in $b_i|S|$ particles
   \STATE Set $\pi_{i+1} \leftarrow \pi_i\ell_i p_i$: multiply the path
   probability by the likelihood and the probability of
@@ -949,7 +972,7 @@ on $\theta$. Instead, we will simply take the path with the highest
 weight for inference via penalized maximum likelihood. Thus, the
 likelihood of a particular parameter vector $\theta$ is evaluated by
 computing the best path with \autoref{alg:dpf} and then using the best
-path with \autoref{alg:kalman}.
+path with the Kalman filter.%\autoref{alg:kalman}.
 
 \subsection{Penalized maximum likelihood}
 \label{sec:penal-maxim-likel}
@@ -1013,7 +1036,9 @@ by our model, contrast these with some alternative approaches to music
 modelling, and discuss some difficulties we encountered. All simulations and empirical calculations were performed with
 \texttt{R}~\citep{R-Core-Team2019} and C++ via \texttt{Rcpp}~\citep{Eddelbuettel2013}. Figures and tables are generated
 using the \texttt{tidyverse} family of
-packages~\citep{Wickham2017, Wickham2016}.
+packages~\citep{Wickham2017, Wickham2016}. Dendrograms combined with
+heatmaps for the proximity matrices were created with the
+\texttt{heatmaply} package~\citep{GaliliOCallaghan2017}.
 % The Supplemental Materials were created
 % with \texttt{knitr} and
 % \texttt{rmarkdown}~\citep{Xie2019,XieAllaire2018,Xie2015}.
@@ -1077,7 +1102,7 @@ harmonic progression in Roman numerals below the staff.
   \includegraphics[width=.9\textwidth]{mazurka-first-10}
   \caption{The first ten measures of Chopin's Mazurka Op.\ 68, No.\
     3. The harmonic progression is indicated below the staff in Roman
-    numerals. Sections are marked above the staff, e.g.\ A
+    numerals. Sections are marked above the staff, e.g., A
     (a). Analysis by the authors. This image comes from the complete
     score published by Bote and Bock in 1880. This composition is in
     the public domain, and the score is freely available via the
@@ -1237,11 +1262,9 @@ Euclidean distance in the prior precision. For example, for
 $p_{1\cdot}$, we calculate
 \begin{equation}
 d\left(p_{1\cdot},\ p'_{1\cdot}\right) = (p_{1\cdot}-p'_{1\cdot})^\top
-  \Omega (p_{1\cdot}-p'_{1\cdot}),
-\end{equation}
-where
-\begin{equation}
-  \Omega^{-1}_{ij} := \Sigma_{ij} :=
+  \Omega (p_{1\cdot}-p'_{1\cdot}),\quad
+\textrm{where}
+  \quad\Omega^{-1}_{ij} := \Sigma_{ij} :=
   \alpha_0^{-2}(\alpha_0+1)^{-1}\left(\alpha_i\alpha_0 \delta_{ij}
     - \alpha_i\alpha_j\right),
 \end{equation}
@@ -1290,7 +1313,7 @@ The first cluster corresponds to performances which are reasonably
 staid. The emphasis state is rarely visited with the performer tending
 to stay in the constant tempo state with periods of slowing down at
 the ends of phrases. Acceleration is never used. Such state
-preferences are clearly inferred by the model as shown in, e.g. the
+preferences are clearly inferred by the model as shown in, e.g., the
 top row of \autoref{fig:clust-density-tp}. Furthermore, these
 performances have relatively low average tempos, and not much
 difference between the A and B sections. Joyce Hatto's performance
@@ -1322,16 +1345,17 @@ constant tempo to the next. State 4 is rare, with fast constant tempo
 changes that persist for small amounts of time tending to reflect note
 emphases.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=.45\linewidth]{raw-data-clusters-1}
-  \caption{Distance matrix and dendrogram calculated using the
-    note-by-note tempo vector for each recording.}
-  \label{fig:raw-data-clusters}
-\end{figure}
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=.45\linewidth]{raw-data-clusters-1}
+%   \caption{Distance matrix and dendrogram calculated using the
+%     note-by-note tempo vector for each recording.}
+%   \label{fig:raw-data-clusters}
+% \end{figure}
 Comparing our clusters to those we would find from simply clustering
 the distances between note-by-note tempo vectors reveals a number of
-differences. The four recordings in \autoref{fig:similar} would be
+differences (see the Supplement for the distance matrix calculated in
+this way). The four recordings in \autoref{fig:similar} would be
 spread across three different clusters, for example, as would our
 cluster one. On the other hand, both metrics see Cortot's recording as a
 strong outlier, and clustering by tempo vectors often (somewhat
@@ -1555,16 +1579,18 @@ use to evaluate and improve their practice.
   Github)
   
 \item[Source code:] Additional R code necessary to reproduce all
-  analyses and graphics. (GNU zipped tar)
+  analyses and graphics. (GNU zipped tar, unblinded)
 
-\item[Appendix:] Supplement with additional graphics for our clusters
+\item[Appendix:] Supplement with additional graphics for all clusters
   and analysis of all 46 recordings. (PDF)
 
 \end{description}
 
 
+\clearpage
 
 
-\bibliographystyle{plainnat}
+
+\bibliographystyle{mybibsty}
 \bibliography{chopinrefs}
 \end{document}
