@@ -248,7 +248,7 @@ ttt %>%
   theme(legend.title = element_blank(), legend.position = 'bottom')
 ```
 
-```{r clust-densities-sub1, fig.height=4,fig.width=8}
+```{r clust-densities-sub1, fig.height=3,fig.width=8}
 ttt %>% filter(parameter %in% lab_lookup[1:5],
                clust != 'other') %>%
   ggplot(aes(x=value, fill=clust)) +
@@ -259,7 +259,7 @@ ttt %>% filter(parameter %in% lab_lookup[1:5],
   theme(legend.title = element_blank(), legend.position = 'bottom')
 ```
 
-```{r clust-densities-sub2, fig.height=6.5,fig.width=8}
+```{r clust-densities-sub2, fig.height=5,fig.width=8}
 ttt %>% filter(parameter %in% lab_lookup[6:12],
                clust != 'other') %>%
   ggplot(aes(x=value, fill=clust)) +
@@ -469,7 +469,7 @@ ggplot(filter(plots, performer == 'Cortot 1951')) +
   # scale_color_manual(values = fivecolors)
 ```
 
-```{r two-performances,fig.height=4}
+```{r two-performances,fig.height=3,out.height="2in"}
 filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
   ggplot() + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
@@ -534,7 +534,7 @@ filter(spline_music , performer %in% c('Richter 1976')) %>%
 
 
 
-```{r similar-perfs,fig.height=6}
+```{r similar-perfs,fig.height=4}
 similar = c('Wasowski 1980','Shebanova 2002','Luisada 1991','Milkina 1970')
 ggplot(filter(plots, performer %in% similar)) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
@@ -552,7 +552,7 @@ ggplot(filter(plots, performer %in% similar)) +
 ```
 
 
-```{r rubinstein-perfs, fig.height=6}
+```{r rubinstein-perfs, fig.height=4}
 similar = c('Rubinstein 1939', 'Rubinstein 1952',
             'Rubinstein 1961','Rubinstein 1966')
 ggplot(filter(plots, performer %in% similar)) + 
@@ -580,7 +580,7 @@ kable(pvec_ml[c(
 
 
 
-```{r bad-model}
+```{r bad-model,fig.height=3,out.height="2in"}
 ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
