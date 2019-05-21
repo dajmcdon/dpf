@@ -912,6 +912,7 @@ y_3 &= (1\quad  0) x_3 + \mbox{N}(0,\
 \end{footnotesize}
 Recall that in any case $y_t$ is a scalar and $x_t \in \mathbb{R}^2$.
 
+
 \subsection{Estimation and computational issues}
 \label{sec:computational-issues}
 
@@ -1023,6 +1024,26 @@ specific choices are shown in \autoref{tab:priors}.
 We chose to fix $\sigma^2_{\textrm{acc}}$ and
 $\sigma^2_{\textrm{stress}}$ after numerical experiments suggested
 that they were poorly identified from the data.
+
+\subsection{Is this model reasonable?}
+
+It is reasonable to ask whether a simple model such as that proposed above is able to
+accurately represent performance practice without removing musically important
+information. In a statistical sense, this question is similar to the
+problem of tuning parameter selection in nonparametric
+estimation. Specifically, we are interested in whether this model
+``over-smooths'' the performance, eliminating some of the useful
+signal. One way to address such a question 
+is to generate a performance using the smoothed tempos learned by
+the model and compare it aurally with the original recording.
+\citet{GuRaphael2012} used a model similar to ours to investigate just
+this question. In one study, they surveyed nine graduate piano majors at a
+major conservatory on twelve different piano excerpts. The pianists
+were not meaningfully able to distinguish between the synthesized and
+real recordings in the majority of experiments. Our model is more
+expressive than that employed in the study, and the parameters are
+estimated from data rather than calibrated. We expect that a similar
+study with our model would yield similar, if not better, results.
 
 
 \section{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}
@@ -1245,6 +1266,8 @@ may be better described by estimating our model separately on the two sections.
     recording.}
   \label{fig:cortot}
 \end{figure}
+
+
 
 \subsection{Clustering musical performances}
 \label{sec:clust-music-perf}
