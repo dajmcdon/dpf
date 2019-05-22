@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  21 MAY 2019 16:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  22 MAY 2019 15:52
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -821,127 +821,139 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-ABD: EveryShipout initializing macros [1
-
-{/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-<gfx/richter-1.pdf, id=92, 422.57875pt x 190.7125pt>
-File: gfx/richter-1.pdf Graphic file (type pdf)
-<use gfx/richter-1.pdf>
-Package pdftex.def Info: gfx/richter-1.pdf  used on input line 246.
-(pdftex.def)             Requested size: 422.77664pt x 190.80804pt.
-LaTeX Font Info:    Try loading font information for U+msa on input line 253.
+ABD: EveryShipout initializing macros
+LaTeX Font Info:    Try loading font information for U+msa on input line 113.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 253.
+LaTeX Font Info:    Try loading font information for U+msb on input line 113.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+wasy on input line 253.
+LaTeX Font Info:    Try loading font information for U+wasy on input line 113.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/wasysym/uwasy.fd
 File: uwasy.fd 2003/10/30 v2.0 Wasy-2 symbol font definitions
-) [3pdfTeX warning (ext4): destination with the same identifier (name{figure.1}
-) has been already used, duplicate ignored
+)
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 113.
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 113.
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <7> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 113.
+ [1
+
+{/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
+<gfx/richter-1.pdf, id=99, 422.57875pt x 190.7125pt>
+File: gfx/richter-1.pdf Graphic file (type pdf)
+<use gfx/richter-1.pdf>
+Package pdftex.def Info: gfx/richter-1.pdf  used on input line 245.
+(pdftex.def)             Requested size: 422.77664pt x 190.80804pt.
+ [3pdfTeX warning (ext4): destination with the same identifier (name{figure.1})
+ has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.268 
+l.267 
        <./gfx/richter-1.pdf>] [4] [5] [6] [7]
-<gfx/mazurka-top.pdf, id=279, 324.3226pt x 125.64903pt>
+<gfx/mazurka-top.pdf, id=285, 324.3226pt x 125.64903pt>
 File: gfx/mazurka-top.pdf Graphic file (type pdf)
 <use gfx/mazurka-top.pdf>
-Package pdftex.def Info: gfx/mazurka-top.pdf  used on input line 662.
+Package pdftex.def Info: gfx/mazurka-top.pdf  used on input line 661.
 (pdftex.def)             Requested size: 220.32364pt x 85.35826pt.
-<gfx/ballade-top.pdf, id=280, 305.89716pt x 129.59134pt>
+<gfx/ballade-top.pdf, id=286, 305.89716pt x 129.59134pt>
 File: gfx/ballade-top.pdf Graphic file (type pdf)
 <use gfx/ballade-top.pdf>
-Package pdftex.def Info: gfx/ballade-top.pdf  used on input line 663.
+Package pdftex.def Info: gfx/ballade-top.pdf  used on input line 662.
 (pdftex.def)             Requested size: 201.49133pt x 85.35826pt.
  [8pdfTeX warning (ext4): destination with the same identifier (name{figure.2})
  has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.686 
+l.685 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 3}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.686 
+l.685 
        <./gfx/mazurka-top.pdf> <./gfx/ballade-top.pdf>]
-<gfx/small-rubinstein-1961-1.pdf, id=306, 536.0025pt x 203.76125pt>
+<gfx/small-rubinstein-1961-1.pdf, id=312, 536.0025pt x 203.76125pt>
 File: gfx/small-rubinstein-1961-1.pdf Graphic file (type pdf)
 <use gfx/small-rubinstein-1961-1.pdf>
 Package pdftex.def Info: gfx/small-rubinstein-1961-1.pdf  used on input line 70
-1.
+0.
 (pdftex.def)             Requested size: 422.77664pt x 160.71777pt.
  [9pdfTeX warning (ext4): destination with the same identifier (name{figure.4})
  has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.722 
+l.721 
        <./gfx/small-rubinstein-1961-1.pdf>] [10pdfTeX warning (ext4): destinati
 on with the same identifier (name{figure.5}) has been already used, duplicate i
 gnored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.780 
+l.779 
       ] [11] [12pdfTeX warning (ext4): destination with the same identifier (na
 me{table.1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.910 \end{align*}
+l.909 \end{align*}
                   pdfTeX warning (ext4): destination with the same identifier (
 name{table.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.910 \end{align*}
+l.909 \end{align*}
                   ]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 940.
+put line 939.
  [13] [14] [15pdfTeX warning (ext4): destination with the same identifier (name
 {table.3}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1072 
+l.1071 
        ] [16]
-<gfx/mazurka-first-10.pdf, id=413, 575.53343pt x 254.77614pt>
+<gfx/mazurka-first-10.pdf, id=419, 575.53343pt x 254.77614pt>
 File: gfx/mazurka-first-10.pdf Graphic file (type pdf)
 <use gfx/mazurka-first-10.pdf>
-Package pdftex.def Info: gfx/mazurka-first-10.pdf  used on input line 1124.
+Package pdftex.def Info: gfx/mazurka-first-10.pdf  used on input line 1123.
 (pdftex.def)             Requested size: 422.77664pt x 187.15129pt.
  [17pdfTeX warning (ext4): destination with the same identifier (name{figure.6}
 ) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1154 
+l.1153 
         <./gfx/mazurka-first-10.pdf>]
-<gfx/two-performances-1.pdf, id=488, 422.57875pt x 190.7125pt>
+<gfx/two-performances-1.pdf, id=494, 422.57875pt x 190.7125pt>
 File: gfx/two-performances-1.pdf Graphic file (type pdf)
 <use gfx/two-performances-1.pdf>
-Package pdftex.def Info: gfx/two-performances-1.pdf  used on input line 1163.
+Package pdftex.def Info: gfx/two-performances-1.pdf  used on input line 1162.
 (pdftex.def)             Requested size: 422.77664pt x 190.80804pt.
  [18pdfTeX warning (ext4): destination with the same identifier (name{figure.7}
 ) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1241 
+l.1240 
         <./gfx/two-performances-1.pdf>]
-<gfx/cortot-performance-1.pdf, id=505, 422.57875pt x 190.7125pt>
+<gfx/cortot-performance-1.pdf, id=511, 422.57875pt x 190.7125pt>
 File: gfx/cortot-performance-1.pdf Graphic file (type pdf)
 <use gfx/cortot-performance-1.pdf>
-Package pdftex.def Info: gfx/cortot-performance-1.pdf  used on input line 1261.
+Package pdftex.def Info: gfx/cortot-performance-1.pdf  used on input line 1260.
 
 (pdftex.def)             Requested size: 422.77664pt x 190.80804pt.
  [19pdfTeX warning (ext4): destination with the same identifier (name{table.4})
@@ -949,54 +961,54 @@ Package pdftex.def Info: gfx/cortot-performance-1.pdf  used on input line 1261.
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1266 
+l.1265 
        ] [20pdfTeX warning (ext4): destination with the same identifier (name{f
 igure.8}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1290 \end{equation}
+l.1289 \end{equation}
                       <./gfx/cortot-performance-1.pdf>]
-<gfx/parametric-clusters-1.pdf, id=524, 269.005pt x 261.97874pt>
+<gfx/parametric-clusters-1.pdf, id=530, 269.005pt x 261.97874pt>
 File: gfx/parametric-clusters-1.pdf Graphic file (type pdf)
 <use gfx/parametric-clusters-1.pdf>
-Package pdftex.def Info: gfx/parametric-clusters-1.pdf  used on input line 1300
+Package pdftex.def Info: gfx/parametric-clusters-1.pdf  used on input line 1299
 .
 (pdftex.def)             Requested size: 211.38832pt x 205.86963pt.
-<gfx/parametric-clusters-2.pdf, id=525, 271.0125pt x 278.03876pt>
+<gfx/parametric-clusters-2.pdf, id=531, 271.0125pt x 278.03876pt>
 File: gfx/parametric-clusters-2.pdf Graphic file (type pdf)
 <use gfx/parametric-clusters-2.pdf>
-Package pdftex.def Info: gfx/parametric-clusters-2.pdf  used on input line 1301
+Package pdftex.def Info: gfx/parametric-clusters-2.pdf  used on input line 1300
 .
 (pdftex.def)             Requested size: 211.38832pt x 216.87784pt.
-<gfx/clust-densities-sub2-1.pdf, id=528, 568.1225pt x 339.2675pt>
+<gfx/clust-densities-sub2-1.pdf, id=534, 568.1225pt x 339.2675pt>
 File: gfx/clust-densities-sub2-1.pdf Graphic file (type pdf)
 <use gfx/clust-densities-sub2-1.pdf>
 Package pdftex.def Info: gfx/clust-densities-sub2-1.pdf  used on input line 132
-2.
+1.
 (pdftex.def)             Requested size: 422.77664pt x 252.4828pt.
-<gfx/clust-densities-sub1-1.pdf, id=529, 568.1225pt x 194.7275pt>
+<gfx/clust-densities-sub1-1.pdf, id=535, 568.1225pt x 194.7275pt>
 File: gfx/clust-densities-sub1-1.pdf Graphic file (type pdf)
 <use gfx/clust-densities-sub1-1.pdf>
 Package pdftex.def Info: gfx/clust-densities-sub1-1.pdf  used on input line 132
-8.
+7.
 (pdftex.def)             Requested size: 422.77664pt x 144.91615pt.
  [21pdfTeX warning (ext4): destination with the same identifier (name{figure.9}
 ) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1341 
+l.1340 
         <./gfx/parametric-clusters-1.pdf> <./gfx/parametric-clusters-2.pdf>]
-<gfx/similar-perfs-1.pdf, id=552, 422.57875pt x 262.9825pt>
+<gfx/similar-perfs-1.pdf, id=558, 422.57875pt x 262.9825pt>
 File: gfx/similar-perfs-1.pdf Graphic file (type pdf)
 <use gfx/similar-perfs-1.pdf>
-Package pdftex.def Info: gfx/similar-perfs-1.pdf  used on input line 1352.
+Package pdftex.def Info: gfx/similar-perfs-1.pdf  used on input line 1351.
 (pdftex.def)             Requested size: 422.77664pt x 263.11426pt.
-<gfx/rubinstein-perfs-1.pdf, id=554, 422.57875pt x 271.0125pt>
+<gfx/rubinstein-perfs-1.pdf, id=560, 422.57875pt x 271.0125pt>
 File: gfx/rubinstein-perfs-1.pdf Graphic file (type pdf)
 <use gfx/rubinstein-perfs-1.pdf>
-Package pdftex.def Info: gfx/rubinstein-perfs-1.pdf  used on input line 1387.
+Package pdftex.def Info: gfx/rubinstein-perfs-1.pdf  used on input line 1386.
 (pdftex.def)             Requested size: 422.77664pt x 271.14828pt.
 
 [22pdfTeX warning (ext4): destination with the same identifier (name{figure.10}
@@ -1004,90 +1016,84 @@ Package pdftex.def Info: gfx/rubinstein-perfs-1.pdf  used on input line 1387.
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1441 
+l.1440 
         <./gfx/clust-densities-sub2-1.pdf>]
-<gfx/alternative-smoothers-1.pdf, id=582, 422.57875pt x 192.72pt>
+<gfx/alternative-smoothers-1.pdf, id=588, 422.57875pt x 192.72pt>
 File: gfx/alternative-smoothers-1.pdf Graphic file (type pdf)
 <use gfx/alternative-smoothers-1.pdf>
 Package pdftex.def Info: gfx/alternative-smoothers-1.pdf  used on input line 14
-69.
+68.
 (pdftex.def)             Requested size: 422.77664pt x 192.81654pt.
  [23pdfTeX warning (ext4): destination with the same identifier (name{figure.11
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1473 
+l.1472 
         <./gfx/clust-densities-sub1-1.pdf>] [24pdfTeX warning (ext4): destinati
 on with the same identifier (name{figure.12}) has been already used, duplicate 
 ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1495 
+l.1494 
         <./gfx/similar-perfs-1.pdf>] [25pdfTeX warning (ext4): destination with
  the same identifier (name{figure.13}) has been already used, duplicate ignored
 
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1511 
+l.1510 
         <./gfx/rubinstein-perfs-1.pdf>]
-<gfx/bad-model-1.pdf, id=635, 422.57875pt x 198.7425pt>
+<gfx/bad-model-1.pdf, id=641, 422.57875pt x 198.7425pt>
 File: gfx/bad-model-1.pdf Graphic file (type pdf)
 <use gfx/bad-model-1.pdf>
-Package pdftex.def Info: gfx/bad-model-1.pdf  used on input line 1524.
+Package pdftex.def Info: gfx/bad-model-1.pdf  used on input line 1523.
 (pdftex.def)             Requested size: 422.77664pt x 198.84207pt.
  [26pdfTeX warning (ext4): destination with the same identifier (name{table.5})
  has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1534 
+l.1533 
        pdfTeX warning (ext4): destination with the same identifier (name{figure
 .14}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1534 
+l.1533 
         <./gfx/alternative-smoothers-1.pdf>] [27pdfTeX warning (ext4): destinat
 ion with the same identifier (name{figure.15}) has been already used, duplicate
  ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1573 
+l.1572 
         <./gfx/bad-model-1.pdf>] [28] (./musicManuscript.bbl [29
 
 ] [30] [31]
 [32]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 281.
-
- (/usr/local/texlive/2018/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
-)
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 281.
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 281.
- [33])
-[34]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1612.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1612.
+ [33]) [34]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1611.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1611.
  (./musicManuscript.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1612.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1612.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1611.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1611.
 
 Package rerunfilecheck Info: File `musicManuscript.out' has not changed.
 (rerunfilecheck)             Checksum: 402926DB059928A28F6ABD7F8515AAE1;1120.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1612.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1611.
  ) 
 Here is how much of TeX's memory you used:
- 19662 strings out of 492649
- 378025 string characters out of 6129622
- 466940 words of memory out of 5000000
- 23024 multiletter control sequences out of 15000+600000
- 18061 words of font info for 69 fonts, out of 8000000 for 9000
+ 19671 strings out of 492649
+ 378166 string characters out of 6129622
+ 466808 words of memory out of 5000000
+ 23033 multiletter control sequences out of 15000+600000
+ 19497 words of font info for 75 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  48i,20n,70p,549b,1024s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
@@ -1100,18 +1106,20 @@ sr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
 /local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/l
 ocal/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loc
 al/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local
-/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/te
-xlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texli
-ve/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texliv
-e/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/
-2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2
-018/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/20
-18/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/
-2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texl
-ive/2018/texmf-dist/fonts/type1/public/wasy2-ps/wasy10.pfb>
-Output written on musicManuscript.pdf (34 pages, 2076326 bytes).
+/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/t
+exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texl
+ive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive
+/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/
+2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/20
+18/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2018
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2018/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2018/t
+exmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2018
+/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/
+2018/texmf-dist/fonts/type1/public/wasy2-ps/wasy10.pfb>
+Output written on musicManuscript.pdf (34 pages, 2100131 bytes).
 PDF statistics:
- 792 PDF objects out of 1000 (max. 8388607)
+ 804 PDF objects out of 1000 (max. 8388607)
  147 named destinations out of 1000 (max. 500000)
  216 words of extra memory for PDF output out of 10000 (max. 10000000)
 
