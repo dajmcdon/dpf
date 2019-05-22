@@ -41,6 +41,6 @@ These data are included with the package.
 To install and simultaneously build the vignette run
 
 ```
-devtools::install_github(‘dajmcdon/dpf’, build_opts = c("--no-resave-data", "--no-manual"))
+devtools::install_github('dajmcdon/dpf', build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
