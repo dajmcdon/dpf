@@ -1,24 +1,5 @@
-\documentclass[12pt]{article}
+\documentclass[aoas]{imsart}
 
-% JASA necessities --------
-% NOTE: To produce blinded version, replace "1" with "0" below.
-\newcommand{\blind}{1}
-\pdfminorversion=4
-% DON'T change margins - should be 1 inch all around.
-% Daniel: This stuff seems not to have that effect despite the JASA
-% template's claim (the bottom margin is huge)
-% \addtolength{\oddsidemargin}{-.5in}%
-% \addtolength{\evensidemargin}{-.5in}%
-% \addtolength{\textwidth}{1in}%
-% \addtolength{\textheight}{-.3in}%
-% \addtolength{\topmargin}{-.8in}%
-\usepackage[margin=1in]{geometry} % use this instead
-
-\def\spacingset#1{\renewcommand{\baselinestretch}%
-{#1}\small\normalsize} \spacingset{1}
-% End JASA stuff --------------
-
-\usepackage{setspace}
 
 \usepackage[letterpaper=true,colorlinks=true,pdfpagemode=none,urlcolor=blue,linkcolor=blue,citecolor=blue,pdfstartview=FitH]{hyperref}
 \usepackage{amsmath,amsfonts,amssymb}
@@ -62,7 +43,7 @@ fill=gray!25]
 % Bibliography
 
 
-\graphicspath{{gfx/},{figs-for-paper_files/figure-latex/}}
+\graphicspath{{../gfx/}}%{../figs-for-paper_files/figure-latex/}}
 %\renewcommand{\includegraphics}[2][]{}
 
 % Number only ref'ed equations
@@ -86,85 +67,69 @@ fill=gray!25]
 
 \begin{document}
 
-\if1\blind
-{
-\title{Markov-switching State Space Models for Uncovering Musical Interpretation}
-\author{Daniel J. McDonald\thanks{Daniel J.\ McDonald is Associate
-    Professor, Department of Statistics, Indiana University,
-    Bloomington, IN 47405 (e-mail: \email{dajmcdon@indiana.edu});
-    Michael McBride is Undergraduate, Department of Statistics, Indiana University,
-    Bloomington, IN 47405 (e-mail: \email{michmcbr@iu.edu});
-    Yupeng Gu is Postdoctoral Researcher, Department of Informatics, Indiana University,
-    Bloomington, IN 47405 (e-mail: \email{yupeng.gu@gmail.com});
-    and Christopher Raphael is Professor, School of Informatics,
-    Computing, and Engineering, Indiana University,
-    Bloomington, IN 47405 (e-mail: \email{craphael@indiana.edu}); 
-    This work was partially supported by 
-    the National Science Foundation Grants DMS-1407439
-    and DMS-1753171 (to DJM) and Grant IIS-1526473 (to CR).}
-    \and
-    Michael McBride
-    \and
-    Yupeng Gu
-    \and
-    Christopher Raphael
-  }
-\maketitle
-} \fi
 
-% For JASA blinding------------
-\if0\blind
-{
-  \bigskip
-  \bigskip
-  \bigskip
-  \begin{center}
-    {\LARGE\bf Markov-switching State Space Models for Uncovering Musical Interpretation}
-\end{center}
-  \medskip
-} \fi
-% end blinding ---------------
+\begin{frontmatter}
+  
+\title{Markov-Switching State Space Models for Uncovering Musical
+  Interpretation}
+\runtitle{Switching Models for Musical
+  Interpretation}
+\author{%
+  \fnms{Daniel J.} \snm{McDonald}\corref{}\ead[label=e1]{dajmcdon@indiana.edu}\thanksref{t1}},
+\author{%
+  \fnms{Michael} \snm{McBride}\ead[label=e2]{michmcbr@iu.edu}},
+\author{%
+  \fnms{Yupeng} \snm{Gu}\ead[label=e3]{yupeng.gu@gmail.com}},
+\and
+\author{\fnms{Christopher} \snm{Raphael}\ead[label=e4]{craphael@indiana.edu}\thanksref{t2}}
+\thankstext{t1}{DJM was partially supported by 
+  the National Science Foundation Grants DMS-1407439
+  and DMS-1753171.}
+\thankstext{t2}{CR was partially supported by the National Science
+  Foundation Grant IIS-1526473.}
+\affiliation{Indiana University, Bloomington}
+\runauthor{McDonald, McBride, Gu, and Raphael}
+\address{Daniel J.\ McDonald and\\Michael McBride\\Department of
+  Statistics\\ Myles Brand Hall\\ Bloomington, IN
+  47408\\ \printead{e1}\\ \phantom{E-mail:\ }\printead*{e2}}
+\address{Yupeng Gu and\\Christopher Raphael\\School of Informatics,
+  Computing,\\ and Engineering\\ Myles Brand Hall\\ Bloomington, IN
+  47408\\ \printead{e3}\\ \phantom{E-mail:\ }\printead*{e4}}
 
-\bigskip
 \begin{abstract}
-For concertgoers, musical interpretation is the most important factor
-in determining whether or not we enjoy a classical performance. Every
-performance includes mistakes---intonation issues, a lost note, an
-unpleasant sound---but these are all easily forgotten (or unnoticed) when a performer
-engages her audience, imbuing a piece with novel emotional content
-beyond the vague instructions inscribed on the printed page. While music teachers use
-imagery or heuristic guidelines to motivate interpretive decisions, combining these
-vague instructions to create a convincing performance remains the domain
-of the performer, subject to the whims of the moment, technical
-fluency, and taste. In this
-research, we use data from the CHARM Mazurka Project---forty-six professional
-recordings of Chopin's Mazurka Op.\ 63 No.\ 3 by consumate artists---with the goal of
-elucidating musically interpretable performance decisions. Using information on the
-inter-onset intervals of the note attacks in the recordings, we apply functional data
-analysis techniques enriched with prior information gained from music
-theory to discover relevant features and perform hierarchical
-clustering. The resulting clusters suggest methods for informing music
-instruction, discovering listening preferences, and analyzing performances.
-
-%The text of your abstract. 200 or fewer words. At 172 currently
+  For concertgoers, musical interpretation is the most important factor
+  in determining whether or not we enjoy a classical performance. Every
+  performance includes mistakes---intonation issues, a lost note, an
+  unpleasant sound---but these are all easily forgotten (or unnoticed) when a performer
+  engages her audience, imbuing a piece with novel emotional content
+  beyond the vague instructions inscribed on the printed page. While music teachers use
+  imagery or heuristic guidelines to motivate interpretive decisions, combining these
+  vague instructions to create a convincing performance remains the domain
+  of the performer, subject to the whims of the moment, technical
+  fluency, and taste. In this
+  research, we use data from the CHARM Mazurka Project---forty-six professional
+  recordings of Chopin's Mazurka Op.\ 68 No.\ 3 by consumate artists---with the goal of
+  elucidating musically interpretable performance decisions. Using information on the
+  inter-onset intervals of the note attacks in the recordings, we apply functional data
+  analysis techniques enriched with prior information gained from music
+  theory to discover relevant features and perform hierarchical
+  clustering. The resulting clusters suggest methods for informing music
+  instruction, discovering listening preferences, and analyzing performances.
+  
+  % The text of your abstract. 200 or fewer words. At 172 currently
 \end{abstract}
 
-\noindent%
-{\it Keywords:} classification and clustering; Kalman filter; hidden Markov model; 
-\vfill
-
-\newpage
-
-\spacingset{1.45} % DON'T change the spacing!
-
-%\tableofcontents
+\begin{keyword}
+  \kwd{classification and clustering}
+  \kwd{Kalman filter}
+  \kwd{hidden Markov model}
+\end{keyword}
 
 
 
 
 
-
-
+\end{frontmatter}
 
 
 
@@ -799,6 +764,7 @@ Corresponding to these configurations, the parameter
 matrices are given in \autoref{tab:parmats} (transition equation) and
 \autoref{tab:parmats2} (measurement equation).
 \begin{table}
+  \caption{Parameter matrices of the transition equation for the switching state space model.\label{tab:parmats}}
 \centering
 \begin{tabular}[h!]{@{}llcccc@{}}
 \toprule
@@ -841,11 +807,11 @@ $2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pma
         & $\begin{pmatrix}0&0\\0&0\end{pmatrix}$\\
   \bottomrule
 \end{tabular}
-\caption{Parameter matrices of the transition equation for the switching state space model.\label{tab:parmats}}
 \end{table}
 %
 %
 \begin{table}
+  \caption{Parameter matrices of the measurement equation for the switching state space model.\label{tab:parmats2}}
 \centering
 \begin{tabular}[h!]{@{}llcccc@{}}
 \toprule
@@ -861,7 +827,6 @@ $2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pma
                                                                   $\sigma^2_\epsilon$\\
 \bottomrule
 \end{tabular}
-\caption{Parameter matrices of the measurement equation for the switching state space model.\label{tab:parmats2}}
 \end{table}
 So for any performance, we want to be able to estimate
 the following parameters: $\sigma_{\textrm{tempo}}^2$, $\sigma_{\textrm{acc}}^2$, $\sigma^2_{\textrm{stress}}$,
@@ -996,6 +961,8 @@ estimate. This has the effect of introducing extra curvature to the
 optimization problem as well as conforming with musical intuition. The
 specific choices are shown in \autoref{tab:priors}. 
 \begin{table}[t]
+    \caption{Informative prior distributions for the music model}
+  \label{tab:priors}
   \centering
   \begin{tabular}{@{}rcll@{}}
     \toprule
@@ -1016,8 +983,6 @@ specific choices are shown in \autoref{tab:priors}.
     $p_{3,\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$ \\
     \bottomrule
   \end{tabular}
-  \caption{Informative prior distributions for the music model}
-  \label{tab:priors}
 \end{table}
 We fix $\sigma^2_{\textrm{acc}}$ and $\sigma^2_{\textrm{stress}}$ after numerical experiments suggested
 that they were poorly identified.
@@ -1581,31 +1546,34 @@ their benefit would be the first step. Together, this could produce an
 immediate graphical representation that students and teachers could
 use to evaluate and improve their practice.
 
-\bigskip
-\begin{center}
-{\large\bf SUPPLEMENTARY MATERIAL}
-\end{center}
 
-\begin{description}
+\begin{supplement}
+%  \sname{Supplement A}
+%  \stitle{Title}
+%  \slink[doi]{10.1214/00-AOASXXXXSUPP}
+%  \sdatatype{.pdf}" 
+%  \sdescription{Some text}
 
-\item[R-package ``dpf'':] R-package containing code to perform the
-  methods described in the article. The package also contains all data
-  sets used as examples in the article. (GNU zipped tar, also on
-  Github)
-  
-\item[Source code:] Additional R code necessary to reproduce all
-  analyses and graphics. (GNU zipped tar, unblinded)
 
-\item[Appendix:] Supplement with additional graphics for all clusters
-  and analysis of all 46 recordings. (PDF)
+  \sname{Supplement}\label{supp}
+  \stitle{Additional figures and source code}
+  \slink[url]{https://github.com/dajmcdon/dpf}
+  \sdescription{The supplementary material online contains the three components.
+    First, the R-package ``\texttt{dpf}'' 
+    containing code to perform the
+    methods described in the article. The package also contains all data
+    sets used as examples in the article. Second, we provide
+    additional \texttt{R} code necessary to reproduce all
+    analyses and graphics. Third, a separate appendix with additional
+    graphics for all clusters and analysis of all 46 recordings.}
 
-\end{description}
+\end{supplement}
 
 
 \clearpage
 
 
 
-\bibliographystyle{mybibsty}
-\bibliography{chopinrefs}
+\bibliographystyle{imsart-nameyear}
+\bibliography{../chopinrefs}
 \end{document}
