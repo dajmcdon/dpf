@@ -6,6 +6,30 @@
 
 using namespace Rcpp;
 
+// resampleSubOptimal
+arma::vec resampleSubOptimal(arma::vec w, int N);
+RcppExport SEXP _dpf_resampleSubOptimal(SEXP wSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(resampleSubOptimal(w, N));
+    return rcpp_result_gen;
+END_RCPP
+}
+// resampleOptimal
+arma::colvec resampleOptimal(arma::colvec w, int N);
+RcppExport SEXP _dpf_resampleOptimal(SEXP wSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(resampleOptimal(w, N));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getloglike
 double getloglike(List pmats, arma::uvec path, arma::mat y);
 RcppExport SEXP _dpf_getloglike(SEXP pmatsSEXP, SEXP pathSEXP, SEXP ySEXP) {
@@ -73,6 +97,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_dpf_resampleSubOptimal", (DL_FUNC) &_dpf_resampleSubOptimal, 2},
+    {"_dpf_resampleOptimal", (DL_FUNC) &_dpf_resampleOptimal, 2},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_musicModel", (DL_FUNC) &_dpf_musicModel, 7},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 12},

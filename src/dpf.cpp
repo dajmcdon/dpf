@@ -22,7 +22,8 @@ arma::uvec SampleNoReplace(arma::uvec x, int size) {
   return(ret);
 }
 
-
+//' @export 
+// [[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
   int M = w.size();
   double tol = 1e-10;
@@ -33,6 +34,12 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   if(M <= N || nz <= N){
     return ws;
   }
+  //Rcout << "The value of N is:" << std::endl << N << std::endl;
+  //Rcout << "The value of M is:" << std::endl << M << std::endl;
+  //Rcout << "The value of tol is:" << std::endl << tol << std::endl;
+  //Rcout << "The value of ws is:" << std::endl << ws << std::endl;
+  //Rcout << "The value of nzz is:" << std::endl << nzz << std::endl;
+  //Rcout << "The value of nz is:" << std::endl << nz << std::endl;
   
   arma::vec w1 = ws;
   typedef std::vector<double> stdvec;
@@ -41,24 +48,42 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   arma::vec z1 = arma::conv_to<arma::vec>::from(z);
   double minprob = z1(M-N);                              //This is the Nth largest element of z1.
   
+  //Rcout << "The value of minprob is:" << std::endl << minprob << std::endl;
+  
   ws.elem(arma::find(ws < minprob)).zeros();
   arma::uvec ties = arma::find(ws==minprob);
   arma::uvec keep = arma::find(ws > minprob);
+  
+  //Rcout << "The value of ties is:" << std::endl << ties << std::endl;
+  //Rcout << "The value of keep is:" << std::endl << keep << std::endl;
+  
   int nkeep = keep.size();
   int tt = ties.size();
+  
+  //Rcout << "The value of nkeep is:" << std::endl << nkeep << std::endl;
+  //Rcout << "The value of tt is:" << std::endl << tt << std::endl;
+  
   if(tt > 1){
-    arma::vec probs(tt);
+    arma::vec probs(tt); //This simply declares a vector probs of size tt
     double p = 1.0 / tt;
-    probs.fill(p);                                    //MICHAEL: probs is never used?
+    probs.fill(p);  //This fills the vector probs with p  //MICHAEL: probs is never used?
     int dontneed = tt - (N - nkeep);
+    
+    //Rcout << "The value of probs is:" << std::endl << probs << std::endl;
+    //Rcout << "The value of dontneed is:" << std::endl << dontneed << std::endl;
+    
     arma::uvec idx = SampleNoReplace(ties, dontneed);
+    //Rcout << "The value of idx is:" << std::endl << idx << std::endl;
     ws.elem(idx).zeros();
   }
   ws = arma::normalise(ws,1);
+  
+  
   return ws;
 }
 
-
+//' @export 
+// [[Rcpp::export]]
 arma::colvec resampleOptimal(arma::colvec w, int N){
   // no zeros no dups?? unused, doesn't seem to work
   int M = w.size();
@@ -73,9 +98,13 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   
   // Hard case.
   ws = arma::sort(ws);
+  ws = arma::normalise(ws,1);
   int Ak = 0;
   double Bk = 1.0;
   int i = M;
+  
+  Rcout << "The value of ws is:" << std::endl << ws << std::endl;
+  
   while(i > M - N){
     i--;
     if(ws(i) < tol || Bk <= tol){
@@ -87,14 +116,20 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
     Bk -= ws(i);
   }
   double cinv = Bk / (N-Ak);
+  Rcout << "The value of cinv is:" << std::endl << cinv << std::endl;
   
   // Set 1
   arma::vec NewW;
   NewW.zeros(M);
+  
+  Rcout << "The value of NewW is:" << std::endl << NewW << std::endl;
+  
+  arma::colvec wnormalized = w;
+  wnormalized = arma::normalise(w,1);
   int L=0;
   double K=0;
   for(i=0; i<M; i++){
-    if(cinv < w(i)){
+    if(cinv < wnormalized(i)){
       NewW(i) += w(i);
       L++;
     }else{
@@ -102,6 +137,10 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
     }
   }
   K /= (N-L);
+  
+  Rcout << "The value of K is:" << std::endl << K << std::endl;
+  Rcout << "The value of NewW is:" << std::endl << NewW << std::endl;
+  
   // Set 2
   RNGScope scope;
   double U1 = runif(1)[0] * K;
@@ -114,6 +153,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
       }
     }
   }
+  NewW = arma::normalise(NewW,1);
   return NewW;
 }
 
