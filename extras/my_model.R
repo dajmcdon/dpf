@@ -68,9 +68,10 @@ toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
   pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14],
                      initialMean = c(samp_mean,0), # 132 is marked tempo, 0 is unused
                      initialVariance = c(400,10)) # sd of 20, 10 is unused
-  beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0,0,0), 
-                    pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
-                    pmats$HHt, pmats$GGt, yt, pmats$transMat, Npart)
+  beam = with(pmats, 
+              beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0,0), 
+                         dt, ct, Tt, Zt,
+                         HHt, GGt, yt, transMat, Npart))
   if(beam$LastStep < length(lt)){
     cat('beam$LastStep < length(lt)\n')
     return(badvals)

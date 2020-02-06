@@ -9,7 +9,7 @@ library(dplyr)
 library(optimr) # cran version
 # library(optimrx) # dev version (installed on my laptop)
 # Note: optimrx correctly handles inability to find an optimum within multistart(), optimr does not
-# fix is to add badval=1e8 to the control list, see optimizer() in djm_optimization.R
+# fix is to add badval=1e8 to the control list, see optimizer() in my_model.R
 
 data(tempos)
 lt = diff(c(tempos$note_onset,61))
