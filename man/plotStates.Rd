@@ -4,15 +4,8 @@
 \alias{plotStates}
 \title{Plots the observed tempo and estimated discrete states given parameters.}
 \usage{
-plotStates(
-  performance,
-  params,
-  y,
-  onset,
-  particleNumber = 200,
-  initialMean = c(132, 0),
-  initialVariance = c(400, 10)
-)
+plotStates(performance, params, y, onset, particleNumber = 200,
+  initialMean = c(132, 0), initialVariance = c(400, 10))
 }
 \arguments{
 \item{performance}{The named performance, e.g. 'Richter_1976'. See \code{names(tempos)}.}

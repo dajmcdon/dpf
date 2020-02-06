@@ -21,9 +21,6 @@ List with components from Kalman filter and Smoother. See details.
 Performs Kalman filtering and smoothing for the switching state space model.
 Also works on any (potentially time varying) state space model.
 }
-\details{
-
-}
 \examples{
 data(tempos)
 theta = c(426.69980736, 136.33213703, -11.84256691, -34.82234559, 
