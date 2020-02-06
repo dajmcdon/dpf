@@ -415,10 +415,10 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   //confirm that t's stay in same order for each matrix
   // in each section, we have:
   //   3 state means (tempo, accel, stress), 3 state variances (same), 1 obs variance
-  //   4 transition matrix parameters
+  //   7 transition matrix parameters
   // up to 22 parameters per performance
   // for now, everything constant, except mu_tempo
-  // States are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) [(1,3) (2,1)]
+  // States are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) (1,3) (2,1), (3,2)
   int nstates = 11;
   int d = 1;
   int m = 2;
@@ -446,6 +446,8 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   dt.tube(1,2) += mus(2);
   dt.tube(0,5) += mus(0);
   dt.tube(0,9) += mus(0);
+  dt.tube(0,10) = lt*mus(1);
+  dt.tube(1,10) += mus(1);
   
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
   
@@ -456,6 +458,7 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   Tt.tube(3,6) += 1;
   Tt.tube(2,6) = lt;
   Tt.tube(2,3) = lt;
+  Tt.tube(0,10) += 1;
   
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
   Zt.tube(0,0,0,9) += 1;
@@ -480,6 +483,10 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   HHt.tube(3,8) += sig2eta(1);
   //(2,1)
   HHt.tube(0,9) += sig2eta(0);
+  //(3,2)
+  HHt.tube(0,10) = sig2eta(1)*lt%lt;
+  for(int iter=1; iter<3; iter++) HHt.tube(iter,10) = sig2eta(1)*lt;
+  HHt.tube(3,10) += sig2eta(1);
   // Extra noise
   if(sig2eta.n_elem>3) HHt.tube(0,0,0,9) += sig2eta(3); // set to zero, generally
   
