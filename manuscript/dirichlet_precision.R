@@ -16,7 +16,9 @@ dist_calc <- function(x, y, prec = diag(ncol(pvec))){
 full_multinom <- function(p) c(p, 1-sum(p))
 
 Dmats <- function(pvec, precisions = list(
-  1, 1, 1, 1, 1, dirichlet_precision(c(85,5,2,8)),
+  1, 1, 1, 1, 1, 
+  #1/4000, 1/100, 1/(15*(2/3)^2), 1/(20*4), 1/4000,
+  dirichlet_precision(c(85,5,2,8)),
   dirichlet_precision(c(4,10,1)),
   dirichlet_precision(c(5,3,7))),
   params = list(1,2,3,4,5,c(6,7,10),c(8,11),c(9,12)),

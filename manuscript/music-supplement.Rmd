@@ -1,19 +1,6 @@
 ---
-title: Supplemental material for _Markov-switching State Space Models for Uncovering Musical Interpretation_
-
-# to produce blinded version set to 1
-blinded: 1
-
-authors: 
-- name: Daniel J. McDonald
-  thanks: Daniel J. McDonald is Associate Professor, Department of Statistics, Indiana University, Bloomington, IN 47405 (e-mail \email{dajmcdon@indiana.edu}); Michael McBride is Undergraduate, Department of Statistics, Indiana University, Bloomington, IN 47405 (e-mail \email{michmcbr@iu.edu}); Yupeng Gu is Postdoctoral Researcher, Department of Informatics, Indiana University, Bloomington, IN 47405 (e-mail \email{yupeng.gu@gmail.com}); and Christopher Raphael is Professor, School of Informatics, Computing, and Engineering, Indiana University, Bloomington, IN 47405 (e-mail \email{craphael@indiana.edu}); This work was partially supported by the National Science Foundation Grants DMS-1407439 and DMS-1753171 (to DJM) and Grant IIS-1526473 (to CR).
-- name: Michael McBride
-- name: Yupeng Gu
-- name: Christopher Raphael
-  
-
 bibliography: chopinrefs.bib
-output: 
+output:
   pdf_document:
     fig_width: 6
     fig_height: 3.5
@@ -50,7 +37,7 @@ pvec_ml = pvec_ml %>% select(-value,-fevals,-gevals,-convergence) %>%
 # pvec_ml = pvec_ml[-bad,]
 theme_set(theme_minimal(base_family="Times"))
 data(tempos)
-lt = diff(c(tempos$note.onset,61))
+lt = diff(c(tempos$note_onset,61))
 library(RColorBrewer)
 fivecolors = viridis(5, option='plasma',begin=.2)[c(1,4,2,5,3)] #brewer.pal(5,'Set1')[c(2,1,3,5,4)]
 library(dendextend)
@@ -125,9 +112,9 @@ the type of switching models we discuss in the manuscript.
 ```{r small-rubinstein-1961,out.width="5in", out.height="2in", fig.width=7.5,fig.height=3}
 ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
   geom_line() + ylab('tempo (bpm)') + xlab('measure') +
-  scale_x_continuous(breaks=1:4*2, limits = c(1,9)) +
+  scale_x_continuous(breaks=1:4*2) +
   #geom_vline(xintercept = c(1,8.9,9)) +
-  # coord_cartesian(xlim=c(1,9-1e-6)) +
+  coord_cartesian(xlim=c(1,9),expand = FALSE) +
   geom_hline(yintercept = 132, linetype='dashed')
 ```
 
@@ -313,7 +300,7 @@ top row of \autoref{fig:clust-density-tp}. Furthermore, these
 performances have relatively low average tempos, and not much
 difference between the A and B sections.
 
-```{r clust-1, fig.height=8.75, fig.width=6,include=TRUE, fig.cap="Performances in the first cluster."}
+```{r clust-1, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the first cluster."}
 perfshapes = c(16,17,15,3)
 ggplot(filter(plots, clust=='1')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
@@ -336,7 +323,7 @@ emphases. The probability of remaining in state 1 is the lowest for
 this cluster while the probability of entering state 2 from state 1 is
 the highest. The acceleration state is visited only rarely.
 
-```{r clust-2, fig.height=8.75, fig.width=6,include=TRUE, fig.cap="Performances in the second cluster."}
+```{r clust-2, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the second cluster."}
 ggplot(filter(plots, clust=='2')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -359,7 +346,7 @@ whereas cluster one
 did not. They also tend to have very large tempo
 contrasts between the A and B sections.
 
-```{r clust-3, fig.height=6, fig.width=6,include=TRUE, fig.cap="Performances in the third cluster."}
+```{r clust-3, fig.height=6, fig.width=5,include=TRUE, fig.cap="Performances in the third cluster."}
 ggplot(filter(plots, clust=='3')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -381,7 +368,7 @@ changes that persist for small amounts of time tending to reflect note
 emphases.
 
 
-```{r clust-4, eval=TRUE, fig.height=6, fig.width=6,include=TRUE, fig.cap="Performances in the fourth cluster."}
+```{r clust-4, eval=TRUE, fig.height=6, fig.width=5,include=TRUE, fig.cap="Performances in the fourth cluster."}
 ggplot(filter(plots, clust=='4')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -396,9 +383,9 @@ ggplot(filter(plots, clust=='4')) +
   facet_wrap(~performer,ncol=3) #+
 ```
 
-The remaining performances are relatively different from all other performances (\autoref{fig:clust-other}. If the distance to the third closest performances exceeded `r othercut`, then the performance was grouped with "other". Essentially, these recordings had at most one similar recording while the four other clusters contained at least `r min(table(pvec_all$clust))`.
+The remaining performances are relatively different from all other performances (\autoref{fig:clust-other}). If the distance to the third closest performances exceeded `r othercut`, then the performance was grouped with "other". Essentially, these recordings had at most one similar recording while the four other clusters contained at least `r min(table(pvec_all$clust))`.
 
-```{r clust-other, fig.height=8.75, fig.width=6,include=TRUE, fig.cap="Performances in the ``other'' cluster."}
+```{r clust-other, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the ``other'' cluster."}
 ggplot(filter(plots, clust=='other')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -592,4 +579,30 @@ ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) +
   theme(legend.position = 'none', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer)
+```
+
+
+## Distribution over states
+
+```{r posterior-richter, }
+richter = pvec_ml["Richter 1976",]
+params = unlist(richter)
+y = matrix(tempos[,"Richter_1976"], nrow = 1)
+pmats = musicModel(lt, params[1], params[2:4], c(params[5],1,1),
+                   params[6:12], c(132,0), c(400,10))
+beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0,0,0), 
+                  pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
+                  pmats$HHt, pmats$GGt, y, pmats$transMat, 1000)
+all_states = apply(beam$paths, 1, convert10to4)
+tib = tibble(
+  x = rep(tempos$note_onset, times=1000), 
+  state = factor(c(all_states), 1:4),
+  weight = rep(beam$weights, each = nrow(tempos)))
+tib = tib %>% group_by(x, state) %>% summarise(w = sum(weight)) %>%
+  mutate(state = fct_recode(state, constant="1", decel="2", accel="3", stress="4"))
+ggplot(tib, aes(x=x, y=w, fill=state)) + geom_col(width = 1) +
+  scale_fill_manual(values = perfcols) + ylab('posterior state probability') +
+  xlab('measure') + scale_x_continuous(expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0)) +
+  theme(legend.position = "bottom")
 ```

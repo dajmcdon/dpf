@@ -1,5 +1,5 @@
 % !TeX program = pdfLaTeX
-\documentclass[12pt]{article}
+\documentclass[aoas]{aoas/imsart}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{graphicx}
 \usepackage[round,sort&compress]{natbib}
@@ -7,16 +7,6 @@
 \usepackage{color}
 \usepackage{booktabs}
 
-%\pdfminorversion=4
-% NOTE: To produce blinded version, replace "0" with "1" below.
-\newcommand{\blind}{1}
-
-% DON'T change margins - should be 1 inch all around.
-\addtolength{\oddsidemargin}{-.5in}%
-\addtolength{\evensidemargin}{-.5in}%
-\addtolength{\textwidth}{1in}%
-\addtolength{\textheight}{1.3in}%
-\addtolength{\topmargin}{-.8in}%
 
 \usepackage{algorithm,algorithmic}
 \def\algorithmautorefname{Algorithm}
@@ -33,7 +23,7 @@
 
 
 \usepackage{xr}
-\externaldocument{musicManuscript}
+\externaldocument{aoas/musicManuscript}
 
 %% load any required packages here
 
@@ -52,7 +42,7 @@
 \renewcommand\thefigure{SM-\arabic{figure}}
 \newcommand{\email}[1]{\href{mailto:#1}{#1}}
 
-\usepackage{setspace}
+%\usepackage{setspace}
 
 \newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
 \renewcommand{\hat}{\widehat}
@@ -68,52 +58,37 @@
 
 \begin{document}
 
+\begin{frontmatter}
+  
+\title{Supplement to Markov-Switching State Space Models for Uncovering Musical
+  Interpretation}
+\runtitle{Supplement to Switching Models for Music}
+\author{%
+  \fnms{Daniel J.} \snm{McDonald}\corref{}\ead[label=e1]{dajmcdon@indiana.edu}\thanksref{t1}},
+\author{%
+  \fnms{Michael} \snm{McBride}\ead[label=e2]{michmcbr@iu.edu}},
+\author{%
+  \fnms{Yupeng} \snm{Gu}\ead[label=e3]{yupeng.gu@gmail.com}},
+\and
+\author{\fnms{Christopher} \snm{Raphael}\ead[label=e4]{craphael@indiana.edu}\thanksref{t2}}
+\thankstext{t1}{DJM was partially supported by 
+  the National Science Foundation Grants DMS-1407439
+  and DMS-1753171.}
+\thankstext{t2}{CR was partially supported by the National Science
+  Foundation Grant IIS-1526473.}
+\affiliation{Indiana University, Bloomington}
+\runauthor{McDonald, McBride, Gu, and Raphael}
+\address{Daniel J.\ McDonald and\\Michael McBride\\Department of
+  Statistics\\ Myles Brand Hall\\ Bloomington, IN
+  47408\\ \printead{e1}\\ \phantom{E-mail:\ }\printead*{e2}}
+\address{Yupeng Gu and\\Christopher Raphael\\School of Informatics,
+  Computing,\\ and Engineering\\ Myles Brand Hall\\ Bloomington, IN
+  47408\\ \printead{e3}\\ \phantom{E-mail:\ }\printead*{e4}}
 
-\def\spacingset#1{\renewcommand{\baselinestretch}%
-{#1}\small\normalsize} \spacingset{1}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\if0\blind
-{
-  \title{\bf Supplemental material for \emph{Markov-switching State Space Models for
-Uncovering Musical Interpretation}}
-
-  \author{
-        Daniel J. McDonald \thanks{Daniel J. McDonald is Associate Professor, Department of Statistics,
-Indiana University, Bloomington, IN 47405 (e-mail
-\email{dajmcdon@indiana.edu}); Michael McBride is Undergraduate,
-Department of Statistics, Indiana University, Bloomington, IN 47405
-(e-mail \email{michmcbr@iu.edu}); Yupeng Gu is Postdoctoral Researcher,
-Department of Informatics, Indiana University, Bloomington, IN 47405
-(e-mail \email{yupeng.gu@gmail.com}); and Christopher Raphael is
-Professor, School of Informatics, Computing, and Engineering, Indiana
-University, Bloomington, IN 47405 (e-mail \email{craphael@indiana.edu});
-This work was partially supported by the National Science Foundation
-Grants DMS-1407439 and DMS-1753171 (to DJM) and Grant IIS-1526473 (to
-CR).} 
-     \and     Michael McBride 
-     \and     Yupeng Gu 
-     \and     Christopher Raphael 
-      }
-  \maketitle
-} \fi
-
-\if1\blind
-{
-  \bigskip
-  \bigskip
-  \bigskip
-  \begin{center}
-    {\LARGE\bf Supplemental material for \emph{Markov-switching State Space Models for
-Uncovering Musical Interpretation}}
-  \end{center}
-  \medskip
-} \fi
+\end{frontmatter}
 
 
-%\onehalfspacing
-\spacingset{1.45} % DON'T change the spacing!
+
 
 \hypertarget{algorithms}{%
 \section{Algorithms}\label{algorithms}}
@@ -277,7 +252,7 @@ of time tending to reflect note emphases.
 \end{figure}
 
 The remaining performances are relatively different from all other
-performances (\autoref{fig:clust-other}. If the distance to the third
+performances (\autoref{fig:clust-other}). If the distance to the third
 closest performances exceeded 0.35, then the performance was grouped
 with ``other''. Essentially, these recordings had at most one similar
 recording while the four other clusters contained at least 4.
@@ -290,6 +265,12 @@ recording while the four other clusters contained at least 4.
 
 \caption{Performances in the ``other'' cluster.}\label{fig:clust-other}
 \end{figure}
+
+\hypertarget{distribution-over-states}{%
+\subsection{Distribution over states}\label{distribution-over-states}}
+
+
+\clearpage
 
 \bibliographystyle{mybibsty}
 \bibliography{chopinrefs.bib}
