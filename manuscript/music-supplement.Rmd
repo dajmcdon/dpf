@@ -24,8 +24,9 @@ opts_chunk$set(message=FALSE, warning=FALSE, cache=TRUE,
                fig.path = 'gfx/',
                fig.width = 6, fig.height = 3, 
                fig.align = 'center')
-library(gplots)
 library(tidyverse)
+library(cowplot)
+library(gplots)
 library(heatmaply)
 load("../extras/mazurkaResults.Rdata") 
 source("dirichlet_precision.R")
@@ -35,7 +36,7 @@ pvec_ml = pvec_ml %>% select(-value,-fevals,-gevals,-convergence) %>%
 # remove Block
 # bad = which(rownames(pvec_ml)=="Block_1995")
 # pvec_ml = pvec_ml[-bad,]
-theme_set(theme_minimal(base_family="Times"))
+theme_set(theme_cowplot(12, "Times"))
 data(tempos)
 lt = diff(c(tempos$note_onset,61))
 library(RColorBrewer)
@@ -134,7 +135,7 @@ dend_perf = hc_perf %>% as.dendrogram
 
 ```{r parametric-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
 #hc_parm = hc_parm+diag(1e-12,nrow(hc_parm))
-othercut = .35
+othercut = .4
 subs = apply(hc_parm,1,quantile,probs=4/46) < othercut
 sDmat = hc_parm[subs,subs]
 nclusts = 4
@@ -185,9 +186,8 @@ clustered = data.frame(clust = as.factor(cutree(as.hclust(sdends), k = nclusts))
 pvec_all = pvec_ml %>% data.matrix %>% data.frame
 pvec_all$performer = row.names(pvec_ml)
 row.names(pvec_all) = NULL
-pvec_all = full_join(pvec_all, clustered)
-levels(pvec_all$clust) = c(levels(pvec_all$clust),'other')
-pvec_all$clust[is.na(pvec_all$clust)] = 'other'
+pvec_all = full_join(pvec_all, clustered) %>% 
+  mutate(clust = fct_explicit_na(clust, "other"))
 ```
 
 # Distance matrix from raw data
@@ -212,7 +212,6 @@ heatmap.2(as.matrix(percentize(dist(perfs))),
           offsetCol = 0, offsetRow = 0,
           key=FALSE
 )
-
 ```
 
 
@@ -260,7 +259,7 @@ ttt %>% filter(parameter %in% lab_lookup[6:12],
 
 # Plotting performances
 
-In \autoref{sec:clust-music-perf} discussed 4 distinct clusters of the 46 performances as well as an "other" category of relatively unique interpretations. Figures \ref{fig:clust-1} to \ref{fig:clust-other} display the note-by-note tempos along with the inferred interpretive decisions for all performances by clustering. Here we include some of the discussion of these clusters from the main text to clarify the figures.
+\autoref{sec:clust-music-perf} of the manuscript discusses 4 distinct clusters of the 46 performances as well as an "other" category of relatively unique interpretations. Figures \ref{fig:clust-1} to \ref{fig:clust-other} display the note-by-note tempos along with the inferred interpretive decisions for all performances by clustering. Here we include some of the discussion of these clusters from the main text to clarify the figures.
 
 ```{r all-perfs, fig.width=6.5,fig.height=9}
 plots = vector("list", 4)
@@ -276,7 +275,7 @@ for(i in 1:nrow(pvec_ml)){
   bestpath = beam$paths[which.max(beam$weights),]
   kal = kalman(pmats, bestpath, y)
   plots[[i]] = data.frame(measure = tempos$note_onset, tempo = c(y), 
-                  inferred = c(kal$ests), state = convert10to4(bestpath))
+                  inferred = c(kal$ests), state = convert11to4(bestpath))
 }
 plots = bind_rows(plots)
 plots$performer = rep(pvec_all$performer, each=length(y))
@@ -309,11 +308,11 @@ ggplot(filter(plots, clust=='1')) +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
   geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols[c(1,2,4)]) +
-  scale_shape_manual(values=perfshapes[c(1,2,4)]) +
+  scale_color_manual(values=perfcols) +
+  scale_shape_manual(values=perfshapes) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,ncol=3) #+
+  facet_wrap(~performer,ncol=3) + panel_border()#+
 ```
 
 Recordings in the second
@@ -336,7 +335,7 @@ ggplot(filter(plots, clust=='2')) +
   theme(legend.position = 'bottom', 
         legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,ncol = 3) #+
+  facet_wrap(~performer,ncol = 3)+ panel_border() #+
 ```
 
 Cluster three (\autoref{fig:clust-3}) is somewhat like cluster one in that performers tend to
@@ -346,7 +345,7 @@ whereas cluster one
 did not. They also tend to have very large tempo
 contrasts between the A and B sections.
 
-```{r clust-3, fig.height=6, fig.width=5,include=TRUE, fig.cap="Performances in the third cluster."}
+```{r clust-3, fig.height=3, fig.width=5,include=TRUE, fig.cap="Performances in the third cluster."}
 ggplot(filter(plots, clust=='3')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -359,7 +358,7 @@ ggplot(filter(plots, clust=='3')) +
   theme(legend.position = 'bottom', 
         legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,ncol=3) #+
+  facet_wrap(~performer,ncol=3) + panel_border()#+
 ```
 
 Cluster four (\autoref{fig:clust-4}) has both faster average tempos and more variability from one period of
@@ -376,11 +375,11 @@ ggplot(filter(plots, clust=='4')) +
   geom_line(aes(x=measure, y=tempo), color='gray40') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols)+#[c(1,2,4)]) +
-  scale_shape_manual(values=perfshapes)+#[c(1,2,4)]) +
+  scale_color_manual(values=perfcols[c(1,2,4)]) +
+  scale_shape_manual(values=perfshapes[c(1,2,4)]) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,ncol=3) #+
+  facet_wrap(~performer,ncol=3)+ panel_border() #+
 ```
 
 The remaining performances are relatively different from all other performances (\autoref{fig:clust-other}). If the distance to the third closest performances exceeded `r othercut`, then the performance was grouped with "other". Essentially, these recordings had at most one similar recording while the four other clusters contained at least `r min(table(pvec_all$clust))`.
@@ -396,7 +395,7 @@ ggplot(filter(plots, clust=='other')) +
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,ncol=3) #+
+  facet_wrap(~performer,ncol=3) + panel_border()#+
 ```
 
 
@@ -468,7 +467,7 @@ filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow = 1) #+
+  facet_wrap(~performer,nrow = 1) + panel_border()#+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
@@ -505,11 +504,12 @@ filter(spline_music , performer %in% c('Richter 1976')) %>%
               fill = 'gray90', color = 'gray90', show.legend = FALSE) +
   geom_point(aes(x=measure, y=tempo), color='gray40', show.legend = FALSE) +
   geom_line(aes(x=measure, y=value, color=key)) + 
-  scale_color_viridis_d(option = 'plasma',
-                        labels=c('music model','musical spline','regression spline')) +
+  scale_color_viridis_d(
+    option = 'plasma',
+    labels=c('music model','musical spline','regression spline')) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow=2) #+
+  facet_wrap(~performer,nrow=2) + panel_border()#+
   # geom_rect(aes(xmin=pointx-2.5, xmax=pointx+2.5,
   #               ymin=pointy-2.5,ymax=pointy+2.5,fill=clust), 
   #           show.legend = FALSE,
@@ -522,7 +522,7 @@ filter(spline_music , performer %in% c('Richter 1976')) %>%
 
 
 ```{r similar-perfs,fig.height=4}
-similar = c('Wasowski 1980','Shebanova 2002','Luisada 1991','Milkina 1970')
+similar = c('Wasowski 1980','Shebanova 2002','Richter 1976','Milkina 1970')
 ggplot(filter(plots, performer %in% similar)) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
@@ -533,7 +533,7 @@ ggplot(filter(plots, performer %in% similar)) +
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow=2) #+
+  facet_wrap(~performer,nrow=2) + panel_border()#+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
@@ -552,14 +552,14 @@ ggplot(filter(plots, performer %in% similar)) +
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'none', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow=2) #+
+  facet_wrap(~performer,nrow=2) + panel_border()#+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
 
 ```{r similar-rubin-parameters}
 kable(pvec_ml[c(
-  'Wasowski 1980','Shebanova 2002','Luisada 1991','Milkina 1970',
+  'Wasowski 1980','Shebanova 2002','Richter 1976','Milkina 1970',
   'Rubinstein 1939', 'Rubinstein 1952',
   'Rubinstein 1961','Rubinstein 1966'),],
       digits = 2, format = 'latex')
@@ -577,32 +577,38 @@ ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) +
   # scale_color_brewer(palette='Set1') +
   scale_color_manual(values=perfcols) +
   theme(legend.position = 'none', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer)
+        strip.text = element_text(hjust = 0), axis.line = element_line("black")) +
+  facet_wrap(~performer) + panel_border()
 ```
 
 
-## Distribution over states
+# Distribution over states
 
-```{r posterior-richter, }
+To examine the stability of the \autoref{alg:dpf}, we examined all the potential paths for Richter's 1976 recording. Here, we saved the most likely 10,000 paths and their weights (rather than only the most likely path). \autoref{fig:posterior-richter-plot} shows the marginal (posterior) probability of being in a particular state for each note. While the paper uses the most likely _path_, this figure is marginal in the sense that a particular note/state combination may have high probability in that many paths visited that note/state. But, the most likely path may not have used that same note/state combination. Nonetheless, there appears to be consensus for many of the notes. The most obviously difficult notes are those near measures 10 and 50. In both cases, the most likely path (\autoref{fig:richter} in the main text) used the stress state, which exceeds 50% posterior probability here.
+
+```{r posterior-richter}
 richter = pvec_ml["Richter 1976",]
 params = unlist(richter)
+B = 10000
 y = matrix(tempos[,"Richter_1976"], nrow = 1)
 pmats = musicModel(lt, params[1], params[2:4], c(params[5],1,1),
                    params[6:12], c(132,0), c(400,10))
 beam = beamSearch(pmats$a0, pmats$P0, c(1,0,0,0,0,0,0,0,0,0), 
                   pmats$dt, pmats$ct, pmats$Tt, pmats$Zt,
-                  pmats$HHt, pmats$GGt, y, pmats$transMat, 1000)
-all_states = apply(beam$paths, 1, convert10to4)
+                  pmats$HHt, pmats$GGt, y, pmats$transMat, B)
+all_states = apply(beam$paths, 1, convert11to4)
 tib = tibble(
-  x = rep(tempos$note_onset, times=1000), 
+  x = rep(tempos$note_onset, times=B), 
   state = factor(c(all_states), 1:4),
   weight = rep(beam$weights, each = nrow(tempos)))
 tib = tib %>% group_by(x, state) %>% summarise(w = sum(weight)) %>%
   mutate(state = fct_recode(state, constant="1", decel="2", accel="3", stress="4"))
+```
+
+```{r posterior-richter-plot, fig.height=3,out.height="2in",include=TRUE, fig.cap="Distribution over potentitial states for Richter's 1976 recording."}
 ggplot(tib, aes(x=x, y=w, fill=state)) + geom_col(width = 1) +
   scale_fill_manual(values = perfcols) + ylab('posterior state probability') +
   xlab('measure') + scale_x_continuous(expand=c(0,0)) +
-  scale_y_continuous(expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0), limits = c(0,1)) +
   theme(legend.position = "bottom")
 ```

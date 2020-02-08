@@ -108,7 +108,6 @@ fill=gray!25]
   of the performer, subject to the whims of the moment, technical
   fluency, and taste. In this
   research, we use data from the CHARM Mazurka Project---forty-six professional
-<<<<<<< HEAD
   recordings of Chopin's Mazurka Op.\ 68 No.\ 3 by consummate
   artists---with the goal of 
   elucidating musically interpretable performance decisions. Using information on the
@@ -116,13 +115,6 @@ fill=gray!25]
   learn a switching state space model enriched with prior information
   gained from music theory to discover relevant features and perform
   hierarchical 
-=======
-  recordings of Chopin's Mazurka Op.\ 68 No.\ 3 by consumate artists---with the goal of
-  elucidating musically interpretable performance decisions. Using information on the
-  inter-onset intervals of the note attacks in the recordings, we apply functional data
-  analysis techniques enriched with prior information gained from music
-  theory to discover relevant features and perform hierarchical
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
   clustering. The resulting clusters suggest methods for informing music
   instruction, discovering listening preferences, and analyzing performances.
   
@@ -176,7 +168,6 @@ conductor, and pianist, gave the following characterization in one of his famous
 ``Young People's Concerts''
 broadcast by the Columbia Broadcasting Corporation in the 1950s and
 1960s \citep{Bernstein2005}.
-<<<<<<< HEAD
 % \begin{quote}
 %   You see, everybody thinks he knows what classical music is: just any music that isn't jazz,
 %   like a Stan Kenton arrangement or a popular song, like ``I Can't Give
@@ -212,35 +203,6 @@ variety of interpretations.\footnote{Of course jazz, rock, pop and
   without the same precision. Compare for example a lead sheet John
   Coltrane's ``Giant Steps'' to his original 1960 recording.}
 There is no ``gold standard'' recording to
-=======
-\begin{quote}
-  You see, everybody thinks he knows what classical music is: just any music that isn't jazz,
-  like a Stan Kenton arrangement or a popular song, like ``I Can't Give
-  You Anything but Love Baby,'' or folk music, like an African war
-  dance, or ``Twinkle, Twinkle Little Star.'' But that isn't what
-  classical music means at all.
-\end{quote}
-Bernstein goes on to discuss an important distinction between what
-we often call ``classical music'' and other types of music which is
-highly relevant to the current study.
-\begin{quote}
-  The real difference is that when a composer
-  writes a piece of what's usually called classical music, he puts down
-  the exact notes that he wants, the exact instruments or voices that he
-  wants to play or sing those notes---even the exact number of
-  instruments or voices; and he also writes down as many directions as
-  he can think of. [...] Of course, no performance can be perfectly exact, because there
-  aren't enough words in the world to tell the performers everything
-  they have to know about what the composer wanted. But that's just what
-  makes the performer's job so exciting---to try and find out from what
-  the composer did write down as exactly as possible what he meant. Now
-  of course, performers are all only human, and so they always figure it
-  out a little differently from one another.  
-\end{quote}
-What separates classical music from other types of music is that the
-music itself is written down but performed millions of times in a
-variety of interpretations. There is no ``gold standard'' recording to
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 which everyone can refer but rather a document created for
 reference. Therefore, the musical genome technique mentioned above
 will only relate ``pieces'' but not ``performances''. We need
@@ -283,14 +245,10 @@ pianists. It is these differences that we hope to capture and understand.
 
 
  
-<<<<<<< HEAD
+
 The vast majority of work at the intersection of statistics
 %or machine learning
 and classical music analysis has focused on a handful of tasks,
-=======
-The vast majority of work at the intersection of statistics or machine
-learning and classical music analysis has focused on a handful of tasks,
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 most notably structure analysis, music generation, and score
 alignment.
 
@@ -313,7 +271,7 @@ Aiva (\url{aiva.ai}), and Melodrive (\url{melodrive.com}). Google has
 developed the Magenta project to enable open-source music
 composition~\citep{RobertsHawthorne2018}.
 
-<<<<<<< HEAD
+
 The score alignment problem matches live or recorded performances to
 the musical score, a necessary processing step for any 
 automated analysis. On-line alignment processes audio waveforms in
@@ -391,25 +349,6 @@ Our appoach considers a broader family of parametrizations but shares
 the basic approach of {\em building in} musical knowledge to the
 model.
 
-=======
-The score alignment
-problem matches live or recorded performances to the musical score, a necessary
-processing step for any type of automated analysis. On-line alignment processes
-audio waveforms in real-time 
-and is sometimes called score
-following~\citep{DannenbergRaphael2006,Cont2010,ContSchwarz2007,ArztWidmer2015}. Audio
-matched to the score can then be used as an input for automated
-musical accompaniment~\citep{Raphael2010,Vercoe1985,Dannenberg1985}.
-Given recorded accompaniment, these systems seek to
-modulate playback in response to a live soloist who both makes
-interpretive timing decisions and mistakes. Off-line alignment~\citep{Earis2007} can be
-used for simply analyzing the recordings, as we do here, or for
-generating features that describe the
-performance~\citep{ThickstunHarchaoui2017}, possibly for later analysis
-in recommender
-systems~\citep{McFeeLanckriet2011,OordDieleman2013}. For an overview
-of these and related goals in music information retrieval, see~\citet{schedl2014music}.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 
 \subsection{Our contributions}
 \label{sec:our-contributions}
@@ -484,12 +423,8 @@ dynamics), and an initial distribution for the state:
 \label{eq:ssmod}
 \end{equation}
 where $\epsilon_i$ are $\eta_i$ are marginally independent and
-<<<<<<< HEAD
 identically distributed  as well as mutually independent and $F$ is
 an arbitrary but specified distribution. Both
-=======
-identically distributed  as well as mutually independent. Both
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 $y_i$ and $x_i$ can be vector-valued, though in our
 application, $y_i$ will be univariate. The
 vector $\{y_i\}_{i=1}^n$ is observed, and the goal is to make
@@ -538,13 +473,8 @@ the distributions of $\epsilon_i$ and $\eta_i$.
 %     continuous.\label{fig:ssmod}} 
 % \end{figure}
 
-<<<<<<< HEAD
 If $f_\theta$ and $g_\theta$ are linear, and $\epsilon_i$,
 $\eta_i$, and $F$ assumed to have Gaussian distributions, Equation \eqref{eq:ssmod} becomes
-=======
-If $f_\theta$ and $g_\theta$ are linear with $\epsilon_i$ and
-$\eta_i$ normally distributed, Equation \eqref{eq:ssmod} becomes
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 \begin{equation}
   \begin{aligned}
     x_{i+1}&= d+T x_i + \eta_{i}, 
@@ -558,20 +488,12 @@ $\eta_i$ normally distributed, Equation \eqref{eq:ssmod} becomes
 where the matrices $d,\ T,\ c,\ Z,\ Q,$ and $G$ are allowed to depend
 on $\theta$ and can potentially vary (deterministically) with $i$. In this case,
 the Kalman filter, %\autoref{alg:kalman}
-<<<<<<< HEAD
 \citep[see for example,][]{Kalman1960,Harvey1990},
 provides closed form 
 solutions for the conditional
 distributions of the states and gives the likelihood of $\theta$
 given data. For completeness, we have included the Kalman filter
 inference algorithm in
-=======
-\citep[see e.g.,][]{Kalman1960,Harvey1990},
-provides closed form 
-solutions for the conditional
-distributions of the states and gives the likelihood of $\theta$
-given data. For completeness, we have included the Kalman filter in
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 the Supplementary Material.% as \autoref{alg:kalman}.
 % \begin{algorithm}[t!]
 %   \begin{singlespace}
@@ -648,12 +570,7 @@ fixed-interval smoother~\citep{AndersonMoore1979}. It produces only
 the unconditional expectations of the hidden state
 $\hat{x}_i=\Expect{x_i\given y_1,\ldots,y_n}$ for the sake of
 computational speed. This version is more appropriate for inference in
-<<<<<<< HEAD
 the type of switching models we discuss below, and is again given in the Supplementary Material.
-=======
-the type of switching models we discuss below. We again provide this
-algorithm in the Supplementary Material.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 
 
 Linear Gaussian state-space models can be made quite flexible
@@ -666,7 +583,6 @@ examples]{DurbinKoopman2001}. Nonlinear, non-Gaussian versions have
 been extensively
 studied~\citep{DurbinKoopman1997,Fuh2006,Kitagawa1987,Kitagawa1996}
 and algorithms for filtering, smoothing, and parameter estimation have
-<<<<<<< HEAD
 been derived~\citep[for example][]{KoyamaPerez-Bolde2010,AndrieuDoucet2010}. 
 However, these models are less useful
 for change-point detection or other discontinuous behavior
@@ -674,38 +590,19 @@ when the times of discontinuity are unknown.
 
 To remedy this deficiency, one can use a switching state-space
 model as shown in \autoref{fig:switchss}. Here, we assume $\{s_i\}_{i=1}^n$ is a
-=======
-been derived~\citep[e.g.,][]{KoyamaPerez-Bolde2010,AndrieuDoucet2010}. 
-However, these models are less useful
-for change-point detection or other forms of discontinuous behavior
-when the times of discontinuity are unknown. 
-
-To remedy this deficiency, one can use a switching state-space
-model as shown in \autoref{fig:switchss}. Here, we assume $S$ is a
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 hidden, discrete process with Markovian dynamics. Then, the value of
 the hidden state at time $i$, $s_i=k$ say, can determine the evolution of
 the continuous model at time $i$. The graphical model in
 \autoref{fig:switchss} gives the conditional independence properties
-<<<<<<< HEAD
 we will use in our model for musical interpretation, 
 representing just one of many possiblities. Switching state-space models have a long
 history with applications ranging from
-=======
-we will use in our model for musical interpretation, but this
-represents just one of many possibilities. Switching state-space models have a long
-history with many applications from
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 economics~\citep{KimNelson1998,Kim1994,Hamilton2011} to speech
 processing~\citep{FoxSudderth2011} to animal
 movement~\citep{PattersonThomas2008,BlockJonsen2011}. An excellent
 overview of the history, typography, and algorithmic developments can
 be found in~\citep{GhahramaniHinton2000}. In Equation~\eqref{eq:lgmod}, the
-<<<<<<< HEAD
 parameter matrices were not time varying. We
-=======
-parameter matrices were not time varying. In our switching model, we
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 allow the switch states $s_i, s_{i-1}$, along with the parameter
 vector $\theta$, to determine the specific dynamics at time $i$:
 \begin{equation}
@@ -726,15 +623,9 @@ matrices govern the evolution of the system.
 
 \begin{figure}
   \centering
-<<<<<<< HEAD
   \begin{tikzpicture}[>=latex,text height=1ex,text depth=0.25ex,ampersand replacement=\&]
     % The various elements are conveniently placed using a matrix:
     \matrix[row sep=.5cm,column sep=.5cm] {
-=======
-  \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex,ampersand replacement=\&]
-    % The various elements are conveniently placed using a matrix:
-    \matrix[row sep=1cm,column sep=1cm] {
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
       % First line: Switch state
       \node (s_k-2)  {$\cdots$}; \&
       \node (s_k-1) [switch]{$s_{i-1}$}; \&
@@ -806,13 +697,8 @@ indicate the number of beats per minute (b.p.m.), and/or with some words
 approximate speed. 
 \begin{figure}[t!]
   \centering
-<<<<<<< HEAD
   \includegraphics[height=2cm]{mazurka-top.pdf}
   \includegraphics[height=2cm]{ballade-top.pdf}
-=======
-  \includegraphics[height=3cm]{mazurka-top.pdf}
-  \includegraphics[height=3cm]{ballade-top.pdf}
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
   \caption{The beginning of two Chopin piano compositions: the Mazurka
     we analyze is on the left while the Ballade No.\ 1, Op.\ 23 is on
     the right.}
@@ -872,11 +758,7 @@ take liberties with these decisions, exactly the liberties we would
 like to discover. This suggests employing a switching model with a
 small number of discrete states.
 
-<<<<<<< HEAD
 We propose a Markov model for $S$ on four
-=======
-Similar to~\citet{GuRaphael2012}, we propose a Markov model for $S$ on four
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 states for four different performance behaviors
 with transition probability
 diagram given by \autoref{fig:transmat}.
@@ -885,11 +767,7 @@ diagram given by \autoref{fig:transmat}.
   \tikzstyle{switch}=[rectangle,
   thick, minimum size=1cm, draw=black]
   \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
-<<<<<<< HEAD
     \matrix[row sep=0.1cm,column sep=.25cm] {
-=======
-    \matrix[row sep=0.25cm,column sep=.5cm] {
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
       \node (S4) [switch] {$4$}; &&&&& & \node (S22) [switch] {$2$};\\
       &\node (S1) [switch] {$1$}; &&&& \node (S2) [switch] {$2$}; \\
       \\ \\ \\ \\ \\ \\
@@ -919,7 +797,6 @@ The 4 switch states correspond to 4 different behaviors for the
 performer: (1) constant tempo, (2) speeding up, (3) slowing down, and
 (4) single note stress. As shown in the diagram, we only allow certain
 transitions for musical reasons and for estimability. The marked
-<<<<<<< HEAD
 transition probabilities are sufficient to infer the remainder. One
 can imagine that a performer will remain mainly in the state 1 with
 departures to states 2 and 3 either due to markings by the composer,
@@ -930,13 +807,6 @@ state, stress, corresponds to {\em tenuto}, a common feature of
 musical performance. Such stresses may be marked with a line over the
 note in question, but are more often a feature of performer taste,
 corresponding to a longer-than-written duration for a particular
-=======
-transition probabilities are sufficient to infer the remainder. The fourth
-state, stress, corresponds to {\em tenuto}, a common feature of
-musical performance. Such stresses may be marked with a line over the
-note in question, but are more often a feature of the performer taste,
-corresponding to a longer-than-written duration of a particular
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 note. Such emphases occur for a variety of musical purposes---emphasis
 of the beat in running notes, the top of a
 phrase, a ``landing point'' where a phrase ends, etc.---but are always
@@ -975,11 +845,7 @@ matrices are given in \autoref{tab:parmats} (transition equation) and
 \begin{table}
   \caption{Parameter matrices of the transition equation for the switching state space model.\label{tab:parmats}}
 \centering
-<<<<<<< HEAD
 \begin{tabular}[h!]{@{}cccccc@{}}
-=======
-\begin{tabular}[h!]{@{}llcccc@{}}
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 \toprule
 %&&&\multicolumn{3}{c}{Transition equation}\\
   \multicolumn{2}{c}{Switch states} &\phantom{a}& \multicolumn{3}{c}{parameter
@@ -1026,7 +892,6 @@ $2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pma
 \begin{table}
   \caption{Parameter matrices of the measurement equation for the switching state space model.\label{tab:parmats2}}
 \centering
-<<<<<<< HEAD
 \begin{tabular}[b!]{@{}ccccc@{}}
 \toprule
 %&&&\multicolumn{3}{c}{Measurement equation}\\
@@ -1038,19 +903,6 @@ $2$ & $3$ && $\begin{pmatrix} l_i\mu_{\textrm{acc}}\\ \mu_{\textrm{acc}}\end{pma
   $4$  && 0 & $\begin{pmatrix} 1 & 1 \end{pmatrix}$ &
                                                                   $\sigma^2_\epsilon$\\
   else && 0 & $\begin{pmatrix} 1 & 0 \end{pmatrix}$ &
-=======
-\begin{tabular}[h!]{@{}llcccc@{}}
-\toprule
-%&&&\multicolumn{3}{c}{Measurement equation}\\
-  \multicolumn{2}{c}{Switch states} &\phantom{a}& \multicolumn{3}{c}{parameter
-                                                    matrices}\\
-  \cmidrule{1-2} \cmidrule{4-6}
-  $s_i$ &&& $c$ & $Z$ & $G$\\
-  \midrule
-  $4$ & && 0 & $\begin{pmatrix} 1 & 1 \end{pmatrix}$ &
-                                                                  $\sigma^2_\epsilon$\\
-  else &&& 0 & $\begin{pmatrix} 1 & 0 \end{pmatrix}$ &
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
                                                                   $\sigma^2_\epsilon$\\
 \bottomrule
 \end{tabular}
@@ -1069,10 +921,7 @@ To clarify this model, we explicate two different behaviors: discrete
 sequence $1\rightarrow 4\rightarrow 1$ (emphasis within constant tempo) and discrete sequence
 $1\rightarrow 1\rightarrow 2$ (constant tempo to slowing down). In the
 first case, the state space system has the following configurations
-<<<<<<< HEAD
 
-=======
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 {\footnotesize
 \begin{align*}
   1\rightarrow 4 && 4\rightarrow 1\\
@@ -1136,11 +985,7 @@ the ``best'' paths using a sampling scheme.
   \begin{algorithmic}[1]
   \STATE {\bfseries Input:}
   $Y$, $\theta$, $\pi_1$ probability vector over initial states
-<<<<<<< HEAD
   (paths), $B$ beam width
-=======
-  (paths), $B$ maximum beam width
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
   \FOR{$i=1$ {\bfseries to} $n$}
   \STATE Set $b_i=|\{\pi_i>0\}|$, the number of current paths
   \STATE Use %\autoref{alg:kalman}
@@ -1176,11 +1021,7 @@ path with the Kalman filter.%\autoref{alg:kalman}.
 \subsection{Penalized maximum likelihood}
 \label{sec:penal-maxim-likel}
 
-<<<<<<< HEAD
 Even without the latent discrete process, parameter estimation in
-=======
-Even without the latent discrete states, parameter estimation in
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 state-space models is a difficult problem, often plagued by spurious
 local minima and non-identifiability. The addition of discrete states
 only exacerbates this issue. However, for the present application, we
@@ -1223,7 +1064,6 @@ specific choices are shown in \autoref{tab:priors}.
     \bottomrule
   \end{tabular}
 \end{table}
-<<<<<<< HEAD
 We fix $\sigma^2_{\textrm{acc}}$ and $\sigma^2_{\textrm{stress}}$ to
 be 1 after numerical experiments suggested
 that they were poorly identified. Essentially, large values of these
@@ -1233,14 +1073,6 @@ separate, so other values of similar magnitude make little difference.
 \subsection{Is this model reasonable}
 
 It is reasonable to ask whether a simple model such as this can
-=======
-We fix $\sigma^2_{\textrm{acc}}$ and $\sigma^2_{\textrm{stress}}$ after numerical experiments suggested
-that they were poorly identified.
-
-\subsection{Is this model reasonable?}
-
-It is reasonable to ask whether a simple model such as this is able to
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 accurately represent performance practice without removing musically important
 information. In a statistical sense, this question is similar to the
 problem of tuning parameter selection in nonparametric
@@ -1249,7 +1081,6 @@ estimation. Specifically, we do not want this model to
 listener appreciation. One way to examine such a question 
 is to generate a performance using the smoothed tempos learned by
 the model and compare it aurally with the original recording.
-<<<<<<< HEAD
 \citet{GuRaphael2012} evaluate this question empirically: they surveyed nine graduate piano majors at a
 major conservatory on twelve different piano excerpts, both performed
 and synthesized. The pianists
@@ -1260,16 +1091,6 @@ possible transitions between states, and it is only first-order
 Markovian. Furthermore, their parameters are not estimated from data but chosen
 by eye. We expect that a similar
 study with our model would yield better results.
-=======
-\citet{GuRaphael2012} used a model similar to ours to investigate just
-this question. In one study, they surveyed nine graduate piano majors at a
-major conservatory on twelve different piano excerpts. The pianists
-were not meaningfully able to distinguish between the synthesized and
-real recordings in the majority of experiments. Our model is more
-expressive than that employed in the study, and the parameters are
-estimated from data rather than calibrated. We expect that a similar
-study with our model would yield similar, if not better, results.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 
 
 \section{Analysis of Chopin's Mazurka Op.\ 68 No.\ 3}
@@ -1417,11 +1238,7 @@ assumption would allow. Richter uses stress frequently. Some may well be
 attributable to larger variance around constant tempo (picked up as
 frequent stress rather than larger $\sigma^2_\epsilon$), but most
 correspond to interesting note emphases, for example the second beat
-<<<<<<< HEAD
 of measure 20. This note is essentially a minor phrase ending, but it is
-=======
-of measure 20. This note is essentially a minor phrase ending, but is
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 also marked in the score with a {\em sforzando} (with sudden
 emphasis). It's the first of two such occurrences in the piece, the
 second coming four measures later on the {\em fermata}, Richter's slowest
@@ -1487,16 +1304,12 @@ recordings and contains the fastest individual note. Additionally,
 there is stunningly little tempo variability in his A sections, but
 dramatic variation in the B section coupled with frequent uses of the
 acceleration and emphasis states. Taken together, Cortot's performance
-<<<<<<< HEAD
 may be better described by estimating our model separately on the two
 sections.\footnote{\citet{Cook2013} suggests that this recording is not
   due to Cortot at all but part of a scandal at the Concert Artist
   referred to as the ``Hatto hoax'', wherein her husband, owner of the
   label, released over 100 recordings made by others but listing her
   as the performer.}
-=======
-may be better described by estimating our model separately on the two sections.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 \begin{figure}[t]
   \centering
     \includegraphics[width=.9\textwidth]{cortot-performance-1}
@@ -1513,7 +1326,6 @@ may be better described by estimating our model separately on the two sections.
 To better understand how all the 46 performances relate to each other,
 we applied parametric clustering using the eleven-dimensional vector
 of estimated parameters. Because the estimated parameters are of
-<<<<<<< HEAD
 different scales, have different domains, and can covary, we
 use
 Mahalanobis distance, which scales by the inverse of the prior variance. The mean and
@@ -1533,29 +1345,6 @@ $i=j$.
 % We then standardize each individual distance matrix to have a
 % maximum distance of 1 and add them together so that the maximum distance
 % between performances is 8.
-=======
-different scales, have different domains, and can covary, we treat
-them differentially. To calculate distances between the mean and
-variance parameters, $\sigma^2_\epsilon$, $\mu_{\textrm{tempo}}$,
-$\mu_{\textrm{acc}}$, $\mu_{\textrm{stress}}$, and
-$\sigma^2_{\textrm{tempo}}$ we simply use Euclidean distance on each
-individually. In the cases of the probabilities, we use weighted
-Euclidean distance in the prior precision. For example, for
-$p_{1\cdot}$, we calculate
-\begin{equation}
-d\left(p_{1\cdot},\ p'_{1\cdot}\right) = (p_{1\cdot}-p'_{1\cdot})^\top
-  \Omega (p_{1\cdot}-p'_{1\cdot}),\quad
-\textrm{where}
-  \quad\Omega^{-1}_{ij} := \Sigma_{ij} :=
-  \alpha_0^{-2}(\alpha_0+1)^{-1}\left(\alpha_i\alpha_0 \delta_{ij}
-    - \alpha_i\alpha_j\right),
-\end{equation}
-is the covariance matrix of the Dirichlet distribution with
-$\alpha_0=\sum_i\alpha_i$ and $\delta_{ij}$ the indicator that
-$i=j$. We then standardize each individual distance matrix to have a
-maximum distance of 1 and add them together so that the maximum distance
-between performances is 8.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 
 
 \begin{figure}[t]
@@ -1574,9 +1363,9 @@ matrix with ``outlying'' performances removed (right). To determine
 outlying performances, we calculated the distance to the third nearest
 performance. We then removed those performances that exceeded a
 threshold, meaning that the nearest similar performances were ``far
-away''. This screening left 25 performances. We used hierarchical
-clustering on these 25 performances, trying between two and five
-clusters. The remaining 21 were grouped together as ``other''. The
+away''. This screening left 30 performances. We used hierarchical
+clustering on these 30 performances, trying between two and five
+clusters. The remaining 16 were grouped together as ``other''. The
 right panel of \autoref{fig:dmats} displays this subset along with a
 dendrogram and four clusters.
 
@@ -1592,23 +1381,15 @@ dendrogram and four clusters.
   \caption{Cluster densities for mean and variance parameters.}
   \label{fig:clust-density-mv}
 \end{figure}
-<<<<<<< HEAD
 The first cluster corresponds to reasonably staid performances. The emphasis state is rarely visited with the performer tending
-=======
-The first cluster corresponds to performances which are reasonably
-staid. The emphasis state is rarely visited with the performer tending
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 to stay in the constant tempo state with periods of slowing down at
 the ends of phrases. Acceleration is never used. Such state
 preferences are clearly inferred by the model as shown in the
 top row of \autoref{fig:clust-density-tp}. Furthermore, these
 performances have relatively low average tempos, and not much
 difference between the A and B sections. Joyce Hatto's performance
-<<<<<<< HEAD
-in \autoref{fig:archetypal} is typical of this cluster.
-=======
-shown in \autoref{fig:archetypal} is typical of this cluster.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
+in \autoref{fig:archetypal} is typical of this cluster, as is her
+similar 2006 recording.
 
 Recordings in the second
 cluster tend to transition quickly between states, especially constant
@@ -1687,24 +1468,8 @@ Rubinstein's recordings, as we would expect.
     & $\sigma^2_{\textrm{tempo}}$ & $p_{11}$ & $p_{12}$ & $p_{22}$
     & $p_{31}$ & $p_{13}$ & $p_{21}$ & $p_{32}$\\
     \midrule
-    Wasowski 1980 & 414.99 & 132.00 & -10.00 & -40.00
-    & 425.00 & 0.85 & 0.05 & 0.67 & 0.34 & 0.02 & 0.26 & 0.20\\
-    Shebanova 2002 & 439.98 & 132.00 & -10.00 & -40.00
-    & 400.02 & 0.85 & 0.05 & 0.67 & 0.33 & 0.02 & 0.27 & 0.20\\
-    Luisada 1991 & 494.33 & 127.80 & -10.24 & -32.56
-    & 411.63 & 0.84 & 0.10 & 0.71 & 0.35 & 0.01 & 0.26 & 0.19\\
-    Milkina 1970 & 435.25 & 136.38 & -9.68 & -40.02 & 400.01
-                                  & 0.87 & 0.05 & 0.68 & 0.33 & 0.02 &
-                                                                       0.26 & 0.21\\
-    \midrule
-    Rubinstein 1939 & 520.32 & 145.26 & -7.89 & -50.82
-    & 345.64 & 0.89 & 0.02 & 0.83 & 0.56 & 0.05 & 0.13 & 0.16\\
-    Rubinstein 1952 & 481.13 & 128.13 & -7.76 & -17.59
-    & 409.30 & 0.93 & 0.04 & 0.68 & 0.32 & 0.01 & 0.28 & 0.19\\
-    Rubinstein 1961 & 434.23 & 139.17 & -8.34 & -35.08
-    & 355.00 & 0.90 & 0.06 & 0.56 & 0.46 & 0.01 & 0.41 & 0.19\\
-    Rubinstein 1966 & 380.95 & 127.24 & -8.80 & -42.28
-    & 473.69 & 0.87 & 0.07 & 0.36 & 0.34 & 0.01 & 0.61 & 0.20\\
+Wasowski 1980 & 414.99 & 132.00 & -10.00 & -40.00 & 425.00 & 0.85 & 0.05 & 0.67 & 0.34 & 0.02 & 0.26 & 0.20\\    Shebanova 2002 & 439.98 & 132.00 & -10.00 & -40.00 & 400.02 & 0.85 & 0.05 & 0.67 & 0.33 & 0.02 & 0.27 & 0.20\\    Richter 1976 & 426.70 & 136.33 & -11.84 & -34.82 & 439.38 & 0.85 & 0.05 & 0.74 & 0.44 & 0.02 & 0.25 & 0.17\\    Milkina 1970 & 435.25 & 136.38 & -9.68 & -40.02 & 400.01 & 0.87 & 0.05 & 0.68 & 0.33 & 0.02 & 0.26 & 0.21\\    \midrule
+Rubinstein 1939 & 520.32 & 145.26 & -7.89 & -50.82 & 345.64 & 0.89 & 0.02 & 0.83 & 0.56 & 0.05 & 0.13 & 0.16\\    Rubinstein 1952 & 481.13 & 128.13 & -7.76 & -17.59 & 409.30 & 0.93 & 0.04 & 0.68 & 0.32 & 0.01 & 0.28 & 0.19\\    Rubinstein 1961 & 434.23 & 139.17 & -8.34 & -35.08 & 355.00 & 0.90 & 0.06 & 0.56 & 0.46 & 0.01 & 0.41 & 0.19\\    Rubinstein 1966 & 380.95 & 127.24 & -8.80 & -42.28 & 473.69 & 0.87 & 0.07 & 0.36 & 0.34 & 0.01 & 0.61 & 0.20\\
     \bottomrule
   \end{tabular}
   }
@@ -1718,20 +1483,12 @@ Our model is just one type of smoothing one could imagine using to
 find low-dimensional structure for the vector of note-by-note
 tempos. Alternative statistical techniques are common, and examining
 how they compare with our method helps to illuminate some of its
-<<<<<<< HEAD
 benefits. The most obvious alternative is to use 
-=======
-benefits. The most obvious alternative is to use smoothing
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 splines~\citep{CravenWahba1978,Wahba1990} though total-variation
 denoising or trend filtering \citep{KimKoh2009,Tibshirani2014} are
 other reasonable alternatives.
 These statistical techniques perform smoothing by encouraging small
-<<<<<<< HEAD
 changes in derivatives (splines) or bounded total variation
-=======
-changes in derivatives (smoothing splines) or bounded total variation
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 (trend filtering). 
 But musical performances do not conform to these assumptions because tempo interpretations rely on the juxtaposition of local smoothness
 with sudden changes and emphases to create listener interest. It is
@@ -1811,7 +1568,7 @@ stands out dramatically, remaining in the much faster constant tempo
 state from the B section with overly frequent emphases. Both of these
 performances are quite volatile, making estimation difficult, and were clustered as ``other''. 
 
-<<<<<<< HEAD
+
 % One issue in our model that the effect of states two and three can
 % be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and
 % $\sigma_2^2$ are large enough, it would be possible to get a
@@ -1839,9 +1596,6 @@ would be better expressed relative to the overall average speed,
 perhaps as $\overline{Y}/10$ b.p.m.\ or similar. In this way, really
 slow or fast pieces could be more easily accommodated. Since we only looked at one
 score, it is sufficient to simply fix some values. 
-=======
-% One issue in our model that the effect of states two and three can be flipped. If $\tau_t$ is small enough, and $\sigma_4^2$ and $\sigma_2^2$ are large enough, it would be possible to get a negative number for the acceleration term when in state 2 or a positive number when in state three and still get a reasonably high likelihood. This could be fixed by adding a constraint on the ratio of the $\tau_t$ and $\sigma$'s 2 and 4.
->>>>>>> fc8e3a47dd9b85b823c147ce01d019ce2787954f
 
 \section{Discussion}
 \label{sec:discussion}
