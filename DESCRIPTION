@@ -1,0 +1,27 @@
+Package: dpf
+Type: Package
+Title: Discrete particle filtering
+Version: 0.3
+Date: 2019-03-15
+Authors@R: c(
+    person("McBride", "Michael", email = "michmcbr@iu.edu", role = "cre"),
+    person("Daniel", "McDonald", email = "dajmcdon@indiana.edu", role = "aut"))
+URL: http://github.com/dajmcdon/dpf
+BugReports: http://github.com/dajmcdon/dpf/issues
+Description: Estimates hidden Markov models greedily in the presence of Gaussian observations
+    and continuous (Gaussian) hidden states.
+License: GPL
+LazyData: TRUE
+Depends: R (>= 2.10)
+Imports: 
+    Rcpp (>= 0.12.10),
+    ggplot2,
+    stats
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.0.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    prettydoc
+Encoding: UTF-8
+VignetteBuilder: knitr, rmarkdown
