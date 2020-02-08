@@ -3,6 +3,7 @@
 \docType{package}
 \name{dpf}
 \alias{dpf}
+\alias{dpf-package}
 \title{dpf: Discrete particle filtering}
 \description{
 The dpf package provides three categories of important functions:

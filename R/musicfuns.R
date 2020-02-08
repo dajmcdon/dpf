@@ -1,21 +1,21 @@
-#' Converts from the expanded ten-state notation to four-state notation
+#' Converts from the expanded eleven-state notation to four-state notation
 #' 
 #' Because our model is actually 2-Markov, we expand from 4 to 16 states. 
-#' But not all states can be visited, so there are only 10.
+#' But not all states can be visited, so there are only 11.
 #'
 #' @param path path in ten-state form
 #'
 #' @return path in four-state form
 #' 
 #' @examples
-#' path = sample(1:10, 25, replace=TRUE)
+#' path = sample(0:10, 25, replace=TRUE)
 #' npath = convert10to4(path)
 #' 
 #' @export
-convert10to4 <- function(path){
-  t1 = c(1,2,4,2,3,1,3,1,3,1)
-  path10 = t1[path+1]
-  path10
+convert11to4 <- function(path){
+  t1 = c(1,2,4,2,3,1,3,1,3,1,2)
+  path11 = t1[path+1]
+  path11
 }
 
 

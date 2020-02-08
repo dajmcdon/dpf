@@ -12,4 +12,4 @@ pvec_ml = t(sapply(outL,fun))
 rownames(pvec_ml) = names(tempos[-c(1:3)])
 pvec_ml = as.data.frame(pvec_ml)
 
-save(pvec_ml, file='mazurkaResults.Rdata')
+save(pvec_ml, file='mazurkaResults-update.Rdata')
