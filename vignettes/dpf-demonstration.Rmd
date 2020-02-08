@@ -88,7 +88,7 @@ lt = diff(c(tempos$note_onset,61)) # notated durations
 y = matrix(tempos$Richter_1976, 1)
 pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
                    c(132,0), c(400,10)) # prior means and variances on X_1
-beam = with(pmats, beamSearch(a0, P0, c(1,rep(0,9)), dt, ct, Tt, Zt,
+beam = with(pmats, beamSearch(a0, P0, c(1,rep(0,10)), dt, ct, Tt, Zt,
                   HHt, GGt, y, transMat, 200))
 bestpath = with(beam, paths[which.max(weights),])
 kal = kalman(pmats, bestpath, y)

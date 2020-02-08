@@ -25,7 +25,7 @@ plotStates <- function(performance, params, y, onset,
     lt = diff(c(onset, 61))
     mats = musicModel(lt, params[1], params[2:4], params[5:7], params[8:14], 
                       initialMean, initialVariance)
-    bs = beamSearch(mats$a0, mats$P0, c(1,rep(0,9)), mats$dt, mats$ct, 
+    bs = beamSearch(mats$a0, mats$P0, c(1,rep(0,10)), mats$dt, mats$ct, 
                     mats$Tt, mats$Zt, mats$HHt, mats$GGt, y, 
                     mats$transMat, particleNumber)
     bestpath = bs$paths[which.max(bs$weights),]
@@ -35,7 +35,7 @@ plotStates <- function(performance, params, y, onset,
       tempo = c(y), 
       inferred = c(kal$ests), 
       state = factor(
-        convert10to4(bestpath), 
+        convert11to4(bestpath), 
         labels=c('constant tempo', 'decelerating','accelerating','stress')
         )
     )
