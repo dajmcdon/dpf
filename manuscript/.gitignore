@@ -1,0 +1,10 @@
+*.rel
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.log
+musicManuscript.out
+musicManuscript.aux
+musicManuscript.log

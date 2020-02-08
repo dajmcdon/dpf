@@ -1,0 +1,26 @@
+
+% Number only ref'ed equations
+\usepackage{mathtools}
+\mathtoolsset{showonlyrefs,showmanualtags}
+
+\renewcommand{\algorithmiccomment}[1]{\hfill $\rhd$ #1}
+\renewcommand{\thealgorithm}{A\arabic{algorithm}} 
+
+\usepackage{afterpage}
+
+\renewcommand\thefigure{SM-\arabic{figure}}
+\newcommand{\email}[1]{\href{mailto:#1}{#1}}
+
+%\usepackage{setspace}
+
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\renewcommand{\hat}{\widehat}
+% next three lines to give Kalman filter sample \varx_t=E[x_t|y_1,...,y_t]
+\usepackage{upgreek}
+\DeclareRobustCommand{\varx}{{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]{\protect\raisebox{\depth}{$#1\upchi$}}
+\newcommand{\given}{\ \vert\ }
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Expect}[1]{\E\left[#1\right]}
+\newcommand{\Var}[1]{\mathbb{V}\left[#1\right]}
+\newcommand{\indicator}[1]{\boldsymbol{1}\left(#1\right)}
