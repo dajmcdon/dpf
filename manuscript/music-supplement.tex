@@ -180,13 +180,13 @@ discussed in some detail in the manuscript.
 \hypertarget{plotting-performances}{%
 \section{Plotting performances}\label{plotting-performances}}
 
-In \autoref{sec:clust-music-perf} discussed 4 distinct clusters of the
-46 performances as well as an ``other'' category of relatively unique
-interpretations. Figures \ref{fig:clust-1} to \ref{fig:clust-other}
-display the note-by-note tempos along with the inferred interpretive
-decisions for all performances by clustering. Here we include some of
-the discussion of these clusters from the main text to clarify the
-figures.
+\autoref{sec:clust-music-perf} of the manuscript discusses 4 distinct
+clusters of the 46 performances as well as an ``other'' category of
+relatively unique interpretations. Figures \ref{fig:clust-1} to
+\ref{fig:clust-other} display the note-by-note tempos along with the
+inferred interpretive decisions for all performances by clustering. Here
+we include some of the discussion of these clusters from the main text
+to clarify the figures.
 
 The first cluster (\autoref{fig:clust-1}) corresponds to performances
 which are reasonably staid. The emphasis state is rarely visited with
@@ -253,9 +253,9 @@ of time tending to reflect note emphases.
 
 The remaining performances are relatively different from all other
 performances (\autoref{fig:clust-other}). If the distance to the third
-closest performances exceeded 0.35, then the performance was grouped
-with ``other''. Essentially, these recordings had at most one similar
-recording while the four other clusters contained at least 4.
+closest performances exceeded 0.4, then the performance was grouped with
+``other''. Essentially, these recordings had at most one similar
+recording while the four other clusters contained at least 3.
 
 \begin{figure}
 
@@ -267,7 +267,31 @@ recording while the four other clusters contained at least 4.
 \end{figure}
 
 \hypertarget{distribution-over-states}{%
-\subsection{Distribution over states}\label{distribution-over-states}}
+\section{Distribution over states}\label{distribution-over-states}}
+
+To examine the stability of the \autoref{alg:dpf}, we examined all the
+potential paths for Richter's 1976 recording. Here, we saved the most
+likely 10,000 paths and their weights (rather than only the most likely
+path). \autoref{fig:posterior-richter-plot} shows the marginal
+(posterior) probability of being in a particular state for each note.
+While the paper uses the most likely \emph{path}, this figure is
+marginal in the sense that a particular note/state combination may have
+high probability in that many paths visited that note/state. But, the
+most likely path may not have used that same note/state combination.
+Nonetheless, there appears to be consensus for many of the notes. The
+most obviously difficult notes are those near measures 10 and 50. In
+both cases, the most likely path (\autoref{fig:richter} in the main
+text) used the stress state, which exceeds 50\% posterior probability
+here.
+
+\begin{figure}
+
+{\centering \includegraphics[height=2in]{gfx/posterior-richter-plot-1} 
+
+}
+
+\caption{Distribution over potentitial states for Richter's 1976 recording.}\label{fig:posterior-richter-plot}
+\end{figure}
 
 
 \clearpage
