@@ -97,6 +97,46 @@ musicModel <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initi
     .Call('_dpf_musicModel', PACKAGE = 'dpf', lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
 }
 
+#' Parameter matrices for our music model on dynamics
+#' 
+#' This function accepts a number of parameters and creates a list of matrices
+#' for Kalman filter evaluation. See the paper for the particular form of the model.
+#' 
+#' @param lt vector of durations between successive notes in the score
+#' @param sig2eps variance of the observation noise
+#' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
+#' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
+#' @param transprobs vector of 7 transition probabilities
+#' @param initialMean a vector of length 2 giving the prior tempo and the prior acceleration for when state 1 or 3 is the starting state
+#' @param initialVariance a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 1 or 3 is the starting state 
+#' 
+#' @return List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
+#' \item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
+#' \item{P0}{a (p^2)xd matrix of the initial covariances of the hidden state. The j'th column corresponds to the initial covariances stored columnwise when starting in the j'th discrete state.}
+#' \item{dt}{a pxdxn cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+#' \item{ct}{a kxdx1 cube of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.}
+#' \item{Tt}{a (p^2)xdxn cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+#' \item{Zt}{a pkxdx1 cube of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.}
+#' \item{HHt}{a (p^2)xdxn cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+#' \item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
+#' \item{transMat}{a dxd matrix of transition probabilities for the discrete states}
+#' }
+#' 
+#' @examples
+#' data(tempos)
+#' theta = c(426.69980736, 136.33213703, -11.84256691, -34.82234559, 
+#'           439.37886221, 1, 1, 0.84916635, 0.04611644, 0.74119571, 
+#'           0.43966082, 0.02116317, 0.24513563, 0.17253254)
+#' y = matrix(tempos[,'Richter_1976'], 1)
+#' lt = diff(c(tempos$note_onset, 61))
+#' pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
+#'                   c(132,0), c(400,10))
+#'                   
+#' @export    
+musicModeldynamics <- function(lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
+    .Call('_dpf_musicModeldynamics', PACKAGE = 'dpf', lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
+}
+
 #' Greedy HMM estimation given continuous hidden states
 #' 
 #' This function maintains a "beam" of size \code{N} representing the highest likelihood

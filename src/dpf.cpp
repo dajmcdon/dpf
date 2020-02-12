@@ -25,6 +25,7 @@ arma::uvec SampleNoReplace(arma::uvec x, int size) {
 //' @export 
 // [[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
+  //Rcout << "The value of w is:" << std::endl << w << std::endl;
   int M = w.size();
   double tol = 1e-10;
   arma::vec ws = w;
@@ -77,6 +78,7 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
     ws.elem(idx).zeros();
   }
   ws = arma::normalise(ws,1);
+  //Rcout << "The value of ws is:" << std::endl << ws << std::endl;
   
   
   return ws;
@@ -85,68 +87,77 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
 //' @export 
 // [[Rcpp::export]]
 arma::colvec resampleOptimal(arma::colvec w, int N){
-  // no zeros no dups?? unused, doesn't seem to work
+
+  //Rcout << "The value of w is:" << std::endl << w << std::endl;
+  
   int M = w.size();
   double tol = 1e-10;
   arma::colvec ws = w;
   ws.elem( arma::find( ws < tol) ).zeros();
   arma::vec nzz = arma::nonzeros(ws);
+  
+  //Rcout << "The value of ws is:" << std::endl << ws << std::endl;
+  
   arma::uword nz = nzz.n_elem;
   if(M <= N || nz <= N){ 
     return ws;
   }
   
   // Hard case.
-  ws = arma::sort(ws);
-  ws = arma::normalise(ws,1);
+  arma::colvec wssortnorm = ws;
+  wssortnorm = arma::sort(wssortnorm);
+  wssortnorm = arma::normalise(wssortnorm,1);
+  //Rcout << "The value of wssortnorm is:" << std::endl << wssortnorm << std::endl;
   int Ak = 0;
   double Bk = 1.0;
   int i = M;
   
-  Rcout << "The value of ws is:" << std::endl << ws << std::endl;
-  
   while(i > M - N){
     i--;
-    if(ws(i) < tol || Bk <= tol){
-      w.elem( arma::find( w < tol) ) .zeros();
-      return w;
+    if(wssortnorm(i) < tol || Bk <= tol){
+      ws.elem( arma::find( ws < tol) ) .zeros();
+      return ws;
     }
-    if(Bk/ws(i) + Ak >= N) break;
+    if(Bk/wssortnorm(i) + Ak >= N) break;
     Ak++;
-    Bk -= ws(i);
+    Bk -= wssortnorm(i);
   }
   double cinv = Bk / (N-Ak);
-  Rcout << "The value of cinv is:" << std::endl << cinv << std::endl;
+  
+  //Rcout << "The value of cinv is:" << std::endl << cinv << std::endl;
   
   // Set 1
   arma::vec NewW;
   NewW.zeros(M);
+  arma::colvec wnormalized = ws;
+  wnormalized = arma::normalise(ws,1);
   
-  Rcout << "The value of NewW is:" << std::endl << NewW << std::endl;
+  //Rcout << "The value of wnormalized is:" << std::endl << wnormalized << std::endl;
   
-  arma::colvec wnormalized = w;
-  wnormalized = arma::normalise(w,1);
   int L=0;
   double K=0;
   for(i=0; i<M; i++){
     if(cinv < wnormalized(i)){
-      NewW(i) += w(i);
+      //Rcout << "The value of i is:" << std::endl << i << std::endl;
+      NewW(i) += ws(i);
       L++;
+      //Rcout << "The value of L is:" << std::endl << L << std::endl;
     }else{
-      K += w(i);  
+      K += ws(i);  
     }
   }
   K /= (N-L);
-  
-  Rcout << "The value of K is:" << std::endl << K << std::endl;
-  Rcout << "The value of NewW is:" << std::endl << NewW << std::endl;
+  //Rcout << "The value of N is:" << std::endl << N << std::endl;
+  //Rcout << "The value of L is:" << std::endl << L << std::endl;
+  //Rcout << "The value of K is:" << std::endl << K << std::endl;
   
   // Set 2
   RNGScope scope;
   double U1 = runif(1)[0] * K;
+  //Rcout << "The value of U1 is:" << std::endl << U1 << std::endl;
   for(int i=0; i<M; i++){
     if(NewW(i)==0){
-      U1 -= w(i);
+      U1 -= ws(i);
       if(U1 < 0){
         NewW(i) += cinv;
         U1 += K;
@@ -154,6 +165,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
     }
   }
   NewW = arma::normalise(NewW,1);
+  //Rcout << "The value of NewW is:" << std::endl << NewW << std::endl;
   return NewW;
 }
 
@@ -284,8 +296,14 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
   arma::mat testLik = lik;
   lik %= transProbs.rows(currentStates);
   lik.each_col() %= w;
+  
+  //Rcout << "The value of lik is:" << std::endl << lik << std::endl;
+  
   w = arma::vectorise(lik);
   w = arma::normalise(w,1);
+  
+  //Rcout << "The value of w is:" << std::endl << w << std::endl;
+  
   w = resampleSubOptimal(w, N);
   if( !arma::any(w)) return List::create(Named("BadPars") = 1);
   arma::uvec positive = arma::find(w);
@@ -458,17 +476,17 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   //   4 transition matrix parameters
   // up to 22 parameters per performance
   // for now, everything constant, except mu_tempo
-  // States are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) [(1,3) (2,1)]
+  // States (in order) are: (1,1) (1,2) (1,4) (2,2) (2,3) (3,1) (3,3) (4,1) (1,3) (2,1)  (3,2)  #Rob
   int nstates = 11;
   int d = 1;
   int m = 2;
   int mm = m*m;
-  int n = lt.n_elem;
+  int n = lt.n_elem; //n is length of onset vector (231)
   
   arma::mat a0(m, nstates, arma::fill::zeros);
-  a0.row(0) += initialMean(0);
-  a0(1,4) += initialMean(1);
-  a0(1,6) += initialMean(1);
+  a0.row(0) += initialMean(0); 
+  a0(1,4) += initialMean(1);  
+  a0(1,6) += initialMean(1); 
   
   arma::mat P0(mm, nstates, arma::fill::zeros);
   P0.row(0) += initialVariance(0);
@@ -490,12 +508,14 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
   
   arma::cube Tt(mm, nstates, n, arma::fill::zeros);
-  Tt.tube(0,0,0,4) += 1;
+  Tt.tube(0,0,0,4) += 1; // .tube(first row, first col, law row, last col)
   Tt.tube(0,6,0,8) += 1;
   Tt.tube(3,3) += 1;
   Tt.tube(3,6) += 1;
   Tt.tube(2,6) = lt;
   Tt.tube(2,3) = lt;
+  
+  //Rcout << "The value of Tt is:" << std::endl << Tt << std::endl;
   
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
   Zt.tube(0,0,0,9) += 1;
@@ -546,6 +566,127 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
   transMat(8,6) = 1; // (1,3) -> (3,3)
   transMat(9,0) = 1; // (2,1) -> (1,1)
   transMat(10,3) = 1; // (3,2) -> (2,2)
+  
+  return List::create(Named("a0") = a0, Named("P0") = P0,
+                      Named("dt") = dt, Named("ct") = ct,
+                      Named("Tt") = Tt, Named("Zt") = Zt,
+                      Named("HHt") = HHt,
+                      // Named("Rt") = Rt, Named("Qt") = Qt,
+                      Named("GGt") = GGt,
+                      Named("transMat") = transMat);
+}
+
+
+//' Parameter matrices for our music model on dynamics
+//' 
+//' This function accepts a number of parameters and creates a list of matrices
+//' for Kalman filter evaluation. See the paper for the particular form of the model.
+//' 
+//' @param lt vector of durations between successive notes in the score
+//' @param sig2eps variance of the observation noise
+//' @param mus vector of 3 mean parameters (\eqn{\mu, \tau, and \varphi})
+//' @param sig2eta vector of 3 state variance parameters (\eqn{\sigma_3^2, \sigma_2^2,and \sigma_4^2})
+//' @param transprobs vector of 7 transition probabilities
+//' @param initialMean a vector of length 2 giving the prior tempo and the prior acceleration for when state 1 or 3 is the starting state
+//' @param initialVariance a vector of length 2 giving the prior variance for the tempo and the prior variance for the acceleration for when state 1 or 3 is the starting state 
+//' 
+//' @return List with components as appropriate for Kalman filtering or Beam Search. These include: \describe{
+//' \item{a0}{a pxd matrix of the initial means of the hidden state. The j'th column corresponds to the initial mean when starting in the j'th discrete state.}
+//' \item{P0}{a (p^2)xd matrix of the initial covariances of the hidden state. The j'th column corresponds to the initial covariances stored columnwise when starting in the j'th discrete state.}
+//' \item{dt}{a pxdxn cube of state intercepts. The j'th column of the i'th slice corresponds to the intercept specified by the j'th discrete state at time i.}
+//' \item{ct}{a kxdx1 cube of observation intercepts. The j'th column corresponds to the intercept specified by the j'th discrete state.}
+//' \item{Tt}{a (p^2)xdxn cube of state slopes. The j'th column of the i'th slice corresponds to the slope matrix stored columnwise of the j'th discrete state at time i.}
+//' \item{Zt}{a pkxdx1 cube of obvervation slopes. The j'th column corresponds to the slope matrix stored columnwise of the j'th discrete state.}
+//' \item{HHt}{a (p^2)xdxn cube of state covariances. The j'th column of the i'th slice corresponds to the covariance matrix stored columnwise of the j'th discrete state at time i.}
+//' \item{GGt}{a (k^2)xdx1 cube of observation covariances. The j'th column corresponds to the covariance matrix stored columnwise of the j'th discrete state.}
+//' \item{transMat}{a dxd matrix of transition probabilities for the discrete states}
+//' }
+//' 
+//' @examples
+//' data(tempos)
+//' theta = c(426.69980736, 136.33213703, -11.84256691, -34.82234559, 
+//'           439.37886221, 1, 1, 0.84916635, 0.04611644, 0.74119571, 
+//'           0.43966082, 0.02116317, 0.24513563, 0.17253254)
+//' y = matrix(tempos[,'Richter_1976'], 1)
+//' lt = diff(c(tempos$note_onset, 61))
+//' pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
+//'                   c(132,0), c(400,10))
+//'                   
+//' @export    
+// [[Rcpp::export]]
+List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mus,
+                arma::vec sig2eta, arma::vec transprobs,
+                arma::vec initialMean, arma::vec initialVariance){ 
+  // States (si,si-1) are: (1,1) (1,2) (2,1) (2,2)
+  int nstates = 4; 
+  int d = 1; //length of observed state
+  int m = 3; //length of hidden state
+  int mm = m*m;
+  int n = lt.n_elem;
+  
+  arma::mat a0(m, nstates, arma::fill::zeros);
+  a0.row(0) += initialMean(0);
+  a0.row(1) += initialMean(1);
+  a0.row(2) += initialMean(2);
+  
+  arma::mat P0(mm, nstates, arma::fill::zeros);
+  P0(0,0) += initialVariance(0);
+  P0(4,0) += initialVariance(1);
+  P0(8,0) += initialVariance(2);
+  P0(0,1) += initialVariance(0);
+  P0(4,1) += initialVariance(1);
+  P0(8,1) += initialVariance(2);
+  P0(0,2) += initialVariance(0);
+  P0(4,2) += initialVariance(1);
+  P0(8,2) += initialVariance(2);
+  P0(0,3) += initialVariance(0);
+  P0(4,3) += initialVariance(1);
+  P0(8,3) += initialVariance(2);
+  
+  arma::cube dt(m, nstates, n, arma::fill::zeros);
+  dt.tube(0,0) += mus(0);
+  dt.tube(0,2) += mus(0);
+  dt.tube(1,2) += mus(1);
+  dt.tube(2,2) += mus(2);
+  
+  arma::cube ct(d, nstates, 1, arma::fill::zeros);
+  ct.tube(0,0) += mueps;
+  ct.tube(0,1) += mueps;
+  ct.tube(0,2) += mueps;
+  ct.tube(0,3) += mueps;
+  
+  arma::cube Tt(mm, nstates, n, arma::fill::zeros);
+  Tt.tube(0,1) += 1;
+  Tt.tube(3,1) += 1;
+  Tt.tube(4,1) += 1;
+  Tt.tube(7,1) += 1;
+  Tt.tube(8,1) += 1;
+  Tt.tube(0,3) += 1;
+  Tt.tube(3,3) += 1;
+  Tt.tube(4,3) += 1;
+  Tt.tube(7,3) += 1;
+  Tt.tube(8,3) += 1;
+  
+  arma::cube Zt(m, nstates, 1, arma::fill::ones);
+  
+  arma::cube HHt(mm, nstates, n, arma::fill::zeros);
+  HHt.tube(0,0) += sig2eta(0);
+  HHt.tube(0,2) += sig2eta(0);
+  HHt.tube(4,2) += sig2eta(1);
+  HHt.tube(8,2) += sig2eta(2);
+  
+  arma::cube GGt(d, nstates, 1, arma::fill::ones);
+  GGt *= sig2eps;
+  
+  arma::mat transMat(nstates, nstates, arma::fill::zeros);
+  transMat(0,0) = transprobs(0); // (1,1) -> (1,1)
+  transMat(0,1) = 1 - transprobs(0); // (1,1) -> (1,2)
+  transMat(1,2) = transprobs(1); // (1,2) -> (2,1)
+  transMat(1,3) = 1 - transprobs(1); // (1,2) -> (2,2)
+  transMat(2,0) = transprobs(2); // (2,1) -> (1,1)
+  transMat(2,1) = 1 - transprobs(2); // (2,1) -> (1,2)
+  transMat(3,2) = transprobs(3); // (2,2) -> (1,1)
+  transMat(3,3) = 1 - transprobs(3); // (2,2) -> (2,2)
   
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
