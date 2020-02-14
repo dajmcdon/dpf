@@ -667,7 +667,9 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   Tt.tube(7,3) += 1;
   Tt.tube(8,3) += 1;
   
-  arma::cube Zt(m, nstates, 1, arma::fill::ones);
+  arma::cube Zt(m, nstates, 1, arma::fill::zeros);
+  Zt.tube(0,0,0,nstates-1) += 1;
+  
   
   arma::cube HHt(mm, nstates, n, arma::fill::zeros);
   HHt.tube(0,0) += sig2eta(0);
