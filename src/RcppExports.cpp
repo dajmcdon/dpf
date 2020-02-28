@@ -61,20 +61,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // musicModeldynamics
-List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs, arma::vec initialMean, arma::vec initialVariance);
-RcppExport SEXP _dpf_musicModeldynamics(SEXP ltSEXP, SEXP muepsSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP, SEXP initialMeanSEXP, SEXP initialVarianceSEXP) {
+List musicModeldynamics(arma::vec lt, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs, arma::vec initialMean, arma::vec initialVariance);
+RcppExport SEXP _dpf_musicModeldynamics(SEXP ltSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP, SEXP initialMeanSEXP, SEXP initialVarianceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
-    Rcpp::traits::input_parameter< double >::type mueps(muepsSEXP);
     Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type transprobs(transprobsSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type initialMean(initialMeanSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type initialVariance(initialVarianceSEXP);
-    rcpp_result_gen = Rcpp::wrap(musicModeldynamics(lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance));
+    rcpp_result_gen = Rcpp::wrap(musicModeldynamics(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -119,7 +118,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dpf_resampleOptimal", (DL_FUNC) &_dpf_resampleOptimal, 2},
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_musicModel", (DL_FUNC) &_dpf_musicModel, 7},
-    {"_dpf_musicModeldynamics", (DL_FUNC) &_dpf_musicModeldynamics, 8},
+    {"_dpf_musicModeldynamics", (DL_FUNC) &_dpf_musicModeldynamics, 7},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 12},
     {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
     {NULL, NULL, 0}

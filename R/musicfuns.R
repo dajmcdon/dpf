@@ -18,6 +18,29 @@ convert10to4 <- function(path){
   path10
 }
 
+#' Converts from the expanded 4-state notation to 2-state notation
+#' 
+#' Because our model is actually 2-Markov, we expand from 2 to 4 states. 
+#' All states can be visited.
+#'
+#' @param path path in four-state form
+#'
+#' @return path in two-state form
+#' 
+#' @examples
+#' path = sample(1:10, 25, replace=TRUE)
+#' npath = convert10to4(path)
+#' 
+#' @export
+convert4to2dynamics <- function(path){
+  t1 = c(1,1,2,2)
+  path10 = t1[path+1]
+  path10
+}
+
+
+
+
 
 # Deprecated --------------------------------------------------------------
 

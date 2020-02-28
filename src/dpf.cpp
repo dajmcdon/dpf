@@ -304,7 +304,7 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
   
   //Rcout << "The value of w is:" << std::endl << w << std::endl;
   
-  w = resampleSubOptimal(w, N);
+  w = resampleOptimal(w, N);
   if( !arma::any(w)) return List::create(Named("BadPars") = 1);
   arma::uvec positive = arma::find(w);
   int nkeep = positive.size();
@@ -614,10 +614,10 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
 //'                   
 //' @export    
 // [[Rcpp::export]]
-List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mus,
+List musicModeldynamics(arma::vec lt, double sig2eps, arma::vec mus,
                 arma::vec sig2eta, arma::vec transprobs,
                 arma::vec initialMean, arma::vec initialVariance){ 
-  // States (si,si-1) are: (1,1) (1,2) (2,1) (2,2)
+  // States (si-1,si) are: (1,1) (2,1) (1,2) (2,2)
   int nstates = 4; 
   int d = 1; //length of observed state
   int m = 3; //length of hidden state
@@ -645,22 +645,15 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   
   arma::cube dt(m, nstates, n, arma::fill::zeros);
   dt.tube(0,0) += mus(0);
+  dt.tube(0,1) += mus(0);
   dt.tube(0,2) += mus(0);
   dt.tube(1,2) += mus(1);
   dt.tube(2,2) += mus(2);
   
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
-  ct.tube(0,0) += mueps;
-  ct.tube(0,1) += mueps;
-  ct.tube(0,2) += mueps;
-  ct.tube(0,3) += mueps;
+
   
   arma::cube Tt(mm, nstates, n, arma::fill::zeros);
-  Tt.tube(0,1) += 1;
-  Tt.tube(3,1) += 1;
-  Tt.tube(4,1) += 1;
-  Tt.tube(7,1) += 1;
-  Tt.tube(8,1) += 1;
   Tt.tube(0,3) += 1;
   Tt.tube(3,3) += 1;
   Tt.tube(4,3) += 1;
@@ -673,6 +666,7 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   
   arma::cube HHt(mm, nstates, n, arma::fill::zeros);
   HHt.tube(0,0) += sig2eta(0);
+  HHt.tube(0,1) += sig2eta(0);
   HHt.tube(0,2) += sig2eta(0);
   HHt.tube(4,2) += sig2eta(1);
   HHt.tube(8,2) += sig2eta(2);
@@ -680,14 +674,15 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
   
+  // States (si-1,si) are: (1,1) (2,1) (1,2) (2,2)
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
   transMat(0,0) = transprobs(0); // (1,1) -> (1,1)
-  transMat(0,1) = 1 - transprobs(0); // (1,1) -> (1,2)
-  transMat(1,2) = transprobs(1); // (1,2) -> (2,1)
-  transMat(1,3) = 1 - transprobs(1); // (1,2) -> (2,2)
-  transMat(2,0) = transprobs(2); // (2,1) -> (1,1)
-  transMat(2,1) = 1 - transprobs(2); // (2,1) -> (1,2)
-  transMat(3,2) = transprobs(3); // (2,2) -> (1,1)
+  transMat(0,2) = 1 - transprobs(0); // (1,1) -> (1,2)
+  transMat(1,0) = transprobs(2); // (2,1) -> (1,1)
+  transMat(1,2) = 1 - transprobs(2); // (2,1) -> (1,2)
+  transMat(2,1) = transprobs(1); // (1,2) -> (2,1)
+  transMat(2,3) = 1 - transprobs(1); // (1,2) -> (2,2)
+  transMat(3,1) = transprobs(3); // (2,2) -> (2,1)
   transMat(3,3) = 1 - transprobs(3); // (2,2) -> (2,2)
   
   return List::create(Named("a0") = a0, Named("P0") = P0,

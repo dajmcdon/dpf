@@ -133,8 +133,8 @@ musicModel <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initi
 #'                   c(132,0), c(400,10))
 #'                   
 #' @export    
-musicModeldynamics <- function(lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
-    .Call('_dpf_musicModeldynamics', PACKAGE = 'dpf', lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
+musicModeldynamics <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
+    .Call('_dpf_musicModeldynamics', PACKAGE = 'dpf', lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
 }
 
 #' Greedy HMM estimation given continuous hidden states
