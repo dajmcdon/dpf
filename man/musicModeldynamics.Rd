@@ -6,7 +6,6 @@
 \usage{
 musicModeldynamics(
   lt,
-  mueps,
   sig2eps,
   mus,
   sig2eta,
