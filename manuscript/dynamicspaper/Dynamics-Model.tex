@@ -1,0 +1,260 @@
+% !TeX program = pdfLaTeX
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx,psfrag,epsf}
+\usepackage{enumerate}
+\usepackage{natbib}
+\usepackage{textcomp}
+\usepackage[hyphens]{url} % not crucial - just used below for the URL
+\usepackage{hyperref}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+%\pdfminorversion=4
+% NOTE: To produce blinded version, replace "0" with "1" below.
+\newcommand{\blind}{0}
+
+% DON'T change margins - should be 1 inch all around.
+\addtolength{\oddsidemargin}{-.5in}%
+\addtolength{\evensidemargin}{-.5in}%
+\addtolength{\textwidth}{1in}%
+\addtolength{\textheight}{1.3in}%
+\addtolength{\topmargin}{-.8in}%
+
+%% load any required packages here
+
+
+
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{pgf}
+\usepackage{tikz}
+
+\begin{document}
+
+
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if0\blind
+{
+  \title{\bf Using Switching State-Space Models to Interpret Musical Dynamics}
+
+  \author{
+        Robert Granger \thanks{The authors gratefully acknowledge \ldots{}} \\
+    Department of Statistics, Indiana University\\
+      }
+  \maketitle
+} \fi
+
+\if1\blind
+{
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf Using Switching State-Space Models to Interpret Musical Dynamics}
+  \end{center}
+  \medskip
+} \fi
+
+\bigskip
+\begin{abstract}
+The text of your abstract. 200 or fewer words.
+\end{abstract}
+
+\noindent%
+{\it Keywords:} 3 to 6 keywords, that do not appear in the title
+\vfill
+
+\newpage
+\spacingset{1.45} % DON'T change the spacing!
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Things to write about in this section
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  Classifying music performances to sort on personal preference
+\item
+  Smoothing performances to sound better from Midi data
+\item
+  Using State-Switching Model
+\end{enumerate}
+
+With a piece of classical music, directions such as
+
+\section{The Switching State-Space Model}
+\label{sec:model}
+
+State-Space models are commonly used to model time series observations
+in the presence of perceived hidden, continuous states. As a result of
+the state-space framework, the observations are viewed as independent
+conditional on the hidden states whereas these hidden states will follow
+a vector autoregressive process. Adding assumptions of linearity and
+Gaussian error produces the following model commonly referred to as the
+general linear Gaussian state-space model \citet{durbin_time_2012} takes
+the form \begin{equation}
+  \begin{aligned}
+    y_t &= C_t + D_tx_t + \epsilon_t, 
+    & \epsilon_t & \sim N(0,G_t)\\
+    x_{t+1} &= A_t + B_tx_t + \eta_t, 
+    & \eta_t & \sim N(0,H_t), 
+    & x_1 & \sim N(x_0,P_0) \\
+  \end{aligned}
+  \label{eq:statespacemod}
+\end{equation} where the first part of \autoref{eq:statespacemod} is
+known as the observation equation and the second part is known as the
+state equation. \(y_t\) is a vector of known observations, and \(x_t\)
+is a vector of the unobserved, continuous states at each time period,
+\(t\). The observation error, \(\epsilon_t\), and the state equation
+error, \(\eta_t\), are both assumed to be independent and identically
+distributed.
+
+In the typical state-space framework, the matrices \(A_t\), \(B_t\),
+\(C_t\), \(D_t\), \(G_t\), and \(H_t\) are allowed to vary across time
+but are known. If there are a finite number of perceived structures for
+these matrices, and the given structure is unknown at time, \(t\), a
+switching state-space model can be used. This model assumes there are
+some underlying discrete states, \(s_i\), that transition over time
+through a Markov process. Making this slight adjustment to
+\autoref{eq:statespacemod} yields the following model which will be used
+as a basic framework for modeling music dynamics.
+
+\begin{equation}
+  \begin{aligned}
+    y_t &= C_t(\Theta_t) + D_t(\Theta_t)x_t + \epsilon_t, 
+    & \epsilon_t & \sim N(0,G_t)\\
+    x_{t+1} &= A_t(\Theta_t) + B_t(\Theta)x_t + \eta_t, 
+    & \eta_t & \sim N(0,H_t), 
+    & x_1 & \sim N(x_0,P_0) \\
+  \end{aligned}
+  \label{eq:switchstatemodel}
+\end{equation}
+
+When it comes to musical dynamics, rarely do musicians attempt to play
+with the same dynamics or loudness throughout the entirety of a piece.
+While there may be dramatic changes occasionally throughout the
+performance, most of the time we expect the musician to steadily change
+the loudness from note to note. Furthermore, the musician may quietly or
+loudly play individual notes for emphasis. In order to model this
+behavior, we propose the following four discrete states:
+
+\begin{list}{}{}
+
+\item[$s_1$:] The musician selects a new value for loudness.
+
+\item[$s_2$:] The musician continues the dynamics in a steady way.
+
+\item[$s_3$:] The musician plays a single note more loudly.
+
+\item[$s_4$:] The musician plays a single note more softly.
+
+\end{list}
+
+The observation, \(y_t\) is the univariate loudness of the note at each
+time period, \(t\). In order to allow the dynamics to progress steadily,
+we implement the framework of \citet{gu_modeling_2012} where the
+continuous hidden states follow a process that allows for piece-wise
+quadratic displays with \[x_t = (x^0_t, x^1_t, x^2_t), \] where
+\(x^0_t\), \(x^1_t\), and \(x^2_t\) are the loudness, the first order
+difference, and the second order difference, respectively. Since we want
+to maintain this smooth progression even when the musician plays a
+single note more loudly or softly, states \(s_3\) and \(s_4\) are
+implemented by adding a constant in the observation equation as opposed
+to changing the state equation. \autoref{tab:parmats} shows the
+parameter matrices for the four states.
+
+The final part of the switching state-space model is designing the
+Markov process for transitioning between the discrete states.
+\autoref{fig:transmat} displays the structure of the transition between
+states. The first state, \(s_1\), allows for the selection of a new
+loudness which then transitions into the smooth progresson state,
+\(s_2\), with probability 1. When arriving in \(s_2\), the next time
+period's discrete state can be any of the possible states including
+itself. If in this progression, we move to a sudden loud note, \(s_3\),
+or a sudden soft note, \(s_4\), then we have the opportunity to continue
+the smooth progression, \(s_2\), or start a new smooth progression,
+\(s_1\). It is not permissible though to immediately then play another
+sudden loud or soft note. With four states, the transition matrix could
+potentially have 12 probabilities to estimate; however, because of
+restrictions placed on the possible transitions, only 5 probabilities
+need to be estimated.
+
+\begin{table}
+\centering
+\begin{tabular}[h!]{@{}llccccccc@{}}
+\toprule
+%&&&\multicolumn{3}{c}{Parameter Matrices}\\
+  \multicolumn{2}{c}{States} &\phantom{a}& \multicolumn{6}{c}{Parameter Matrices}\\
+  \cmidrule{1-2} \cmidrule{4-9}
+  $s_i$ &&& $A$ & $B$ & $C$ & $D$ & $G$ & $H$ \\
+  \midrule
+  $s_1$ & && $\begin{pmatrix} \mu_1 \\ \mu_2 \\ \mu_3 \end{pmatrix}$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} \sigma_1^2&0&0 \\ 0&\sigma_2^2&0 \\ 0&0&\sigma_3^2 \end{pmatrix}$\\
+  \\
+  $s_2$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  \\
+  $s_3$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  \\
+  $s_4$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $-\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+
+\bottomrule
+\end{tabular}
+\caption{Parameter matrices for the switching state space model.\label{tab:parmats}}
+\end{table}
+
+\begin{figure}[tb!]
+  \centering
+  \tikzstyle{switch}=[rectangle,
+  thick, minimum size=1cm, draw=black]
+  \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
+    \matrix[row sep=0.25cm,column sep=.5cm] {
+      &&& \node (S1) [switch] {$s_1$};&&& \\
+      \\ \\ \\ \\ \\ \\
+      &&& \node (S2) [switch] {$s_2$};&&& \\
+      \\ \\ \\ \\ \\ \\
+      &\node (S3) [switch] {$s_3$}; &&&& \node (S4) [switch] {$s_4$};\\
+    };
+    \path[->]
+    (S1) edge [bend right] node [left] {1}(S2)
+    (S2) edge [bend right] node [right] {$p_{21}$}(S1)
+    (S2) edge [loop above] node [left] {}(S2)
+    (S2) edge [bend right] node [right] {$p_{23}$}(S3)
+    (S2) edge [bend right] node [right] {$p_{24}$}(S4)
+    (S3) edge [bend left] node [left] {$p_{31}$}(S1)
+    (S3) edge [bend right] node [left] {}(S2)
+    (S4) edge [bend right] node [right] {$p_{41}$}(S1)
+    (S4) edge [bend right] node [left] {}(S2);
+  \end{tikzpicture}
+  \caption{Transition diagram. \label{fig:transmat}}
+\end{figure}
+
+\section{Evaluating the Model}
+\label{sec:analysis}
+
+Things to include:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\tightlist
+\item
+  Discussion of state-space model algorithm with discrete particle
+  filter
+\end{enumerate}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\nocite{*}
+
+\bibliographystyle{agsm}
+\bibliography{musicdynamicsbib.bib}
+
+\end{document}

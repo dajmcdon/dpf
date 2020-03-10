@@ -4,7 +4,21 @@
 \alias{beamSearch}
 \title{Greedy HMM estimation given continuous hidden states}
 \usage{
-beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
+beamSearch(
+  a0,
+  P0,
+  w0,
+  dt,
+  ct,
+  Tt,
+  Zt,
+  HHt,
+  GGt,
+  yt,
+  transProbs,
+  N,
+  samplemethod
+)
 }
 \arguments{
 \item{a0}{a pxd matrix of state prior means, where the i'th column is the mean for the i'th state}
@@ -30,6 +44,8 @@ beamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
 \item{transProbs}{a dxd matrix of transition probabilities for the discrete states}
 
 \item{N}{the maximum particle number}
+
+\item{samplemethod}{is the method in which the resampling stage should be performed. A "0" indicates that low probability particles should be resampled with equal probability.  A "1" indicates that only the large "N" particles with the largest probabilities will be kept.}
 }
 \value{
 List with components "paths", "weights", and "LastStep". 
@@ -56,6 +72,6 @@ lt = diff(c(tempos$note_onset, 61))
 pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
                   c(132,0), c(400,10)) # prior means and variances on X_1
 beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0), dt, ct, Tt, Zt,
-            HHt, GGt, y, transMat, 200))
+            HHt, GGt, y, transMat, 200, samplemethod = 1))
 
 }

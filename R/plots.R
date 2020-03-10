@@ -108,7 +108,7 @@ plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar,titl
   lt = diff(c(onset,61))
   
   if(model=="dynamics"){
-    mats = musicModeldynamics(lt, theta[1], theta[2:4], theta[5:7], theta[8:11],
+    mats = musicModeldynamics(lt, theta[1], theta[2], theta[3:5], theta[6:8], theta[9:13],
                               priormean, priorvar)
     kal <- kalman(pmats,states,y)
     df = data.frame(
@@ -116,23 +116,35 @@ plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar,titl
       dynamics = c(y), 
       inferred = c(kal$ests), 
       state = factor(
-        convert4to2dynamics(states),
-        levels=c(1,2),
-        labels=c('New Value', 'Smooth Progression')
+        states,
+        levels=c(0,1,2,3),
+        labels=c('New Value', 'Smooth Progression','Positive Emphasis','Negative Emphasis')
       )
     )
+    df2 <- data.frame(
+      start = c(0,9,17,21,33,45,53),
+      end = c(8,16,20,32,44,52,60)+1,
+      direction = factor(c(1,0,2,0,4,1,0),
+                         levels=c(0,1,2,4),
+                         labels=c("p","f","ff","poco piu vivo"))
+    )
     myplot <- ggplot2::ggplot(df) + 
-      ggplot2::geom_rect(
-        data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
-        mapping=ggplot2::aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-        fill = 'gray90', color = 'gray90') +
-      ggplot2::geom_line(ggplot2::aes(x=measure, y=dynamics), color='black') +
+      geom_rect(data=df2, aes(NULL,NULL,xmin=start,xmax=end,fill=direction),
+                ymin=-Inf,ymax=Inf,color="white",size=0.5,alpha=0.3)+
+      scale_fill_manual("Composer Direction",values=c("p"="grey95",
+                                                      "f"="grey90",
+                                                      "ff"="grey75",
+                                                      "sf"="grey50",
+                                                      "poco piu vivo"="lightblue"))+
+      ggplot2::geom_line(ggplot2::aes(x=measure, y=dynamics), color='grey10') +
       ggplot2::geom_point(ggplot2::aes(x=measure, y=inferred, color=state)) +
-      ggplot2::scale_color_viridis_d() +
-      ggplot2::theme_minimal() +
-      ggplot2::theme(legend.position = 'bottom', 
-                     legend.title = ggplot2::element_blank()) +
-      ggplot2::ggtitle(title)
+      scale_color_manual("Performer Intention",values=c('New Value'="blue",
+                                                       'Smooth Progression'="darkcyan",
+                                                       'Positive Emphasis'="darkorange1",
+                                                       'Negative Emphasis'="red"))+
+      ggplot2::theme(legend.position = 'right') +
+      ggplot2::ggtitle(title) +
+      ggplot2::labs(x="Measure", y="Dynamics")
   }
   
   if(model=="tempo"){

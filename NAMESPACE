@@ -2,7 +2,7 @@
 
 export(beamSearch)
 export(convert10to4)
-export(convert4to2dynamics)
+export(convertdynamicstates)
 export(ddirichlet)
 export(getloglike)
 export(kalman)

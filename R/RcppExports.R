@@ -133,8 +133,8 @@ musicModel <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initi
 #'                   c(132,0), c(400,10))
 #'                   
 #' @export    
-musicModeldynamics <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
-    .Call('_dpf_musicModeldynamics', PACKAGE = 'dpf', lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
+musicModeldynamics <- function(lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
+    .Call('_dpf_musicModeldynamics', PACKAGE = 'dpf', lt, mueps, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
 }
 
 #' Greedy HMM estimation given continuous hidden states
@@ -157,6 +157,7 @@ musicModeldynamics <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMea
 #' @param yt a kxn matrix of obervations
 #' @param transProbs a dxd matrix of transition probabilities for the discrete states
 #' @param N the maximum particle number
+#' @param samplemethod is the method in which the resampling stage should be performed. A "0" indicates that low probability particles should be resampled with equal probability.  A "1" indicates that only the large "N" particles with the largest probabilities will be kept.
 #' 
 #' @return List with components "paths", "weights", and "LastStep". 
 #' \describe{
@@ -175,11 +176,11 @@ musicModeldynamics <- function(lt, sig2eps, mus, sig2eta, transprobs, initialMea
 #' pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
 #'                   c(132,0), c(400,10)) # prior means and variances on X_1
 #' beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0), dt, ct, Tt, Zt,
-#'             HHt, GGt, y, transMat, 200))
+#'             HHt, GGt, y, transMat, 200, samplemethod = 1))
 #' 
 #' @export 
-beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N) {
-    .Call('_dpf_beamSearch', PACKAGE = 'dpf', a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
+beamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N, samplemethod) {
+    .Call('_dpf_beamSearch', PACKAGE = 'dpf', a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N, samplemethod)
 }
 
 #' Estimate continuous states given parameters and discrete hidden states

@@ -87,86 +87,70 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
 //' @export 
 // [[Rcpp::export]]
 arma::colvec resampleOptimal(arma::colvec w, int N){
-
-  //Rcout << "The value of w is:" << std::endl << w << std::endl;
   
   int M = w.size();
   double tol = 1e-10;
-  arma::colvec ws = w;
+  arma::colvec ws = normalise(w,1);
+  
+  //Remove 0s and check if sampling procedure is necessary
   ws.elem( arma::find( ws < tol) ).zeros();
   arma::vec nzz = arma::nonzeros(ws);
-  
-  //Rcout << "The value of ws is:" << std::endl << ws << std::endl;
-  
   arma::uword nz = nzz.n_elem;
   if(M <= N || nz <= N){ 
     return ws;
   }
   
-  // Hard case.
-  arma::colvec wssortnorm = ws;
-  wssortnorm = arma::sort(wssortnorm);
-  wssortnorm = arma::normalise(wssortnorm,1);
-  //Rcout << "The value of wssortnorm is:" << std::endl << wssortnorm << std::endl;
+  
+  // Calculate C: THIS IS TESTED AND APPEARS CORRECT
+  arma::colvec wssort = ws;
+  wssort = arma::sort(wssort);
   int Ak = 0;
   double Bk = 1.0;
   int i = M;
   
   while(i > M - N){
     i--;
-    if(wssortnorm(i) < tol || Bk <= tol){
+    if(wssort(i) < tol || Bk <= tol){
       ws.elem( arma::find( ws < tol) ) .zeros();
       return ws;
     }
-    if(Bk/wssortnorm(i) + Ak >= N) break;
+    if(Bk/wssort(i) + Ak >= N) break;
     Ak++;
-    Bk -= wssortnorm(i);
+    Bk -= wssort(i);
   }
   double cinv = Bk / (N-Ak);
-  
   //Rcout << "The value of cinv is:" << std::endl << cinv << std::endl;
+
   
-  // Set 1
-  arma::vec NewW;
-  NewW.zeros(M);
-  arma::colvec wnormalized = ws;
-  wnormalized = arma::normalise(ws,1);
-  
-  //Rcout << "The value of wnormalized is:" << std::endl << wnormalized << std::endl;
-  
+  // Create Set 1
+  arma::vec FINALW;
+  FINALW.zeros(M);
   int L=0;
   double K=0;
   for(i=0; i<M; i++){
-    if(cinv < wnormalized(i)){
-      //Rcout << "The value of i is:" << std::endl << i << std::endl;
-      NewW(i) += ws(i);
+    if(cinv < ws(i)){
+      FINALW(i) += ws(i);
       L++;
-      //Rcout << "The value of L is:" << std::endl << L << std::endl;
     }else{
-      K += ws(i);  
+      K += ws(i);  //Compute K needed for Set 2
     }
   }
   K /= (N-L);
-  //Rcout << "The value of N is:" << std::endl << N << std::endl;
-  //Rcout << "The value of L is:" << std::endl << L << std::endl;
-  //Rcout << "The value of K is:" << std::endl << K << std::endl;
+
   
-  // Set 2
+  // Create Set 2
   RNGScope scope;
-  double U1 = runif(1)[0] * K;
-  //Rcout << "The value of U1 is:" << std::endl << U1 << std::endl;
+  double U1 = runif(1)[0]*K;
   for(int i=0; i<M; i++){
-    if(NewW(i)==0){
+    if(FINALW(i)==0){
       U1 -= ws(i);
       if(U1 < 0){
-        NewW(i) += cinv;
+        FINALW(i) += cinv;
         U1 += K;
       }
     }
   }
-  NewW = arma::normalise(NewW,1);
-  //Rcout << "The value of NewW is:" << std::endl << NewW << std::endl;
-  return NewW;
+  return FINALW;
 }
 
 struct KFOUT{
@@ -269,7 +253,7 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
          arma::mat transProbs,
          arma::mat a0, arma::mat P0,
          arma::mat dt, arma::mat ct, arma::mat Tt, arma::mat Zt, //Matrices stored in columns of these variables. Re turned into matrices in other functions.
-         arma::mat HHt, arma::mat GGt, arma::vec yt){
+         arma::mat HHt, arma::mat GGt, arma::vec yt, int samplemethod){
   int npart = currentStates.size();
   int m = a0.n_rows;                            //dimension of each particle (the continuous part)
   int K = dt.n_cols;                            //number of possible discrete states
@@ -304,7 +288,13 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
   
   //Rcout << "The value of w is:" << std::endl << w << std::endl;
   
-  w = resampleOptimal(w, N);
+  if(samplemethod == 0){
+    w = resampleOptimal(w, N);
+  } else if(samplemethod == 1){
+    w = resampleSubOptimal(w, N);
+  } else {
+    Rcout << "The value of w is:" << std::endl << w << std::endl;
+  }
   if( !arma::any(w)) return List::create(Named("BadPars") = 1);
   arma::uvec positive = arma::find(w);
   int nkeep = positive.size();
@@ -614,10 +604,10 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
 //'                   
 //' @export    
 // [[Rcpp::export]]
-List musicModeldynamics(arma::vec lt, double sig2eps, arma::vec mus,
+List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mus,
                 arma::vec sig2eta, arma::vec transprobs,
                 arma::vec initialMean, arma::vec initialVariance){ 
-  // States (si-1,si) are: (1,1) (2,1) (1,2) (2,2)
+  // States are: 1, 2, 3, 4
   int nstates = 4; 
   int d = 1; //length of observed state
   int m = 3; //length of hidden state
@@ -645,15 +635,24 @@ List musicModeldynamics(arma::vec lt, double sig2eps, arma::vec mus,
   
   arma::cube dt(m, nstates, n, arma::fill::zeros);
   dt.tube(0,0) += mus(0);
-  dt.tube(0,1) += mus(0);
-  dt.tube(0,2) += mus(0);
-  dt.tube(1,2) += mus(1);
-  dt.tube(2,2) += mus(2);
+  dt.tube(1,0) += mus(1);
+  dt.tube(2,0) += mus(2);
   
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
-
+  ct.tube(0,2) += mueps;
+  ct.tube(0,3) += -mueps;
   
   arma::cube Tt(mm, nstates, n, arma::fill::zeros);
+  Tt.tube(0,1) += 1;
+  Tt.tube(3,1) += 1;
+  Tt.tube(4,1) += 1;
+  Tt.tube(7,1) += 1;
+  Tt.tube(8,1) += 1;
+  Tt.tube(0,2) += 1;
+  Tt.tube(3,2) += 1;
+  Tt.tube(4,2) += 1;
+  Tt.tube(7,2) += 1;
+  Tt.tube(8,2) += 1;
   Tt.tube(0,3) += 1;
   Tt.tube(3,3) += 1;
   Tt.tube(4,3) += 1;
@@ -666,24 +665,23 @@ List musicModeldynamics(arma::vec lt, double sig2eps, arma::vec mus,
   
   arma::cube HHt(mm, nstates, n, arma::fill::zeros);
   HHt.tube(0,0) += sig2eta(0);
-  HHt.tube(0,1) += sig2eta(0);
-  HHt.tube(0,2) += sig2eta(0);
-  HHt.tube(4,2) += sig2eta(1);
-  HHt.tube(8,2) += sig2eta(2);
+  HHt.tube(4,0) += sig2eta(1);
+  HHt.tube(8,0) += sig2eta(2);
   
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
   
-  // States (si-1,si) are: (1,1) (2,1) (1,2) (2,2)
+  //Order: p21, p23, p24, p31, p41
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
-  transMat(0,0) = transprobs(0); // (1,1) -> (1,1)
-  transMat(0,2) = 1 - transprobs(0); // (1,1) -> (1,2)
-  transMat(1,0) = transprobs(2); // (2,1) -> (1,1)
-  transMat(1,2) = 1 - transprobs(2); // (2,1) -> (1,2)
-  transMat(2,1) = transprobs(1); // (1,2) -> (2,1)
-  transMat(2,3) = 1 - transprobs(1); // (1,2) -> (2,2)
-  transMat(3,1) = transprobs(3); // (2,2) -> (2,1)
-  transMat(3,3) = 1 - transprobs(3); // (2,2) -> (2,2)
+  transMat(0,1) = 1;
+  transMat(1,0) = transprobs(0);
+  transMat(1,1) = 1 - transprobs(0) - transprobs(1) - transprobs(2);
+  transMat(1,2) = transprobs(1);
+  transMat(1,3) = transprobs(2);
+  transMat(2,0) = transprobs(3);
+  transMat(2,1) = 1 - transprobs(3);
+  transMat(3,0) = transprobs(4);
+  transMat(3,1) = 1 - transprobs(4);
   
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
@@ -751,6 +749,7 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
 //' @param yt a kxn matrix of obervations
 //' @param transProbs a dxd matrix of transition probabilities for the discrete states
 //' @param N the maximum particle number
+//' @param samplemethod is the method in which the resampling stage should be performed. A "0" indicates that low probability particles should be resampled with equal probability.  A "1" indicates that only the large "N" particles with the largest probabilities will be kept.
 //' 
 //' @return List with components "paths", "weights", and "LastStep". 
 //' \describe{
@@ -769,14 +768,14 @@ List initializeParticles(arma::vec w0, int N, arma::mat a0, arma::mat P0,
 //' pmats = musicModel(lt, theta[1], theta[2:4], theta[5:7], theta[8:14], 
 //'                   c(132,0), c(400,10)) # prior means and variances on X_1
 //' beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0), dt, ct, Tt, Zt,
-//'             HHt, GGt, y, transMat, 200))
+//'             HHt, GGt, y, transMat, 200, samplemethod = 1))
 //' 
 //' @export 
 // [[Rcpp::export]]
 List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                 arma::cube dt, arma::cube ct, arma::cube Tt, arma::cube Zt,
                 arma::cube HHt, arma::cube GGt, arma::mat yt,
-                arma::mat transProbs, int N){
+                arma::mat transProbs, int N, int samplemethod){
   arma::uword n = yt.n_cols;
   arma::uword K = transProbs.n_cols;
   double maxpart = pow(K,n);
@@ -820,7 +819,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                               dt.slice(iter * dtvar), ct.slice(iter * ctvar), 
                               Tt.slice(iter * Ttvar), Zt.slice(iter * Ztvar), 
                               HHt.slice(iter * HHtvar), 
-                              GGt.slice(iter * GGtvar), yt.col(iter));
+                              GGt.slice(iter * GGtvar), yt.col(iter), samplemethod);
     int BP = step["BadPars"];
     if(BP) break;
     arma::vec newW = step["newW"];
