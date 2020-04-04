@@ -19,7 +19,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // resampleOptimal
-arma::colvec resampleOptimal(arma::colvec w, int N);
+List resampleOptimal(arma::colvec w, int N);
 RcppExport SEXP _dpf_resampleOptimal(SEXP wSEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

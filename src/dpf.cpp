@@ -25,7 +25,7 @@ arma::uvec SampleNoReplace(arma::uvec x, int size) {
 //' @export 
 // [[Rcpp::export]]
 arma::vec resampleSubOptimal(arma::vec w, int N){
-  //Rcout << "The value of w is:" << std::endl << w << std::endl;
+  //Rcout << "The value of wbefore is:" << std::endl << w << std::endl;
   int M = w.size();
   double tol = 1e-10;
   arma::vec ws = w;
@@ -84,10 +84,13 @@ arma::vec resampleSubOptimal(arma::vec w, int N){
   return ws;
 }
 
+
+
 //' @export 
 // [[Rcpp::export]]
-arma::colvec resampleOptimal(arma::colvec w, int N){
+List resampleOptimal(arma::colvec w, int N){
   
+  double frac = -999;
   int M = w.size();
   double tol = 1e-10;
   arma::colvec ws = normalise(w,1);
@@ -97,7 +100,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   arma::vec nzz = arma::nonzeros(ws);
   arma::uword nz = nzz.n_elem;
   if(M <= N || nz <= N){ 
-    return ws;
+    return List::create(Named("W") = ws, Named("frac") = frac);
   }
   
   
@@ -112,7 +115,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
     i--;
     if(wssort(i) < tol || Bk <= tol){
       ws.elem( arma::find( ws < tol) ) .zeros();
-      return ws;
+      return List::create(Named("W") = ws, Named("frac") = frac);
     }
     if(Bk/wssort(i) + Ak >= N) break;
     Ak++;
@@ -120,7 +123,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   }
   double cinv = Bk / (N-Ak);
   //Rcout << "The value of cinv is:" << std::endl << cinv << std::endl;
-
+  
   
   // Create Set 1
   arma::vec FINALW;
@@ -136,7 +139,8 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
     }
   }
   K /= (N-L);
-
+  frac = L/double(M);
+  //Rcout << "The value of frac is:" << std::endl << frac << std::endl;
   
   // Create Set 2
   RNGScope scope;
@@ -150,7 +154,7 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
       }
     }
   }
-  return FINALW;
+  return List::create(Named("W") = FINALW, Named("frac") = frac);
 }
 
 struct KFOUT{
@@ -183,7 +187,7 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   // Update a_t-1|t-1 to a_t using CURRENT state
   atemp = dt + Tt * a0;
   Ptemp = HHt + Tt * P0 * Tt.t();
-  
+
   // Make predictions using a_t
   arma::mat pred = ct + Zt * atemp;
   arma::mat vt = yt - pred;
@@ -278,6 +282,7 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
     P1.slice(part) = P11;
   }
   arma::mat testLik = lik;
+  //Rcout << "The value of testLik is:" << std::endl << testLik << std::endl;
   lik %= transProbs.rows(currentStates);
   lik.each_col() %= w;
   
@@ -286,15 +291,20 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
   w = arma::vectorise(lik);
   w = arma::normalise(w,1);
   
-  //Rcout << "The value of w is:" << std::endl << w << std::endl;
   
+  double frac = -999;
+  //Rcout << "The value of wbefore is:" << std::endl << w << std::endl;
   if(samplemethod == 0){
-    w = resampleOptimal(w, N);
+    List wsample = resampleOptimal(w, N);
+    arma::vec newW = wsample["W"];
+    w = newW;
+    frac = wsample["frac"];
   } else if(samplemethod == 1){
     w = resampleSubOptimal(w, N);
   } else {
-    Rcout << "The value of w is:" << std::endl << w << std::endl;
+    w = resampleSubOptimal(w, N);
   }
+  //Rcout << "The value of wafter is:" << std::endl << w << std::endl;
   if( !arma::any(w)) return List::create(Named("BadPars") = 1);
   arma::uvec positive = arma::find(w);
   int nkeep = positive.size();
@@ -304,11 +314,14 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
   arma::uvec newstates(nkeep);
   arma::uvec oldstates(nkeep);
   int i=0;
+  //Rcout << "The value of K is:" << std::endl << K << std::endl;
+  //Rcout << "The value of npart is:" << std::endl << npart << std::endl;
   for(int k=0; k<K; k++){
     for(int part=0; part < npart; part++){
       if(w(part + k*npart)>0){
         newstates(i) = k;
         oldstates(i) = part;
+        //Rcout << "The value of oldstates() is:" << std::endl << part << std::endl;
         arma::mat a1tmp = a1.subcube(0,k,part,m-1,k,part);
         arma::mat P1tmp = P1.subcube(0,k,part,mm-1,k,part);
         aout.col(i) = a1tmp;
@@ -323,7 +336,8 @@ List dpf(arma::uvec currentStates, arma::colvec w, int N,
                       Named("oldstates") = oldstates,
                       Named("newstates") = newstates,
                       Named("newW") = newW,
-                      Named("testLik") = testLik);
+                      Named("testLik") = testLik,
+                      Named("frac") = frac);
 }
 
 
@@ -659,6 +673,7 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   Tt.tube(7,3) += 1;
   Tt.tube(8,3) += 1;
   
+  
   arma::cube Zt(m, nstates, 1, arma::fill::zeros);
   Zt.tube(0,0,0,nstates-1) += 1;
   
@@ -799,6 +814,7 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                                   Tt.slice(0), Zt.slice(0), 
                                   HHt.slice(0), 
                                   GGt.slice(0), yt.col(0));
+  
   int BP = step["BadPars"];
   if(BP) return List::create(Named("LastStep") = 1);
   arma::vec newW = step["newW"];
@@ -812,6 +828,8 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
   particles.head(CurrentPartNum) = newS;
   paths(arma::span(0, CurrentPartNum - 1), 0) = newS;
   arma::uword iter = 1;
+  arma::colvec frac(n,arma::fill::zeros);
+  //Rcout << "The value of n is:" << std::endl << n << std::endl;
   while(iter < n){
     step = dpf(particles.head(CurrentPartNum), weights.head(CurrentPartNum), 
                               maxpart, transProbs, 
@@ -822,8 +840,11 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
                               GGt.slice(iter * GGtvar), yt.col(iter), samplemethod);
     int BP = step["BadPars"];
     if(BP) break;
+    double test = step["frac"];
+    frac(iter-1) += test;
     arma::vec newW = step["newW"];
     CurrentPartNum = newW.n_elem;
+    //Rcout << "The value of CurrentPartNum is:" << std::endl << CurrentPartNum << std::endl;
     weights.head(CurrentPartNum) = newW;
     if(CurrentPartNum < maxpart) weights.tail(maxpart-CurrentPartNum) *= 0; // fix decreasing CurrentPartNum
     arma::mat a1tmp = step["a1"];
@@ -831,16 +852,19 @@ List beamSearch(arma::mat a0, arma::mat P0, arma::vec w0,
     arma::mat P1tmp = step["P1"];
     P0.head_cols(CurrentPartNum) = P1tmp;
     arma::uvec newS = step["newstates"];
+    //Rcout << "The value of newS is:" << std::endl << newS << std::endl;
     particles.head(CurrentPartNum) = newS;
-    arma::uvec old = step["oldstates"];
-    arma::umat tmp = paths.rows(old);
+    arma::uvec old = step["oldstates"]; 
+    //Rcout << "The value of old is:" << std::endl << old << std::endl;
+    arma::umat tmp = paths.rows(old); //crash
     paths.head_rows(CurrentPartNum) = tmp;   //could create issues if CurrentPartNum decreases over time?
     paths(arma::span(0,CurrentPartNum-1), iter) = newS;
     iter++;
   }
   return List::create(Named("paths") = paths,
                       Named("weights") = weights,
-                      Named("LastStep") = iter++);
+                      Named("LastStep") = iter++,
+                      Named("frac") = frac);
 }
 
 

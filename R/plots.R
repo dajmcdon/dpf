@@ -144,6 +144,7 @@ plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar,titl
                                                        'Negative Emphasis'="red"))+
       ggplot2::theme(legend.position = 'right') +
       ggplot2::ggtitle(title) +
+      cowplot::theme_cowplot() +
       ggplot2::labs(x="Measure", y="Dynamics")
   }
   

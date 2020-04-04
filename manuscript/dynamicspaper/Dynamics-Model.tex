@@ -30,6 +30,7 @@
 \usepackage{booktabs}
 \usepackage{pgf}
 \usepackage{tikz}
+\usepackage{algorithm2e}
 
 \begin{document}
 
@@ -77,6 +78,8 @@ The text of your abstract. 200 or fewer words.
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
+\def\algorithmautorefname{Algorithm}
+
 Things to write about in this section
 
 \begin{enumerate}
@@ -89,7 +92,9 @@ Things to write about in this section
   Using State-Switching Model
 \end{enumerate}
 
-With a piece of classical music, directions such as
+The composer gives directions about dynamics. \(p\) stands for ``piano''
+and indicates this section should be played ``soft''. The ``f'' stands
+for ``forte'' and indicates this section should be played
 
 \section{The Switching State-Space Model}
 \label{sec:model}
@@ -130,9 +135,9 @@ as a basic framework for modeling music dynamics.
 
 \begin{equation}
   \begin{aligned}
-    y_t &= C_t(\Theta_t) + D_t(\Theta_t)x_t + \epsilon_t, 
+    y_t &= C_t(s_t) + D_t(s_t)x_t + \epsilon_t, 
     & \epsilon_t & \sim N(0,G_t)\\
-    x_{t+1} &= A_t(\Theta_t) + B_t(\Theta)x_t + \eta_t, 
+    x_{t+1} &= A_t(s_t) + B_t(s_t)x_t + \eta_t, 
     & \eta_t & \sim N(0,H_t), 
     & x_1 & \sim N(x_0,P_0) \\
   \end{aligned}
@@ -149,44 +154,54 @@ behavior, we propose the following four discrete states:
 
 \begin{list}{}{}
 
-\item[$s_1$:] The musician selects a new value for loudness.
+\item[$s^1$:] The musician selects a new value for loudness.
 
-\item[$s_2$:] The musician continues the dynamics in a steady way.
+\item[$s^2$:] The musician continues the dynamics in a steady way.
 
-\item[$s_3$:] The musician plays a single note more loudly.
+\item[$s^3$:] The musician plays a single note more loudly.
 
-\item[$s_4$:] The musician plays a single note more softly.
+\item[$s^4$:] The musician plays a single note more softly.
 
 \end{list}
 
 The observation, \(y_t\) is the univariate loudness of the note at each
 time period, \(t\). In order to allow the dynamics to progress steadily,
-we implement the framework of \citet{gu_modeling_2012} where the
-continuous hidden states follow a process that allows for piece-wise
-quadratic displays with \[x_t = (x^0_t, x^1_t, x^2_t), \] where
-\(x^0_t\), \(x^1_t\), and \(x^2_t\) are the loudness, the first order
-difference, and the second order difference, respectively. Since we want
-to maintain this smooth progression even when the musician plays a
-single note more loudly or softly, states \(s_3\) and \(s_4\) are
-implemented by adding a constant in the observation equation as opposed
-to changing the state equation. \autoref{tab:parmats} shows the
-parameter matrices for the four states.
+the continuous hidden states, \(x_t\), follow a process that allows for
+piece-wise quadratic displays. At each time period, \(x_t\), is an array
+of length three, \[x_t = (x^0_t, x^1_t, x^2_t), \] where \(x^0_t\) is
+the loudness, \(x^1_t\) is the first order difference, and \(x^2_t\) is
+the second order difference. Since we want to maintain this smooth
+progression even when the musician plays a single note more loudly or
+softly, states \(s^3\) and \(s^4\) are implemented by adding a constant
+in the observation equation as opposed to changing the state equation.
+The model is similar to that proposed in \citet{gu_modeling_2012}, but
+extended to include these additional states. \autoref{tab:parmats} shows
+the parameter matrices for the four states.
 
 The final part of the switching state-space model is designing the
 Markov process for transitioning between the discrete states.
 \autoref{fig:transmat} displays the structure of the transition between
-states. The first state, \(s_1\), allows for the selection of a new
+states. The first state, \(s^1\), allows for the selection of a new
 loudness which then transitions into the smooth progresson state,
-\(s_2\), with probability 1. When arriving in \(s_2\), the next time
+\(s^2\), with probability 1. When arriving in \(s^2\), the next time
 period's discrete state can be any of the possible states including
-itself. If in this progression, we move to a sudden loud note, \(s_3\),
-or a sudden soft note, \(s_4\), then we have the opportunity to continue
-the smooth progression, \(s_2\), or start a new smooth progression,
-\(s_1\). It is not permissible though to immediately then play another
+itself. If in this progression, we move to a sudden loud note, \(s^3\),
+or a sudden soft note, \(s^4\), then we have the opportunity to continue
+the smooth progression, \(s^2\), or start a new smooth progression,
+\(s^1\). It is not permissible though to immediately then play another
 sudden loud or soft note. With four states, the transition matrix could
 potentially have 12 probabilities to estimate; however, because of
 restrictions placed on the possible transitions, only 5 probabilities
 need to be estimated.
+
+In total, there are 13 distinct unknown parameters,
+\(\theta \in \Theta\), spread across 4 unknown states, \(s^i \in S\),
+through \(T\) time periods. A summary of the parameters to be estimated
+are:
+\(\Theta = \{\mu_c, \sigma^2_\epsilon, \mu_0, \mu_1, \mu_2, \sigma^2_0, \sigma^2_1, \sigma^2_2, p_{21}, p_{23}, p_{24}, p_{31}, p_{41}\}\).
+In the next section, we discuss finding smoothed estimates of the
+dynamics which requires estimation of these parameters along with the
+continous and discrete states.
 
 \begin{table}
 \centering
@@ -195,15 +210,15 @@ need to be estimated.
 %&&&\multicolumn{3}{c}{Parameter Matrices}\\
   \multicolumn{2}{c}{States} &\phantom{a}& \multicolumn{6}{c}{Parameter Matrices}\\
   \cmidrule{1-2} \cmidrule{4-9}
-  $s_i$ &&& $A$ & $B$ & $C$ & $D$ & $G$ & $H$ \\
+  $S$ &&& $A$ & $B$ & $C$ & $D$ & $G$ & $H$ \\
   \midrule
-  $s_1$ & && $\begin{pmatrix} \mu_1 \\ \mu_2 \\ \mu_3 \end{pmatrix}$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} \sigma_1^2&0&0 \\ 0&\sigma_2^2&0 \\ 0&0&\sigma_3^2 \end{pmatrix}$\\
+  $s^1$ & && $\begin{pmatrix} \mu_0 \\ \mu_1 \\ \mu_2 \end{pmatrix}$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} \sigma_0^2&0&0 \\ 0&\sigma_1^2&0 \\ 0&0&\sigma_2^2 \end{pmatrix}$\\
   \\
-  $s_2$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  $s^2$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
   \\
-  $s_3$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  $s^3$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
   \\
-  $s_4$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $-\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  $s^4$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $-\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
 
 \bottomrule
 \end{tabular}
@@ -239,15 +254,262 @@ need to be estimated.
 \section{Evaluating the Model}
 \label{sec:analysis}
 
-Things to include:
+\subsection{The algorithm}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi})}
-\tightlist
-\item
-  Discussion of state-space model algorithm with discrete particle
-  filter
-\end{enumerate}
+The construction of the model is designed to allow us to separate the
+observed dynamics, \(y_t\), from the performer's intended dynamics,
+\(E[y_t]\). Hence, the aim in estimating the intended dynamics is
+attempting to remove \(\epsilon_t\), which can be seen as unintended
+deviations from the desired loudness.
+
+When the parameter values, \(\theta_i \in \Theta\), and the discrete
+states, \(S\), are known, the Kalman filter (see
+\citet{kalman_new_1960}) can be used to find estimates of the continuous
+hidden states, \(\{x_t\}_{t=0}^t\), along with the likelihood of
+\(\Theta\). While the Kalman filter provides an easy way to compute the
+likelihood, the estimate of \(x_t\) is obtained using only observations
+coming before time \(t\). In order to use all information, we implement
+the Kalman smoothing algorithm introduced in \citet{rauch_maximum_1965}.
+Given \(\Theta\) and \(S\), this algorithm provides an estimate,
+\(\hat{x_t} = E[x_t|y_0,...y_T]\), which can be used to compute a fitted
+or ``smoothed'' value, \(\hat{y_t}\).
+
+So far, if \(\Theta\) and \(S\) are known, we have a closed form
+solution to obtaining the smoothed dynamics through the Kalman smoother.
+If \(\Theta\) is known, we can obtain the most likely set of discrete
+states, \(S\), by simply running the Kalman smoother algorithm on every
+possible combination of discrete states and discovering the largest
+likelihood. This may work if the number of discrete states and/or time
+periods is small; however, the number of state combinations to check
+would be \(\|\{s_i \in S\}\|^T\). For example, if we were using the
+music dynamics model presented in the previous section on Chopin's
+Mazurka Op. 63 No.~3 (which has 231 notes), the total number of state
+combinations to check would be \(4^{231}\approx1.19\times 10^{139}\). Of
+course, many of these state combinations could be removed due to 0
+likelihood given the restrictions on the state transitions, but even if
+this is taken into account, the number of state combinations would be
+far too large. To overcome this issue, we only look at a subset of these
+combinations through the Discrete Particle Filter as described in
+\citet{mcdonald_markov-switching_2019}. The algorithm works by
+estimating the partial likelihood iteratively through time at each of
+the possible discrete state paths using the Kalman Filter. Each of these
+paths is known as a particle with only the previous states and partial
+likelihood being saved. This process would still require checking all
+\(\{\#s_i \in S\}^T\) paths, so to get around this, a maximum number of
+particles to save at each time iteration is selected.
+
+\begin{figure}[tb!]
+  \centering
+  \tikzstyle{switch}=[rectangle,
+  thick, minimum size=0.5cm, draw=black]
+  \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
+    \matrix[row sep=0.25cm,column sep=.75cm] {
+      \node (S1) [switch] {$s_1$}; &&\node (S4) [switch] {$s_1s_1$};&& \node (S7) [switch] {$s_1s_1$}; && \node (S8) [switch] {$s_1s_1s_1$}; && \node (S9) [switch] {$s_1s_1s_1$}; &&\\
+      \\
+      && && && \node (S13) [switch] {$s_1s_1s_2$};\\
+      \\
+       &&\node (S3) [switch] {$s_1s_2$}; && \node (S10) [switch] {$s_1s_2$}; && \node (S14) [switch] {$s_1s_2s_1$}; && \node (S20) [switch] {$s_1s_2s_1$}; \\
+      \\ 
+             && &&  && \node (S15) [switch] {$s_1s_2s_2$}; && \node (S21) [switch] {$s_2s_2s_2$}; \\
+      \\
+      \node (S2) [switch] {$s_2$}; &&\node (S5) [switch] {$s_2s_1$};&&\node (S11) [switch] {$s_2s_1$};&& \node (S16) [switch] {$s_2s_1s_1$}; && \node (S22) [switch] {$s_2s_1s_1$}; \\
+      \\
+      && && && \node (S17) [switch] {$s_2s_1s_2$};&&\node (S23) [switch] {$s_2s_1s_2$};
+      \\ 
+       &&\node (S6) [switch] {$s_2s_2$};&&\node (S12) [switch] {$s_2s_2$};&& \node (S18) [switch] {$s_2s_2s_1$};\\
+      \\
+      &&&&&& \node (S19) [switch] {$s_2s_2s_2$}; &&\\
+      \\
+      \hline
+      \\
+      \\
+      $t=1$ && && \hspace{12px} $t=2$ && && \hspace{52px} $t=3$  \\
+    };
+    \path[->]
+    (S1) edge (S3)
+    (S7) edge (S8)
+    (S7) edge (S13)
+    (S8) edge [dashed] (S9)
+    (S10) edge (S14)
+    (S10) edge (S15)
+    (S11) edge (S16)
+    (S11) edge (S17)
+    (S4) edge [dashed] (S7)
+    (S1) edge (S4)
+    (S2) edge (S5)
+    (S12) edge (S18)
+    (S12) edge (S19)
+    (S3) edge [dashed] (S10)
+    (S5) edge [dashed] (S11)
+    (S6) edge [dashed] (S12)
+    (S14) edge [dashed] (S20)
+    (S15) edge [dashed] (S21)
+    (S16) edge [dashed] (S22)
+    (S17) edge [dashed] (S23)
+    (S2) edge (S6);
+  \end{tikzpicture}
+  \caption{Discrete Particle Filter with 2 discrete states and capping the maximum number of stored particles at 5 for each time iteration. \label{fig:dpf}}
+\end{figure}
+
+\autoref{fig:dpf} illustrates this concept with 2 discrete states and
+the maximum number of particles set at 5. There are four possible state
+paths to check when passing from \(t=1\) to \(t=2\) which is less than
+the maximum particle number so all four paths are saved. When moving
+from \(t=2\) to \(t=3\), the number of paths increases to 8. Since only
+5 paths are allowed, three of these paths must be dropped and will no
+longer be considered as possible solutions. In order to decide which
+paths are to be saved a sampling procedure must be performed. One
+sampling procedure proposed by \citet{tugnait_detection_1982} is to
+simply keep the paths that have the highest likelihood. Another sampling
+procedure proposed by \citet{akashi_random_1977} is to randomly sample
+one particle out of the total number of states descended from each of
+the \(t-1\) particles in proportion to their respective likelihoods.
+\citet{fearnhead_-line_2003} proposes another stochastic approach but
+one that minimizes the expected mean squared error. This approach
+determines a threshold value such that all particles with likelihood
+above this value are kept and the remaining particles to be kept are
+chosen at random with probability equal to their respective likelihoods.
+
+The final step is estimating the model parameters, \(\Theta\), that
+maximize the likelihood. This is no easy task as this model presents a
+couple of problems: 1) many of the parameters are constrained in our
+model as variances need to be positive and the probabilities should be
+between 0 and 1; 2) there are many local maxima making finding a global
+maxima difficult. To help alleviate these concerns, we can implement
+Bayesian priors on our parameters. Using carefully selected priors
+allows us to steer the algorithm away from impossible solutions and
+direct it toward more desired solutions. These issues also lead us to
+carefully consider our optimization technique. We will use two different
+methods. First, we will implement Nelder-Mead which can find local
+maxima for unconstrained multidimensional problems without the need for
+derivative computation \citet{nelder_simplex_1965}. Second, we will
+implement Simulated Annealing (SANN) which is commonly used when dealing
+with problems with many local maxima in order to estimate the global
+maxima. For both of these methods, the selection of initial values can
+greatly determine the outcome, so many should be selected and tried. The
+best solution found, regardless of the algorithm or initial values,
+shall be deemed the approximate solution.
+
+The complete algorithm can be found in \autoref{alg:masteralgorithm}.
+The solution to this model was solved using software R
+\citet{r_core_team_r_2019}. The Nelder-Mead optimization is performed
+using the package \texttt{optimr} by \citet{nash_optimr_2019} and the
+discrete particle filter was implemented by extending the package
+\texttt{dpf} by \citet{mcdonald_dpf_2020}.
+
+\begin{algorithm}[H]
+ \caption{Algorithm for Solving Music Dynamics Model\label{alg:masteralgorithm}}
+\SetAlgoLined
+ \textbf{Input} Y, a vector of observed dynamics\;
+ \textbf{Initialize} $\Theta$\;
+ \While{(Stopping Criteria)}{
+ Create Matrices A, B, C, D, G, H at each $t$ for each $s^i \in S$\;
+ Implement Discrete Particle Filter\;
+ Compute the log-likelihood: \hspace{2px} $l(Y|\Theta,S) + l(S|\Theta) + l(\Theta)$\;
+ Update $\Theta$ via Nelder-Mead Optimization or SANN\;
+ }
+\end{algorithm}
+
+\subsection{Results for Chopin's Mazurka Op. 63 No. 3}
+
+The model was fit using observed dynamics from 46 different performances
+of Chopin's Mazurka Op. 63. No 3. This data was created by Andrew Earis
+\citet{earis_mazurka_2009} and found on the website for the Centre for
+the History and Analysis of Recorded Music (CHARM)
+\citet{charm_centre_2009}. The technique used to create the data is
+described in detail in his paper ``An algorithm to extra expressive
+timing and dynamics from piano recordings''
+\citet{earis_algorithm_2007}.
+
+To implement \autoref{alg:masteralgorithm} on dynamics data from
+performances of Chopin's Mazurka Op. 63 No.3, we must make a few
+specific decisons. First, we choose prior distributions applicable
+specifically to Chopin's Mazurka Op. 63 No.3, which can be found in
+\autoref{tab:priors}. Secondly, regarding the Discrete Partile Filter,
+we selected to keep up to 500 particles with the sampling criterion of
+keeping the largest likeliehoods. Lastily, since there are many local
+minima, we used 20 different starting points drawn randomly and
+independently from each of the prior distributions per optimization
+technique (both Nelder-Mead and SANN).
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}rcll@{}}
+    \toprule
+    Parameter & \phantom{a} & Distribution & Prior Mean \\
+    \midrule
+    $\mu_c$ & $\sim$ & Gamma$(100,\ 0.1)$ & 10\\
+    $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(10,\ 0.5)$ & 5\\
+    $\mu_{0}$ & $\sim$ & Normal$(\overline{Y},\ 10)$ & $\overline{Y}$\\
+    $\mu_{1} $ & $\sim$ & Normal$(0,\ 0.25)$ & 0\\
+    $\mu_{2} $ & $\sim$ & Normal$(0,\ 0.25)$ & 0\\
+    $\sigma^2_{0} $ & $\sim$ & Gamma$(10,\ 1)$ & 10 \\
+    $\sigma^2_{1} $ & $\sim$ & Gamma$(3,\ 1)$ & 3 \\
+    $\sigma^2_{2} $ & $\sim$ & Gamma$(3,\ 1)$ & 3 \\
+    $p_{2,\cdot}$ & $\sim$ & Dirichlet$(5,\ 85,\ 5,\ 5)$ & 0.05, 0.85, 0.05, 0.05 \\
+    $p_{3,\cdot}$ & $\sim$ & Beta$(2,\ 8)$ & 0.20\\
+    $p_{4,\cdot}$ & $\sim$ & Beta$(2,\ 8)$ & 0.20\\
+    \bottomrule
+  \end{tabular}
+  \caption{Informative prior distributions for Chopin's Mazurka Op. 63 No.3}
+  \label{tab:priors}
+\end{table}
+
+The results for one performance by Sviatislav Richter are shown in
+Figure \ref{fig:richter1976} with the results of the other performances
+found in the appendix. The black line traces the observed dynamics for
+each note across time in accordance with their note onset. The colored
+dots are used to differentiate the 4 possible discrete states and show
+the interpreted musical dynamics for each note. The background is shaded
+based on musical directions given by the composer in the score. Notice
+with this performance, the model often seems to start a new smooth
+progression when the composer gives direction about the dynamics. There
+are occasions where this is not always the case. Notice that Richter
+appears to smoothly adjust the dynamics from the first ``forte'' section
+into the first ``piano'' section. Then he proceeds with a couple of
+abrupt changes to the dynamics although keeping it relavitely ``soft''.
+These unscripted parts of the performance are what we hope to discover
+as they can provide an explanation for why one person might prefer one
+performance over another.
+
+\begin{figure}
+\centering
+\includegraphics{Dynamics-Model_files/figure-latex/richter1976-1.pdf}
+\caption{\label{fig:richter1976}Interpreted Dynamics from Richter's 1976
+performance of Chopin's Mazurka Op. 63 No.~3. The black line traces the
+observed dynamics while the colored dots are the smoothed interpreted
+dynamics.}
+\end{figure}
+
+The final important piece of this model that can be used to characterize
+a performance is the parameter values, \(\Theta\). The parameters for
+this particular performance can be found in
+\autoref{tab:parameterestimatesrichter}, and all parameter estimates for
+the 46 performances can be found in the appendix. Certain parameters can
+be very informative in differentiating performances. For example, large
+values of \(\mu_c\) will tell us that the performer often uses very loud
+or very soft points of emphasis, whereas smaller values indicate the
+performer is more subtle. If we want to get some idea as to the overall
+loudness of a piece, we may take a look at \(\mu_0\). The parameter
+values, along with the interpreted dynamics and discrete state, provide
+considerable information regarding differentiating between performances.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}rcccccccc@{}}
+    \toprule
+    $\mu_c$ & $\sigma^2_{\epsilon}$ & $\mu_{0}$ & $\mu_{1}$ & $\mu_{2}$ & $\sigma^2_{0} $ & $\sigma^2_{1} $ & $\sigma^2_{2}$ \\
+    \midrule
+    $10.7833$ & $4.2609$ & $21.8404$ & $-0.1353$ & $-0.0222$ & $12.2454$ & $0.2225$ & $0.0034$ \\
+    \midrule
+    $p_{21}$ & $p_{23}$ & $p_{24}$ & $p_{31}$ & $p_{41}$ \\
+    \midrule
+    $0.0502$ & $0.0165$ & $0.0436$ & $0.1068$ & $0.04836$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Parameter Estimates for Richter's 1976 Performance of Chopin's Mazurka Op. 63 No.3}
+  \label{tab:parameterestimatesrichter}
+\end{table}
 
 \section{Conclusion}
 \label{sec:conclusion}
