@@ -864,7 +864,7 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
     arma::mat Tmat = Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1));
     s = path(iter);
     Tmat.reshape(m,m);
-    ahat.col(iter) = att.col(iter) + Ptt.slice(iter) * Tmat * P00 * a00;
+    ahat.col(iter) = att.col(iter) + Ptt.slice(iter) * Tmat.t() * P00 * a00;
   }
   arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
   arma::mat zz = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));

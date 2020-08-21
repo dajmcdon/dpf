@@ -1,0 +1,42 @@
+
+Report from Referee 2 on
+AOAS2002-013, "Mardov-switching state space models for uncovering
+musical interpretation,"
+Daniel J MacDonald, Michael McBride, Yupeng Gu, Christopher Raphael
+
+
+I think this is a very nice paper. It is very interesting and thorough. 
+The authors also make a strong case as to why statistical modeling is
+needed here, as opposed to machine learning, which I really liked.
+
+The only point with which I strongly disagree is their characterization 
+of the tempo variability within a state, given on p9, first paragraph:
+
+    The observed ratio of musical time to clock time is therefore 
+    best viewed as stochastic, the sum of an intentional, constant 
+    tempo, plus noise representing inaccuracy or, perhaps more 
+    charitably, unintentional variation which the listener fails 
+    to perceive as "wrong". 
+
+While there is certainly some variation that can be attributed to error, 
+I strongly disagree that, even in a state of "constant tempo", the 
+variability is chiefly attributed to such error. Rather, in my opinion,
+there is a great deal of intentional artistic expression in those micro 
+variations (i.e. not the 4 states they capture in their paper, but 
+within a state of constant tempo). To me, Rubenstein is intentionally 
+creating that variability in the recording that they highlight, and 
+that is part of the character of his interpretation. That professional 
+musicians can often repeat the same variation patterns in different 
+parts of the piece but not others (and in a way that "makes sense" 
+structurally) suggests that they do have control over that variability. 
+Watching good professional musicians play Steve Reich's phase music in 
+live concert, which requires incredibly steadiness of tempo from the 
+performers, should also suggest that much of the micro variability 
+that, for instance, Rubenstein employs is surely under his control.
+
+However, this doesn't change their paper at all as their method is 
+not designed to model this variation, but rather to smooth it! So 
+whichever interpretation one goes with, the results of their analysis 
+are exactly the same. The disagreement here is a musical one, not a 
+statistical one.  But, is there a statistical way to settle this?
+

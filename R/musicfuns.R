@@ -3,7 +3,7 @@
 #' Because our model is actually 2-Markov, we expand from 4 to 16 states. 
 #' But not all states can be visited, so there are only 11.
 #'
-#' @param path path in ten-state form
+#' @param path path in 11-state form
 #'
 #' @return path in four-state form
 #' 

@@ -4,13 +4,15 @@
 \name{tempos}
 \alias{tempos}
 \title{Tempos of 46 Chopin piano recordings}
-\format{A data frame with 231 rows and 49 variables:
+\format{
+A data frame with 231 rows and 49 variables:
 \describe{
   \item{meas_num}{The number of the measure in the score}
   \item{beat}{The beat (within the measure) at which the note occurs}
   \item{note_onset}{The relative onset time of the note. This is calculated as (beat-meas_num)/3 + meas_num.}
   \item{remaining columns}{The instantaneous tempo (in beats per minute) of each note as played in the particular performance. Column names give the name of the performer and year of the recording. These are calculated from the raw data by dividing the actual duration of the note by the notated duration. That is, a note which should take up one beat in the score and lasts for .5 seconds is recorded as 120 bpm.}
-}}
+}
+}
 \source{
 \url{http://www.mazurka.org.uk}
 }

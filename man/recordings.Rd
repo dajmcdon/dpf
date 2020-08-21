@@ -4,11 +4,13 @@
 \name{recordings}
 \alias{recordings}
 \title{Recordings}
-\format{A data frame with 46 rows and 2 variables:
+\format{
+A data frame with 46 rows and 2 variables:
 \describe{
   \item{performer}{The last name of the pianist}
   \item{year}{The year in which the recording was made}
-}}
+}
+}
 \source{
 \url{http://www.mazurka.org.uk}
 }

@@ -1,0 +1,96 @@
+AOAS2002-013, "Markov-switching state space models for uncovering
+musical interpretation,"
+Daniel J MacDonald, Michael McBride, Yupeng Gu, Christopher Raphael
+
+Dear Daniel:
+
+Thank you for submitting your manuscript to The Annals of 
+Applied Statistics. Three highly knowledgeable referees and
+I have read it carefully; constructive reports from Referees
+1 (R1R1.pdf) and 2 (R1E2.txt), and brief reports from 
+Referee 2 (R1E3.txt) and myself (R1E1.txt), are available via 
+the links below. Three of us agree that your manuscript is
+well written, nicely organized, and offers a potentially
+useful approach to musical compositions. We enjoyed reading
+it and believe it matches well the mission of AOAS.
+
+All four reports raise important issues which need to be 
+addressed before we can proceed with further review at this time.
+The main issues are:
+
+1. Model for tempo:
+
+Referee 1 raises a really interesting point: should changes in
+tempo be viewed as additive or multiplicative? Referee 1 makes
+a good case for considering an additive model for log(tempo).
+Referee 2 makes a similar comment about your approach to "tempo".
+
+2. Sensitivity to priors:
+
+I agree wholeheartedly with point #2 from Referee 1: how sensitive
+are your results to your priors, especially in view of your "rather 
+strong {\it a priori} assumptions" (p5, l.7), "reasonably strong 
+prior information for many of the parameters" (p13, l.-3), and
+"reasonably strong information about the probabilities of transitioning 
+between states" (p14, l.2-3)? These "strong" statements almost scream
+for some sensitivity analysis - or else, *very* solid evidence that
+changing them would be non-sensical from a musical perspective.
+
+3. Clustering:
+
+I also have to agree with Referee 1 (#3) about the clustering.
+It is absolutely a great idea. But I think much more can be done.
+See also my report for another (possibly naive) idea.
+
+4. Objective:
+
+The most critical report, by far, comes from Referee 3, whose
+musical collaborator believes you are addressing the wrong problem:
+
+"He/she mentioned it would be much more interesting to attempt 
+to decide what variations in interpretation and performances 
+are more compelling to the listener (among other possibilities). 
+Indeed, to me the authors do not demonstrate the utility of their
+approach in this application - the paper is mostly descriptive."
+
+First, I am quite sure that Referee 3 did not know (as I do)
+that you and your co-authors are musicians yourselves. Second,
+I am not sure that your model *cannot* "decide what variations 
+in interpretation and performances are more compelling to the
+listener." But I do believe that you *can* "demonstrate [or, at
+least describe] the utility of [your] approach" for this purpose.
+
+5. Exposition:
+
+Referee 1 and I identified several errors in exposition, some
+of which are important. Please proofread carefully.
+
+
+These and other issues are identified in the enclosed reports. 
+I believe that most of the comments are intended to be constructive, 
+and I hope you will find them useful in that regard. 
+
+In my opinion, a revision that fully addresses them would lead 
+to an improved manuscript that will be very favorably received. 
+While some of the issues are straightforward, others will require 
+serious attention, and, at this point, I cannot guarantee the
+outcome. However, based on my own reading and the enthusiasm 
+from Referees 1 and 2, I am optimistic that, with sincere effort, 
+all issues can be addressed satisfactorily. If you would like 
+to undertake a revision, please follow the links below, and be 
+sure to include point-by-point responses to each of the comments 
+in the reviews (as a single, additional Supplementary File).
+Please be advised, I can make no guarantees about acceptance at 
+this time. I believe that you can successfully address the issues, 
+but much depends on how well you respond to them, particularly 
+points 1-3 above. Almost surely I will ask Referee 1 to review
+the revision.
+
+Thank you for submitting your manuscript to AOAS. I hope the 
+enclosed reports will be useful to you in your work and look forward 
+to seeing a revision. Thank you again for your interest in AOAS.
+
+Sincere regards,
+
+Karen Kafadar
+Editor-in-Chief, Annals of Applied Statistics

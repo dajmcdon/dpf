@@ -7,7 +7,7 @@
 convert11to4(path)
 }
 \arguments{
-\item{path}{path in ten-state form}
+\item{path}{path in 11-state form}
 }
 \value{
 path in four-state form
