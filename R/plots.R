@@ -104,13 +104,13 @@ plotStates <- function(performance, params, y, onset,
 #'plotStates2(theta,states,y,dynamics$note_onset,model="dynamics",c(20,0,0), c(25,10,0),title="Richter 1976")
 #' 
 #' @export
-plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar,title="Music Plot"){
+plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar, title="Music Plot"){
   lt = diff(c(onset,61))
   
   if(model=="dynamics"){
-    mats = musicModeldynamics(lt, theta[1], theta[2], theta[3:5], theta[6:8], theta[9:13],
+    mats = musicModeldynamics(lt, theta[1], theta[2], theta[3:5], theta[6:8], theta[9:12], theta[13],
                               priormean, priorvar)
-    kal <- kalman(pmats,states,y)
+    kal <- kalman(mats,states,y)
     df = data.frame(
       measure = onset, 
       dynamics = c(y), 
@@ -118,7 +118,7 @@ plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar,titl
       state = factor(
         states,
         levels=c(0,1,2,3),
-        labels=c('New Value', 'Smooth Progression','Positive Emphasis','Negative Emphasis')
+        labels=c('New Value', 'Smooth Progression','Loud Deviation','Soft Deviation')
       )
     )
     df2 <- data.frame(
@@ -140,8 +140,8 @@ plotStates2 <- function(theta, states, y, onset, model, priormean, priorvar,titl
       ggplot2::geom_point(ggplot2::aes(x=measure, y=inferred, color=state)) +
       scale_color_manual("Performer Intention",values=c('New Value'="blue",
                                                        'Smooth Progression'="darkcyan",
-                                                       'Positive Emphasis'="darkorange1",
-                                                       'Negative Emphasis'="red"))+
+                                                       'Loud Deviation'="darkorange1",
+                                                       'Soft Deviation'="red"))+
       ggplot2::theme(legend.position = 'right') +
       ggplot2::ggtitle(title) +
       cowplot::theme_cowplot() +

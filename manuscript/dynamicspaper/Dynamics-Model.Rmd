@@ -1,52 +1,95 @@
 ---
-title: Using Switching State-Space Models to Interpret Musical Dynamics
+title: Switching State Space Models for Interpreting Musical Dynamics
 
 # to produce blinded version set to 1
 blinded: 0
 
 authors: 
 - name: Robert Granger
-  thanks: The authors gratefully acknowledge ...
   affiliation: Department of Statistics, Indiana University
   
 
 keywords:
-- 3 to 6 keywords
-- that do not appear in the title
+- classical music
+- hidden Markov model
 
 abstract: |
-  The text of your abstract.  200 or fewer words.
+  In this paper, we attempt to illuminate a performer's musical intentions using a Markov-switching state space model.  Specifically, the model we propose is designed for the dynamics of classical music.  Unlike many other models of trend estimation, this model requires the estimation of a series of parameters.  These parameters can be viewed as hidden musical attributes of a performance that would not be revealed through the calculation of simple statistics.  For this analysis, we use dynamics data of 46 different performances of Chopin’s Mazurka Op. 68 No. 3. from the Centre for the History and Analysis of Recorded Music (CHARM) Mazurka Project.
+  
+
   
 bibliography: musicdynamicsbib.bib
+bibliostyle: unsrtnat
 header-includes:
-   - \usepackage{amsmath}
    - \usepackage{booktabs}
    - \usepackage{pgf}
    - \usepackage{tikz}
-   - \usepackage{algorithm2e}
+   - \usepackage[ruled,vlined]{algorithm2e}
+   - \usepackage[toc,page]{appendix}
+   - \usepackage{longtable}
+   -  \hypersetup{
+     colorlinks=true,
+     linkcolor=red,
+     citecolor = blue,      
+     urlcolor=cyan,
+     }
+   - \newcommand*{\Appendixautorefname}{appendix}
+   - \usepackage{float} #use the 'float' package
+   - \floatplacement{figure}{t}
+   - \usepackage[skip=0pt]{caption}
 
 output: rticles::asa_article
 ---
 
-# Introduction
-
 \def\algorithmautorefname{Algorithm}
 
-Things to write about in this section
+```{r codesetup, warning=FALSE, message=FALSE, echo=FALSE}
+library(dpf)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
+library(cowplot)
+library(kableExtra)
 
-1) Classifying music performances to sort on personal preference
+load("mazurkaDynamicsResults.Rdata") 
+thetatable <- as.data.frame(t(do.call(rbind.data.frame, pvec_ml[,1:13])))
+thetatable <- thetatable[order(row.names(thetatable)),] #sorts by performance (alphabetical)
 
-2) Smoothing performances to sound better from Midi data
+perftitle <- sub("_", " ", rownames(thetatable)) #Remove underscore
+perftitle <- sub("\\.", "-", perftitle) #Change . to -
 
-3) Using State-Switching Model
+roundthetatable <- round(thetatable,2)
+parameters1 <- roundthetatable[1:23,c(1,13,2:8)]
+parameters2 <- roundthetatable[24:46,c(1,13,2:8)]
+probabilities1 <- roundthetatable[1:23,9:12]
+probabilities2 <- roundthetatable[24:46,9:12]
 
-The composer gives directions about dynamics. $p$ stands for "piano" and indicates this section should be played "soft".  The "f" stands for "forte" and indicates this section should be played 
+mysymbolsparam <- c("$\\mu_c$","$\\mu_e$","$\\sigma^2_\\epsilon$","$\\mu_0$","$\\mu_1$","$\\mu_2$","$\\sigma^2_0$","$\\sigma^2_1$","$\\sigma^2_2$")
+mysymbolsprobs <- c("$p_{21}$","$p_{23}$","$p_{24}$","$p_{41}$")
+
+roundthetatable3 <- round(thetatable,3)
+```
 
 
-\section{The Switching State-Space Model}
-\label{sec:model}
 
-State-Space models are commonly used to model time series observations in the presence of perceived hidden, continuous states.  As a result of the state-space framework, the observations are viewed as independent conditional on the hidden states whereas these hidden states will follow a vector autoregressive process. Adding assumptions of linearity and Gaussian error produces the following model commonly referred to as the general linear Gaussian state-space model @durbin_time_2012 takes the form
+# Introduction
+
+
+In this paper, we attempt to illuminate a performer's musical intentions surrounding the dynamics of classical music.  Through the use of a Markov-switching state space model, the series of dynamics values within a single performance are carefully smoothed with the goal of differentiating the perceived intentions of the performer from the observed dynamics found in the data. Classical music is different from other types of music as a composer creates a piece, but many performers may play it adding their own interpretation.  While, the composer gives some specific direction like the pitch of notes to play, the instructions regarding dynamics are relatively vague.  For example, when performing a piece, a performer will observe a \emph{p} which stands for \emph{piano}, indicating this section should be played "softly".  Meanwhile, an \emph{f} stands for \emph{forte} and indicates the given section should be played "loudly".  While we would expect the \emph{forte} section to be played louder than the \emph{piano} section, no direction is given on how softly or loudly the specified section should be played.  The performer may also attempt to ease into a \emph{piano} section from a \emph{forte} section or they may want to make a sudden change.  These decisions are left to the interpretation of the performer.
+
+There are a variety of different trend estimating techniques, but we propose using a Markov-switching state space model for two reasons.  First, the technique should incorporate actions found within a performance.  Often times, performers make dramatic changes in dynamics to start a new section, something we want our model to identify, not smooth out as noise.  Likewise, this may extend to individual notes where intentional emphasis is used by the performer.  Using smoothing techniques like a moving average or spline would ignore these key elements.  The second reason for using this type of model is that it requires the estimation of certain parameters.  These parameters offer additional insight and can be viewed as hidden attributes of a performance.  Attributes found through simple calculation of averages and variances would ignore the complexity of the decisions made during a performance.
+
+Similar analysis of modelling musical performances with Markov-switching state space models has been performed on tempo data \citep{mcdonald_markov-switching_2019,gu_modeling_2012}.  When modeling tempo, the expectation is for the performer to hold a constant tempo, with some periods of potential speeding up or slowing down.  This same expectation cannot be said for the dynamics and thus requires a different model setup.  Although a Markov-switching state space model can still be used, the difference comes in the selection of different discrete states and parameter matrices.  While Gu and Raphael did give some attention to modeling dynamics, this paper looks to expand their work.
+
+\def\sectionautorefname{Section} 
+
+The paper procedes as follows: \autoref{Sec:model} begins with a general description of Markov-switching state space models followed with specific details regarding the states and the parameter matrices used to model musical dynamics. \autoref{sec:analysis} explains the algorithm used to evaluate the model and discusses results for several performances.  \autoref{sec:conclusion} briefly concludes with potential uses of this model along with potential future areas of research.
+
+
+\section{The Markov-Switching State Space Model}
+\label{Sec:model}
+
+State space models are commonly used to model time series observations in the presence of hidden, continuous states.  As a result of the state space framework, the observations are viewed as independent conditional on the hidden states whereas these hidden states will follow a vector autoregressive process. Adding assumptions of linearity and normal error produces what is commonly referred to as the general linear Gaussian state space model \citep{durbin_time_2012}.  It takes the form
 \begin{equation}
   \begin{aligned}
     y_t &= C_t + D_tx_t + \epsilon_t, 
@@ -57,9 +100,9 @@ State-Space models are commonly used to model time series observations in the pr
   \end{aligned}
   \label{eq:statespacemod}
 \end{equation}
-where the first part of \autoref{eq:statespacemod} is known as the observation equation and the second part is known as the state equation. $y_t$ is a vector of known observations, and $x_t$ is a vector of the unobserved, continuous states at each time period, $t$.  The observation error, $\epsilon_t$, and the state equation error, $\eta_t$, are both assumed to be independent and identically distributed.  
+where the first part of \autoref{eq:statespacemod} is known as the observation equation and the second part is known as the state equation. The vector $y_t$ consists of the known observations at each time period, $t$, whereas the vector $x_t$ consists of the unobserved, continuous states on which $y_t$ is dependent.  The observation error, $\epsilon_t$, and the state equation error, $\eta_t$, are assumed to be serially independent and independent of each other.  
 
-In the typical state-space framework, the matrices $A_t$, $B_t$, $C_t$, $D_t$, $G_t$, and $H_t$ are allowed to vary across time but are known. If there are a finite number of perceived structures for these matrices, and the given structure is unknown at time, $t$, a switching state-space model can be used.  This model assumes there are some underlying discrete states, $s_i$, that transition over time through a Markov process.  Making this slight adjustment to \autoref{eq:statespacemod} yields the following model which will be used as a basic framework for modeling music dynamics.
+In the typical state space framework, the matrices $A_t$, $B_t$, $C_t$, $D_t$, $G_t$, and $H_t$ are allowed to vary across time but are known. If there are a finite number of perceived structures for these matrices, and the given structure is unknown at time, $t$, a Markov-switching state space model can be used.  This model assumes there are some underlying discrete states, $s_t$, that transition over time through a Markov process.  Making this slight adjustment to \autoref{eq:statespacemod} yields the following model which will be used as a basic framework for modeling music dynamics.
 
 \begin{equation}
   \begin{aligned}
@@ -72,7 +115,7 @@ In the typical state-space framework, the matrices $A_t$, $B_t$, $C_t$, $D_t$, $
   \label{eq:switchstatemodel}
 \end{equation}
 
-When it comes to musical dynamics, rarely do musicians attempt to play with the same dynamics or loudness throughout the entirety of a piece.  While there may be dramatic changes occasionally throughout the performance, most of the time we expect the musician to steadily change the loudness from note to note. Furthermore, the musician may quietly or loudly play individual notes for emphasis.  In order to model this behavior, we propose the following four discrete states:
+When it comes to musical dynamics, rarely do musicians attempt to play with the same dynamics or loudness throughout the entirety of a piece.  Most of the time we expect the musician to steadily change the loudness from note to note; however, there may exist moments where the musician deviates greatly from the trend with either louder or softer than usual notes.  A single note may be played more loudly because the performer is specifically trying to add emphasis.  Adding this emphasis may be on the performer's own perogative or may be dictated by the piece with an accent, "\textbf{$>$}".  On the other hand, a single note appearing in the data more softly is likely not part of the performer's intent.  If a note in the data is played more softly, it may be because the performer missed a note or did not hit it as hard as intended.  It could also be something went wrong in the data creation step. Regardless, we do not attempt to identify why the dynamics data indicates an unusually soft note, but it is important to include this in our model for statistical estimation purposes.  We tried estimating without explicitly incorporating these low sounds in the model, but the excessive statistical noise caused the model to falsely indicate starts of new smooth progressions.  Therefore, in order to model the described behavior, we propose the following four discrete states:
 
 \begin{list}{}{}
 
@@ -86,47 +129,48 @@ When it comes to musical dynamics, rarely do musicians attempt to play with the 
 
 \end{list}
 
-The observation, $y_t$ is the univariate loudness of the note at each time period, $t$.  In order to allow the dynamics to progress steadily, the continuous hidden states, $x_t$, follow a process that allows for piece-wise quadratic displays.  At each time period, $x_t$, is an array of length three,
-$$x_t = (x^0_t, x^1_t, x^2_t), $$
-where $x^0_t$ is the loudness, $x^1_t$ is the first order difference, and $x^2_t$ is the second order difference.  Since we want to maintain this smooth progression even when the musician plays a single note more loudly or softly, states $s^3$ and $s^4$ are implemented by adding a constant in the observation equation as opposed to changing the state equation.  The model is similar to that proposed in @gu_modeling_2012, but extended to include these additional states.  \autoref{tab:parmats} shows the parameter matrices for the four states.  
-
-The final part of the switching state-space model is designing the Markov process for transitioning between the discrete states. \autoref{fig:transmat} displays the structure of the transition between states.  The first state, $s^1$, allows for the selection of a new loudness which then transitions into the smooth progresson state, $s^2$, with probability 1.  When arriving in $s^2$, the next time period's discrete state can be any of the possible states including itself.  If in this progression, we move to a sudden loud note, $s^3$, or a sudden soft note, $s^4$, then we have the opportunity to continue the smooth progression, $s^2$, or start a new smooth progression, $s^1$. It is not permissible though to immediately then play another sudden loud or soft note. With four states, the transition matrix could potentially have 12 probabilities to estimate; however, because of restrictions placed on the possible transitions, only 5 probabilities need to be estimated.
-
-In total, there are 13 distinct unknown parameters, $\theta \in \Theta$, spread across 4 unknown states, $s^i \in S$, through $T$ time periods. A summary of the parameters to be estimated are: $\Theta = \{\mu_c, \sigma^2_\epsilon, \mu_0, \mu_1, \mu_2, \sigma^2_0, \sigma^2_1, \sigma^2_2, p_{21}, p_{23}, p_{24}, p_{31}, p_{41}\}$. In the next section, we discuss finding smoothed estimates of the dynamics which requires estimation of these parameters along with the continous and discrete states.
+The observation, $y_t$ is the univariate loudness of the note at each time period, $t$.  In order to allow the dynamics to progress steadily, the continuous hidden states, $x_t$, follow a process that allows for piece-wise quadratics.  At each time period, $x_t$, is a vector of length three,
+$$x_t^\prime = (x^0_t, x^1_t, x^2_t), $$
+where $x^0_t$ is the loudness, $x^1_t$ is the first order difference, and $x^2_t$ is the second order difference.  The aim is to maintain this smooth progression even when the musician plays a single note more loudly or softly.  The states $s^3$ and $s^4$ are therefore implemented by adding a constant in the observation equation as opposed to changing the state equation.  The model is similar to that proposed in \cite{gu_modeling_2012}, but extended to include these additional states.  \autoref{tab:parmats} shows the parameter matrices for the four states.  
 
 \begin{table}
+\caption{Parameter matrices for the switching state space model.\label{tab:parmats}}
 \centering
-\begin{tabular}[h!]{@{}llccccccc@{}}
+\begin{tabular}[h!]{@{}ccccccccc@{}}
 \toprule
 %&&&\multicolumn{3}{c}{Parameter Matrices}\\
   \multicolumn{2}{c}{States} &\phantom{a}& \multicolumn{6}{c}{Parameter Matrices}\\
   \cmidrule{1-2} \cmidrule{4-9}
-  $S$ &&& $A$ & $B$ & $C$ & $D$ & $G$ & $H$ \\
+  \multicolumn{2}{c}{$S$}&& $A$ & $B$ & $C$ & $D$ & $G$ & $H$ \\
   \midrule
-  $s^1$ & && $\begin{pmatrix} \mu_0 \\ \mu_1 \\ \mu_2 \end{pmatrix}$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} \sigma_0^2&0&0 \\ 0&\sigma_1^2&0 \\ 0&0&\sigma_2^2 \end{pmatrix}$\\
+  \multicolumn{2}{c}{$s^1$} && $\begin{pmatrix} \mu_0 \\ \mu_1 \\ \mu_2 \end{pmatrix}$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1&0&0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} \sigma_0^2&0&0 \\ 0&\sigma_1^2&0 \\ 0&0&\sigma_2^2 \end{pmatrix}$\\
   \\
-  $s^2$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  \multicolumn{2}{c}{$s^2$} && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & 0 & $\begin{pmatrix} 1&0&0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
   \\
-  $s^3$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  \multicolumn{2}{c}{$s^3$} && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $\mu_c$ & $\begin{pmatrix} 1&0&0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
   \\
-  $s^4$ & && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $-\mu_c$ & $\begin{pmatrix} 1\\ 0 \\ 0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
+  \multicolumn{2}{c}{$s^4$} && $\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}$ & $\begin{pmatrix} 1&1&0 \\ 0&1&1 \\ 0&0&1 \end{pmatrix}$ & $\mu_e$ & $\begin{pmatrix} 1&0&0 \end{pmatrix}$ & $\sigma_\epsilon^2$ & $\begin{pmatrix} 0&0&0 \\ 0&0&0 \\ 0&0&0 \end{pmatrix}$\\
 
 \bottomrule
 \end{tabular}
-\caption{Parameter matrices for the switching state space model.\label{tab:parmats}}
 \end{table}
 
+The final part of the switching state space model is designing the Markov process for transitioning between the discrete states which is displayed in \autoref{fig:transmat}.  The first state, $s^1$, allows for the selection of a new loudness which then transitions into the smooth progresson state, $s^2$, with probability 1.  When arriving in $s^2$, the next time period's discrete state can be any of the possible states including itself.  If in this progression, we move to a sudden loud note, $s^3$, or a sudden soft note, $s^4$, then we have the opportunity to continue the smooth progression, $s^2$, or start a new smooth progression, $s^1$. It is not permissible though to immediately then play another sudden loud or soft note. 
+
+In total, there are 13 unknown parameters, $\theta \in \Theta$, spread across 4 different discrete states, $s^i \in S$, through $T$ time periods. A summary of the parameters to be estimated are: $\Theta = \{\mu_c, \mu_e, \sigma^2_\epsilon, \mu_0, \mu_1, \mu_2, \sigma^2_0, \sigma^2_1, \sigma^2_2, p_{21}, p_{23}, p_{24}, p_{41}\}$. Note this vector contains only four probabilities.  With four states, the transition matrix could potentially have up to twelve probabilities requiring estimation; however, because of the restrictions placed on the possible transitions, this number is reduced to four.  In the next section, we discuss finding smoothed estimates of the dynamics which requires estimation of these parameters along with the continuous and discrete states.
+
 \begin{figure}[tb!]
+\caption{Transition diagram. \label{fig:transmat}}
   \centering
   \tikzstyle{switch}=[rectangle,
   thick, minimum size=1cm, draw=black]
   \begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
     \matrix[row sep=0.25cm,column sep=.5cm] {
-      &&& \node (S1) [switch] {$s_1$};&&& \\
+      &&& \node (S1) [switch] {$s^1$};&&& \\
       \\ \\ \\ \\ \\ \\
-      &&& \node (S2) [switch] {$s_2$};&&& \\
+      &&& \node (S2) [switch] {$s^2$};&&& \\
       \\ \\ \\ \\ \\ \\
-      &\node (S3) [switch] {$s_3$}; &&&& \node (S4) [switch] {$s_4$};\\
+      &\node (S3) [switch] {$s^3$}; &&&& \node (S4) [switch] {$s^4$};\\
     };
     \path[->]
     (S1) edge [bend right] node [left] {1}(S2)
@@ -134,12 +178,11 @@ In total, there are 13 distinct unknown parameters, $\theta \in \Theta$, spread 
     (S2) edge [loop above] node [left] {}(S2)
     (S2) edge [bend right] node [right] {$p_{23}$}(S3)
     (S2) edge [bend right] node [right] {$p_{24}$}(S4)
-    (S3) edge [bend left] node [left] {$p_{31}$}(S1)
-    (S3) edge [bend right] node [left] {}(S2)
+    % (S3) edge [bend left] node [left] {$p_{31}$}(S1)
+    (S3) edge [bend right] node [left] {1}(S2)
     (S4) edge [bend right] node [right] {$p_{41}$}(S1)
     (S4) edge [bend right] node [left] {}(S2);
   \end{tikzpicture}
-  \caption{Transition diagram. \label{fig:transmat}}
 \end{figure}
 
 
@@ -147,13 +190,13 @@ In total, there are 13 distinct unknown parameters, $\theta \in \Theta$, spread 
 \section{Evaluating the Model}
 \label{sec:analysis}
 
-\subsection{The algorithm}
+Evaluation of the model requires the estimation of the parameters, $\theta \in \Theta$; the discrete states, $\{s_t\}^T_{t=1}$; and the continuous hidden states $\{x_t\}^T_{t=1}$.  These estimates are obtained using only the assumptions and structure of the model along with the observed dynamics, $\{y_t\}^T_{t=1}$.  Once these estimates are obtained, we then compute predicted values, $E[y_t|...]$, which can be thought of as the performer's intended dynamics. Hence, the aim in estimating the intended dynamics is attempting to remove $\epsilon_t$, which can be seen as unintended deviations from the desired loudness. 
 
-The construction of the model is designed to allow us to separate the observed dynamics, $y_t$, from the performer's intended dynamics, $E[y_t]$. Hence, the aim in estimating the intended dynamics is attempting to remove $\epsilon_t$, which can be seen as unintended deviations from the desired loudness. 
+\subsection{The Algorithm}
 
-When the parameter values, $\theta_i \in \Theta$, and the discrete states, $S$, are known, the Kalman filter (see @kalman_new_1960) can be used to find estimates of the continuous hidden states, $\{x_t\}_{t=0}^t$, along with the likelihood of $\Theta$.  While the Kalman filter provides an easy way to compute the likelihood, the estimate of $x_t$ is obtained using only observations coming before time $t$.  In order to use all information, we implement the Kalman smoothing algorithm introduced in @rauch_maximum_1965.  Given $\Theta$ and $S$, this algorithm provides an estimate, $\hat{x_t} = E[x_t|y_0,...y_T]$, which can be used to compute a fitted or "smoothed" value, $\hat{y_t}$.
+When the parameter values, $\theta_i \in \Theta$, and the discrete states, $\{s_t\}^T_{t=1}$, are known, the Kalman filter \citep{kalman_new_1960} can be used to find estimates of the continuous hidden states, $\{x_t\}_{t=1}^T$, along with the likelihood.  While the Kalman filter provides an easy way to compute the likelihood, the estimate of $x_t$ is obtained using only observations coming before time $t$.  In order to use all information, we implement the Kalman smoothing algorithm introduced in \citep{rauch_maximum_1965}.  This algorithm provides an estimate, $\hat{x_t} = E[x_t|y_1,...y_T]$, which can be used to compute a fitted or "smoothed" value, $\hat{y_t}$.
 
-So far, if $\Theta$ and $S$ are known, we have a closed form solution to obtaining the smoothed dynamics through the Kalman smoother.  If $\Theta$ is known, we can obtain the most likely set of discrete states, $S$, by simply running the Kalman smoother algorithm on every possible combination of discrete states and discovering the largest likelihood.  This may work if the number of discrete states and/or time periods is small; however, the number of state combinations to check would be $\|\{s_i \in S\}\|^T$.  For example, if we were using the music dynamics model presented in the previous section on Chopin's Mazurka Op. 63 No. 3 (which has 231 notes), the total number of state combinations to check would be $4^{231}\approx1.19\times 10^{139}$.  Of course, many of these state combinations could be removed due to 0 likelihood given the restrictions on the state transitions, but even if this is taken into account, the number of state combinations would be far too large.  To overcome this issue, we only look at a subset of these combinations through the Discrete Particle Filter as described in @mcdonald_markov-switching_2019.  The algorithm works by estimating the partial likelihood iteratively through time at each of the possible discrete state paths using the Kalman Filter.  Each of these paths is known as a particle with only the previous states and partial likelihood being saved.  This process would still require checking all $\{\#s_i \in S\}^T$ paths, so to get around this, a maximum number of particles to save at each time iteration is selected. 
+The Kalman smoother provides a closed form solution to obtaining the maximum likelihood estimates of our continuous hidden states, but what if the discrete states, $\{s_t\}^T_{t=1}$, are unknown?  We can obtain the most likely set of discrete states by simply running the Kalman smoother algorithm on every possible combination of discrete states and choosing the set of discrete states that yields the largest likelihood.  This may work if the number of discrete states and/or time periods is small; however, the number of state combinations to check may be large and can be computed as $|\{s^i \in S\}|^T$.  For example, the music dynamics model presented in the previous section has four discrete states and the piece to be evaluated, Chopin's Mazurka Op.\ 68 No.\ 3, has 231 notes. This brings the grand total of state combinations to check to $4^{231}\approx1.19\times 10^{139}$.  Of course, many of these state combinations could be removed due to 0 likelihood given the restrictions on the state transitions, but even with this taken into account, the number of state combinations is far too large.  To overcome this issue, we use the Discrete Particle Filter as described in \cite{mcdonald_markov-switching_2019}.  We begin by estimating the partial likelihood iteratively through time at each of the possible discrete state paths using the Kalman Filter.  Each of these paths is known as a particle with only the previous states and partial likelihood being saved.  This process would still require checking all $|\{s^i \in S\}|^T$ paths, so to get around this, we implement the greedy search algorithm called Beam Search.  This search algorithm requires selecting a maximum number of particles to save at each time iteration and discards the rest. 
 
 \begin{figure}[tb!]
   \centering
@@ -208,14 +251,10 @@ So far, if $\Theta$ and $S$ are known, we have a closed form solution to obtaini
   \caption{Discrete Particle Filter with 2 discrete states and capping the maximum number of stored particles at 5 for each time iteration. \label{fig:dpf}}
 \end{figure}
 
-\autoref{fig:dpf} illustrates this concept with 2 discrete states and the maximum number of particles set at 5.  There are four possible state paths to check when passing from $t=1$ to $t=2$ which is less than the maximum particle number so all four paths are saved.  When moving from $t=2$ to $t=3$, the number of paths increases to 8.  Since only 5 paths are allowed, three of these paths must be dropped and will no longer be considered as possible solutions.  In order to decide which paths are to be saved a sampling procedure must be performed.  One sampling procedure proposed by @tugnait_detection_1982 is to simply keep the paths that have the highest likelihood.  Another sampling procedure proposed by @akashi_random_1977 is to randomly sample one particle out of the total number of states descended from each of the $t-1$ particles in proportion to their respective likelihoods. @fearnhead_-line_2003 proposes another stochastic approach but one that minimizes the expected mean squared error.  This approach determines a threshold value such that all particles with likelihood above this value are kept and the remaining particles to be kept are chosen at random with probability equal to their respective likelihoods.
+\autoref{fig:dpf} illustrates this concept with 2 discrete states and the maximum number of particles set at 5.  There are four possible state paths to check when passing from $t=1$ to $t=2$ which is less than the maximum particle number so all four paths are saved.  When moving from $t=2$ to $t=3$, the number of paths increases to 8.  Since only 5 paths are allowed, three of these paths must be dropped and will no longer be considered as possible solutions.  In order to decide which paths are to be saved a sampling procedure must be performed.  One sampling procedure proposed by \citep{tugnait_detection_1982} is to simply keep the paths that have the highest likelihood.  Another sampling procedure proposed by \citep{akashi_random_1977} is to randomly sample one particle out of the total number of states descended from each of the $t-1$ particles in proportion to their respective likelihoods. \citep{fearnhead_-line_2003} proposes another stochastic approach but one that minimizes the expected mean squared error between the approximated distribution and the true distribution's probabilities.  This approach determines a threshold value such that all particles with likelihood above this value are kept and the remaining particles to be kept are chosen at random with probability equal to their respective likelihoods.  Once a sampling technique is selected and the procedure is implemented through all time points, a sample of discrete state sequences is saved the size of the beam width.  Since the goal of this paper is to find the most likely sequence of discrete states, the one with the highest likelihood is selected.
 
-The final step is estimating the model parameters, $\Theta$, that maximize the likelihood. This is no easy task as this model presents a couple of problems: 1) many of the parameters are constrained in our model as variances need to be positive and the probabilities should be between 0 and 1; 2) there are many local maxima making finding a global maxima difficult. To help alleviate these concerns, we can implement Bayesian priors on our parameters.  Using carefully selected priors allows us to steer the algorithm away from impossible solutions and direct it toward more desired solutions.  These issues also lead us to carefully consider our optimization technique.  We will use two different methods.  First, we will implement Nelder-Mead which can find local maxima for unconstrained multidimensional problems without the need for derivative computation @nelder_simplex_1965.  Second, we will implement Simulated Annealing (SANN) which is commonly used when dealing with problems with many local maxima in order to estimate the global maxima. For both of these methods, the selection of initial values can greatly determine the outcome, so many should be selected and tried.  The best solution found, regardless of the algorithm or initial values, shall be deemed the approximate solution.
-
-The complete algorithm can be found in \autoref{alg:masteralgorithm}.  The solution to this model was solved using software R @r_core_team_r_2019.  The Nelder-Mead optimization is performed using the package \texttt{optimr} by @nash_optimr_2019 and the discrete particle filter was implemented by extending the package \texttt{dpf} by @mcdonald_dpf_2020.
-
-\begin{algorithm}[H]
- \caption{Algorithm for Solving Music Dynamics Model\label{alg:masteralgorithm}}
+\begin{algorithm}[t]
+ \caption{Solving Music Dynamics Model\label{alg:masteralgorithm}}
 \SetAlgoLined
  \textbf{Input} Y, a vector of observed dynamics\;
  \textbf{Initialize} $\Theta$\;
@@ -227,19 +266,23 @@ The complete algorithm can be found in \autoref{alg:masteralgorithm}.  The solut
  }
 \end{algorithm}
 
-\subsection{Results for Chopin's Mazurka Op. 63 No. 3}
+The final step is estimating the model parameters, $\Theta$, that maximize the likelihood. This is a difficult task as this model presents a couple of problems: 1) many of the parameters are constrained as variances need to be positive and the probabilities of leaving the same state should sum to 1 while also being constrained between 0 and 1; 2) there are many local maxima making finding a global maxima difficult. To help alleviate these concerns, we can include Bayesian priors on our parameters.  Using carefully selected priors allows us to steer the algorithm away from impossible solutions and direct it toward more desired solutions.  These issues also lead us to carefully consider our optimization technique.  We will use two different methods.  The first is the Nelder-Mead algorithm which can find local maxima for unconstrained multidimensional problems without the need for derivative computation \citep{nelder_simplex_1965}.  The second is the Simulated Annealing (SANN) algorithm which is commonly used when dealing with problems with many local maxima in order to estimate the global maxima.  Neither of these methods are perfect at avoiding a local maximum and hence the selection of initial values plays an important role.  To overcome this challenge, we will select a variety of different starting points drawn randomly from the Bayesian priors.
 
-The model was fit using observed dynamics from 46 different performances of Chopin's Mazurka Op. 63. No 3.  This data was created by Andrew Earis @earis_mazurka_2009 and found on the website for the Centre for the History and Analysis of Recorded Music (CHARM) @charm_centre_2009.  The technique used to create the data is described in detail in his paper "An algorithm to extra expressive timing and dynamics from piano recordings" @earis_algorithm_2007.
+\vspace{10px}
 
-To implement \autoref{alg:masteralgorithm} on dynamics data from performances of Chopin's Mazurka Op. 63 No.3, we must make a few specific decisons.  First, we choose prior distributions applicable specifically to Chopin's Mazurka Op. 63 No.3, which can be found in \autoref{tab:priors}.  Secondly, regarding the Discrete Partile Filter, we selected to keep up to 500 particles with the sampling criterion of keeping the largest likeliehoods.  Lastily, since there are many local minima, we used 20 different starting points drawn randomly and independently from each of the prior distributions per optimization technique (both Nelder-Mead and SANN).
+\autoref{alg:masteralgorithm} displays the complete procedure.  The solution to this model was found using software R \citep{r_core_team_r_2019}.  The Nelder-Mead and SANN methods are performed using the package \texttt{optimr} by \cite{nash_optimr_2019}.  The discrete particle filter was implemented by extending the package \texttt{dpf} by \cite{mcdonald_dpf_2020}.
+
+\subsection{Results for Chopin's Mazurka Op.\ 68 No.\ 3}
 
 \begin{table}[t]
+  \caption{Informative prior distributions for Chopin's Mazurka Op.\ 68 No.\ 3}
   \centering
   \begin{tabular}{@{}rcll@{}}
     \toprule
     Parameter & \phantom{a} & Distribution & Prior Mean \\
     \midrule
     $\mu_c$ & $\sim$ & Gamma$(100,\ 0.1)$ & 10\\
+    $\mu_e$ & $\sim$ & -Gamma$(100,\ 0.1)$ & -10\\
     $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(10,\ 0.5)$ & 5\\
     $\mu_{0}$ & $\sim$ & Normal$(\overline{Y},\ 10)$ & $\overline{Y}$\\
     $\mu_{1} $ & $\sim$ & Normal$(0,\ 0.25)$ & 0\\
@@ -248,56 +291,303 @@ To implement \autoref{alg:masteralgorithm} on dynamics data from performances of
     $\sigma^2_{1} $ & $\sim$ & Gamma$(3,\ 1)$ & 3 \\
     $\sigma^2_{2} $ & $\sim$ & Gamma$(3,\ 1)$ & 3 \\
     $p_{2,\cdot}$ & $\sim$ & Dirichlet$(5,\ 85,\ 5,\ 5)$ & 0.05, 0.85, 0.05, 0.05 \\
-    $p_{3,\cdot}$ & $\sim$ & Beta$(2,\ 8)$ & 0.20\\
+    % $p_{3,\cdot}$ & $\sim$ & Beta$(2,\ 8)$ & 0.20\\
     $p_{4,\cdot}$ & $\sim$ & Beta$(2,\ 8)$ & 0.20\\
     \bottomrule
   \end{tabular}
-  \caption{Informative prior distributions for Chopin's Mazurka Op. 63 No.3}
   \label{tab:priors}
 \end{table}
 
-The results for one performance by Sviatislav Richter are shown in Figure \ref{fig:richter1976} with the results of the other performances found in the appendix. The black line traces the observed dynamics for each note across time in accordance with their note onset.  The colored dots are used to differentiate the 4 possible discrete states and show the interpreted musical dynamics for each note.  The background is shaded based on musical directions given by the composer in the score.  Notice with this performance, the model often seems to start a new smooth progression when the composer gives direction about the dynamics.  There are occasions where this is not always the case.  Notice that Richter appears to smoothly adjust the dynamics from the first "forte" section into the first "piano" section.  Then he proceeds with a couple of abrupt changes to the dynamics although keeping it relavitely "soft".  These unscripted parts of the performance are what we hope to discover as they can provide an explanation for why one person might prefer one performance over another.
+The model was estimated using observed dynamics from forty-six different performances of Chopin's Mazurka Op.\ 68 No.\ 3.  This data was reverse conducted (created) by Craig Sapp using Andrew Earis's Expression Algorithm software.  The software and data can be found on the website for the Centre for the History and Analysis of Recorded Music (CHARM) Mazurka Project \citep{charm_centre_2009}.  The technique used to create the data is described in detail in Andrew Earis's paper "An algorithm to extra expressive timing and dynamics from piano recordings" \citep{earis_algorithm_2007}.
 
-```{r,richter1976,echo=FALSE,fig.margin=TRUE,fig.cap="\\label{fig:richter1976}Interpreted Dynamics from Richter's 1976 performance of Chopin's Mazurka Op. 63 No. 3.  The black line traces the observed dynamics while the colored dots are the smoothed interpreted dynamics."}
-library(dpf)
-set.seed(617)
-yt <- matrix(dynamics[,'Richter_1976'], 1)
+To implement \autoref{alg:masteralgorithm} on dynamics data from performances of Chopin's Mazurka Op.\ 68 No.\ 3, we must make a few specific decisons.  First, we choose prior distributions applicable specifically to Chopin's Mazurka Op.\ 68 No.\ 3, which can be found in \autoref{tab:priors}.  Secondly, regarding the Discrete Particle Filter, we selected to keep up to 500 particles with the sampling criterion of keeping the largest likelihoods.  Lastily, since there are many local minima, we used 10 different starting points drawn randomly and independently from each of the prior distributions for each optimization technique (both Nelder-Mead and SANN).
+
+```{r,exampletable,echo=FALSE,fig.margin=TRUE,fig.cap="\\label{fig:exampletable}Interpreted Dynamics from selected performances of Chopin's Mazurka Op. 68 No. 3.  The black line traces the observed dynamics while the colored dots are the smoothed interpreted dynamics.",message=FALSE,warning=FALSE}
+
+
+performance1 <- which(row.names(thetatable)=="Luisada_1991")
+performance2 <- which(row.names(thetatable)=="Rubinstein_1966")
+performance3 <- which(row.names(thetatable)=="Block_1995")
+performance4 <- which(row.names(thetatable)=="Rubinstein_1939")
+
+theta1 <- as.matrix(thetatable[performance1,],1) 
+theta2 <- as.matrix(thetatable[performance2,],1)
+theta3 <- as.matrix(thetatable[performance3,],1) 
+theta4 <- as.matrix(thetatable[performance4,],1)
+
+yt1 <- matrix(dynamics[,'Luisada_1991'], 1)
+yt2 <- matrix(dynamics[,'Rubinstein_1966'], 1)
+yt3 <- matrix(dynamics[,'Block_1995'], 1)
+yt4 <- matrix(dynamics[,'Rubinstein_1939'], 1)
 lt = diff(c(dynamics$note_onset, 61))
-theta <- c(10.783294628,  4.260923847,
-           21.840403351, -0.135257595, -0.022207528,
-           12.245382937,  0.222490695,  0.003387143,
-           0.050233166,   0.016500239,  0.043559623,  0.106812768,  0.048355188)
-pmats = musicModeldynamics(lt, theta[1], theta[2], theta[3:5], theta[6:8], theta[9:13], c(18,0,0), c(10,2,2)) 
-beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0), dt, ct, Tt, Zt,
-                              HHt, GGt, yt, transMat, 500, samplemethod = 1))
-states = beam$paths[which.max(beam$weights),]
 
-plotStates2(theta,states,yt,dynamics$note_onset,model="dynamics",c(18,0,0), c(10,2,2),title='')
+pmats1 = musicModeldynamics(lt, theta1[1], theta1[2], theta1[3:5], theta1[6:8], theta1[9:12], theta1[13],
+                           c(18,0,0), c(10,2,2))
+pmats2 = musicModeldynamics(lt, theta2[1], theta2[2], theta2[3:5], theta2[6:8], theta2[9:12], theta2[13],
+                            c(18,0,0), c(10,2,2))
+pmats3 = musicModeldynamics(lt, theta3[1], theta3[2], theta3[3:5], theta3[6:8], theta3[9:12], theta3[13],
+                           c(18,0,0), c(10,2,2))
+pmats4 = musicModeldynamics(lt, theta4[1], theta4[2], theta4[3:5], theta4[6:8], theta4[9:12], theta4[13],
+                            c(18,0,0), c(10,2,2))
+beam1 = with(pmats1, beamSearch(a0, P0, c(1,0,0,0), dt, ct, Tt, Zt,
+                              HHt, GGt, yt1, transMat, 500, samplemethod = 1))
+beam2 = with(pmats2, beamSearch(a0, P0, c(1,0,0,0), dt, ct, Tt, Zt,
+                                HHt, GGt, yt2, transMat, 500, samplemethod = 1))
+beam3 = with(pmats3, beamSearch(a0, P0, c(1,0,0,0), dt, ct, Tt, Zt,
+                                HHt, GGt, yt2, transMat, 500, samplemethod = 1))
+beam4 = with(pmats4, beamSearch(a0, P0, c(1,0,0,0), dt, ct, Tt, Zt,
+                                HHt, GGt, yt2, transMat, 500, samplemethod = 1))
+
+states1 = beam1$paths[which.max(beam1$weights),]
+states2 = beam2$paths[which.max(beam2$weights),]
+states3 = beam3$paths[which.max(beam1$weights),]
+states4 = beam4$paths[which.max(beam2$weights),]
+kal1 <- kalman(pmats1,states1,yt1)
+kal2 <- kalman(pmats2,states2,yt2)
+kal3 <- kalman(pmats3,states3,yt3)
+kal4 <- kalman(pmats4,states4,yt4)
+
+dfpart1 <- data.frame(measure = dynamics$note_onset, 
+                 dynamics = c(yt1), 
+                 inferred = c(kal1$ests), 
+                 state = factor(states1,
+                                levels=c(0,1,2,3),
+                                labels=c('New Value', 'Smooth Progression','Loud Deviation','Soft Deviation')
+                 ),
+                 performance = rep("Luisada 1991",231)
+)
+dfpart2 <- data.frame(measure = dynamics$note_onset, 
+                      dynamics = c(yt2), 
+                      inferred = c(kal2$ests), 
+                      state = factor(states2,
+                                     levels=c(0,1,2,3),
+                                     labels=c('New Value', 'Smooth Progression','Loud Deviation','Soft Deviation')
+                      ),
+                      performance = rep("Rubinstein 1966",231)
+)
+dfpart3 <- data.frame(measure = dynamics$note_onset, 
+                      dynamics = c(yt3), 
+                      inferred = c(kal3$ests), 
+                      state = factor(states3,
+                                     levels=c(0,1,2,3),
+                                     labels=c('New Value', 'Smooth Progression','Loud Deviation','Soft Deviation')
+                      ),
+                      performance = rep("Block 1995",231)
+)
+dfpart4 <- data.frame(measure = dynamics$note_onset, 
+                      dynamics = c(yt4), 
+                      inferred = c(kal4$ests), 
+                      state = factor(states4,
+                                     levels=c(0,1,2,3),
+                                     labels=c('New Value', 'Smooth Progression','Loud Deviation','Soft Deviation')
+                      ),
+                      performance = rep("Rubinstein 1939",231)
+)
+df <- rbind(dfpart1,dfpart2)
+#df <- rbind(dfpart1,dfpart2,dfpart3,dfpart4)
+df2 <- data.frame(start     = c(0,9,17,21,33,45,53),
+                  end       = c(8,16,20,32,44,52,60)+1,
+                  direction = factor(c(1,0,2,0,4,1,0),
+                                     levels=c(0,1,2,4),
+                                     labels=c("p","f","ff","poco piu vivo"))
+)
+
+
+myplot <- ggplot2::ggplot(df) + 
+      geom_rect(data=df2, aes(NULL,NULL,xmin=start,xmax=end,fill=direction),
+                ymin=-Inf,ymax=Inf,color="white",size=0.5,alpha=0.3)+
+      scale_fill_manual("Composer Direction",values=c("p"="grey95",
+                                                      "f"="grey90",
+                                                      "ff"="grey75",
+                                                      "sf"="grey50",
+                                                      "poco piu vivo"="lightblue"))+
+      ggplot2::geom_line(ggplot2::aes(x=measure, y=dynamics), color='grey10') +
+      ggplot2::geom_point(ggplot2::aes(x=measure, y=inferred, color=state)) +
+      ggplot2::facet_grid(performance~.)+
+      scale_color_manual("Performer Intention",values=c('New Value'="blue",
+                                                        'Smooth Progression'="darkcyan",
+                                                        'Loud Deviation'="darkorange1",
+                                                        'Soft Deviation'="red"))+
+      ggplot2::theme(legend.position = 'right') +
+      ggplot2::ggtitle("") +
+      cowplot::theme_cowplot() +
+      ggplot2::labs(x="Measure", y="Dynamics")+
+      ggplot2::ggtitle("Interpreted Dynamics")
+myplot
 ```
 
+Graphical representations for the performances of Jean-Marc Luisada in 1991 and Arthur Rubinstein in 1966 are shown in \autoref{fig:exampletable}.  These along with plots of the other forty-four performances can be found in \autoref{appendixd}. The black line traces the observed dynamics for each note across musical time as given by the score.  The colored dots are used to differentiate the 4 possible discrete states and show the interpreted musical dynamics for each note.  The background is shaded based on musical directions given by the composer in the score.  Notice with these performances, the model often seems to start a new smooth progression when the composer gives direction about the dynamics.  There are occasions where this is not always the case.  Notice that Luisada appears to smoothly adjust the dynamics from the second \emph{piano} section into the \emph{poco piu vivo} section and again when transitioning from the final \emph{forte} section to the final \emph{piano} section.  Similarly, Rubinstein also smoothly transitions but he does this between the first \emph{forte} section into the only \emph{fortissimo} section.  These unscripted parts of the performance are what we hope to discover as they allow us to contrast and compare each performance.
 
-The final important piece of this model that can be used to characterize a performance is the parameter values, $\Theta$.  The parameters for this particular performance can be found in \autoref{tab:parameterestimatesrichter}, and all parameter estimates for the 46 performances can be found in the appendix.  Certain parameters can be very informative in differentiating performances.  For example, large values of $\mu_c$ will tell us that the performer often uses very loud or very soft points of emphasis, whereas smaller values indicate the performer is more subtle.  If we want to get some idea as to the overall loudness of a piece, we may take a look at $\mu_0$.  The parameter values, along with the interpreted dynamics and discrete state, provide considerable information regarding differentiating between performances.
+```{r table3, echo=FALSE,warning=FALSE,message=FALSE}
 
-\begin{table}[t]
-  \centering
-  \begin{tabular}{@{}rcccccccc@{}}
-    \toprule
-    $\mu_c$ & $\sigma^2_{\epsilon}$ & $\mu_{0}$ & $\mu_{1}$ & $\mu_{2}$ & $\sigma^2_{0} $ & $\sigma^2_{1} $ & $\sigma^2_{2}$ \\
-    \midrule
-    $10.7833$ & $4.2609$ & $21.8404$ & $-0.1353$ & $-0.0222$ & $12.2454$ & $0.2225$ & $0.0034$ \\
-    \midrule
-    $p_{21}$ & $p_{23}$ & $p_{24}$ & $p_{31}$ & $p_{41}$ \\
-    \midrule
-    $0.0502$ & $0.0165$ & $0.0436$ & $0.1068$ & $0.04836$ \\
-    \bottomrule
-  \end{tabular}
-  \caption{Parameter Estimates for Richter's 1976 Performance of Chopin's Mazurka Op. 63 No.3}
-  \label{tab:parameterestimatesrichter}
-\end{table}
+rownames(roundthetatable3) <- sub("_", " ", rownames(roundthetatable3)) #Remove underscore
+rownames(roundthetatable3) <- sub("\\.", "-", rownames(roundthetatable3)) #Change . to -
+
+
+performance1 <- which(row.names(roundthetatable3)=="Block 1995")
+performance2 <- which(row.names(roundthetatable3)=="Luisada 1991")
+performance3 <- which(row.names(roundthetatable3)=="Sofronitsky 1949")
+performance4 <- which(row.names(roundthetatable3)=="Rubinstein 1966")
+performance5 <- which(row.names(roundthetatable3)=="Grinberg 1951")
+performance6 <- which(row.names(roundthetatable3)=="Hatto 1993")
+performance7 <- which(row.names(roundthetatable3)=="Richter 1976")
+
+exampleperformances <- c(performance1,performance2,performance3,performance4,performance5,performance6,performance7)
+sortedexampleperformances <- sort(exampleperformances)
+
+exampleparameters <- roundthetatable3[sortedexampleperformances,c(1,13,2:8)]
+exampleprobabilities <- roundthetatable3[sortedexampleperformances,9:12]
+
+
+kable(exampleparameters,format = "latex",booktabs=T,col.names = mysymbolsparam, caption="Parameter Estimates for Selected Performances of Chopin's Mazurka Op.68 No.3\\label{tab:parameterestimatesrichter}", escape=FALSE)  %>%
+  kable_styling(latex_options = "striped")
+```
+
+```{r table3ext, echo=FALSE,warning=FALSE}
+kable(exampleprobabilities,booktabs=T,col.names = mysymbolsprobs, escape=FALSE,
+      caption="Probability Estimates for Selected Performances of Chopin's Mazurka Op.68 No.3\\label{tab:probestimatesrichter}")  %>%
+  kable_styling(latex_options = "striped")
+```
+
+Analyzing the graphical representations of each performance have the benefit of illuminating complexities within a performance but may be cumbersome when attempting to compare and contrast many performances.  Instead, we analyze the parameter and transition probability values, $\Theta$. All estimated values for the 46 performances can be found in \autoref{appendixa} and \autoref{appendixb}.  For the reader's convenience, the parameter estimates for performances discussed in this section can be found in \autoref{tab:parameterestimatesrichter} and \autoref{tab:probestimatesrichter}.  Along with the tables of estimated parameters, we also supply density plots of the estimated parameters.  These density plots show the distribution of the estimated parameters and should not be mistaken for the estimated posterior distributions for some performance.  
+
+```{r denseplots,echo=FALSE,fig.margin=TRUE,fig.cap="\\label{fig:densityplots}Density Plots of Estimated Parameters for 46 Performances of Chopin's Mazurka Op. 68 No. 3.",message=FALSE,warning=FALSE,fig.height=3.5}
+
+fixroundthetatable <- roundthetatable[,c(1,13,2:12)]
+colnames(fixroundthetatable) <- c("mu[c]","mu[e]","sigma[epsilon]^2","mu[0]","mu[1]","mu[2]","sigma[0]^2","sigma[1]^2","sigma[2]^2",
+                                  "p[21]","p[23]","p[24]","p[41]")
+
+longthetatablemu0and1 <- fixroundthetatable[c(4,5)] %>%
+  pivot_longer(cols=`mu[0]`:`mu[1]`)
+
+paramdensitymu0mu1 <- ggplot(longthetatablemu0and1, aes(x=value)) + 
+  geom_density(color="black",fill="lightblue") +
+  facet_wrap(name~.,nrow=1, scales="free", labeller=label_parsed)+
+  theme_cowplot() 
+paramdensitymu0mu1
+```
+
+We analyze the density plots in order to get a better understanding of the distribution of the parameters. We begin with a look at the estimated parameters, $\mu_{0}$ and $\mu_1$.  The parameter $\mu_0$ can be interpreted as the most likely starting point for each smoothed quadratic section.  Joyce Hatto's 1993 performance is estimated to have the lowest average starting point with $\mu_0=$ `r roundthetatable3[18,3]` and Vladimir Sofronitsky's 1949 performance is estimated to have the highest average starting point with $\mu_0=$ `r roundthetatable[42,3]`.  The average of all the $\mu_0$'s across all 46 performances is ```r round(mean(roundthetatable[,3]),3)```.  \autoref{fig:densityplots} displays the density plot of $\mu_0$ which reveals the distribution of $\mu_0$'s is fairly symmetric but with more concentration around the mean than the normal distribution.  The parameter $\mu_1$ can be interpreted as the average initial change in the dynamics of a performance.  As long as $\mu_2$ is small relative to $\mu_1$ or if they both have the same sign, this change will persistent through each smoothed quadratic section.  The parameter estimates for these performances range from a low of `r roundthetatable3[33,4]` in Sviatoslav Richter's 1976 performance to a high of `r roundthetatable3[17,4]` in Maria Grinberg's 1951 performance.  From the density plot for $\mu_1$, the distribution of the estimated parameters appears roughly normal with a mean equal to ```r round(mean(thetatable$mu1),3)```.  The mean being greater than zero indicates that, on average, performers tend to (at least initially) increase the volume through each smoothed quadratic section.
+
+In order to get a fuller understanding of the parameters, we compare the estimated parameters in Luisada's 1991 performance with Rubinstein's 1966 performance.  Luisada's 1991 performance has $\mu_0 = 27.312$, $\mu_1=-0.165$, and $\mu_2=-0.110$ indicating that he typically starts loudly and then softens.  On the other hand, Rubinstein's performance has $\mu_0 = 12.840$, $\mu_1=0.470$ and $\mu_2=-0.033$, indicating that he typically starts each smoothed section more softly and then gets louder.  Taking an average across all note dynamics for the Luisada 1991 and Rubinstein 1966 performances yields ```r round(mean(dynamics$Luisada_1991),2)``` and ```r round(mean(dynamics$Rubinstein_1966),2)```, respectively.  While it is interesting to know that Rubinstein's 1966 was louder, on average, than Luisada's 1991 performance, we can see that without modeling the performer's intentions, interesting details are being missed.  We also analyze the variance within each performance.  Calculating the overall variation of note dynamics for the Luisada 1996 performance reveals a variance of ```r round(var(dynamics$Luisada_1991),2)```.  Calculating the overall note dynamics of the Rubinstein 1996 performance reveals more homogeneity with a variance of ```r round(var(dynamics$Rubinstein_1966),2)```.  Although the variation in note dynamics is higher for the Luisada 1996 performance, we observe through modelling the performer's intentions that Luisada typically has less variation in the starting dynamics of each piece-wise quadratic section than Rubinstein with $\sigma^2_0=12.098$ and 17.045, respectively.  This is a new characteristic of the performance that would be otherwise hidden without using the music dynamics model.
+
+Lastly, we compare the four estimated transition probabilities.  The estimates for $p_{21}$ and $p_{41}$\footnote{We focus on $p_{21}$ more than $p_{41}$ as being in state 4 is much less likely. } show how likely is it for the performer to start a new smoothed section.   The model also reveals how likely the performer will emphasize a note by playing it more loudly through the estimated value $p_{23}$.  For the Luisada 1991 and Rubinstein 1966 performances, all of the probabilities are relatively the same, but we do find differences in some of the other performances.  For example, while the Luisada 1991 and Rubinstein 1966 performances have relatively low probabilities in starting a new smoothed section, Michel Block's 1995 performance is more likely with $p_{21}=.101$.  Also, the Block 1995 performance is more likely to have emphasized notes with estimated $p_{23}=0.027$, a probability larger than either Luisada and Rubinstein's performances.
+
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-\nocite{*}
+Using a Markov-switching state space model, we were able to illuminate the intentions of a classical music performance with regards to the dynamics. In the process, a series of parameters were estimated that can be perceived as musical attributes hidden in the data.  Using these attributes, we discussed a few pieces and showed various characteristics that would have been hidden by simply sticking to commonly used statistics like means or standard deviations.  We then proceeded to make contrasts and comparisons of the various pieces based on these musical attributes.
+
+The analysis described here can be taken a step further.  In \cite{mcdonald_markov-switching_2019}, the authors chose to cluster the performances based on the estimated parameters from their tempo model using hierarchical clustering.  With the estimated parameters here and/or combining them with the estimated parameters of their tempo model, one could use their favorite clustering or classifying techniques on the performances.  With additional knowledge from the data, it seems likely that the ability to cluster or classify would be improved.
+
+Clustering and classifying are the foundational methods used in music recommendation systems that many users of music media platforms rely in order to discover or find new music.  For example, the fast growing online music streaming service, Spotify, has a "Made For You" section that creates recommended playlists for the user based on their listening habits.  In order to provide these recommendations, Spotify's algorithm takes into consideration information about which songs you "like", "share", and even "skip" along with information from other users that are deemed similar \citep{spotify_spotify_2019}.  While it is certainly advantageous to use data from users experience, more information can be obtained by focusing on the musical attributes of a performance itself.  Pandora, another music streaming service, created the Music Genome Project where a team of musicologists listen and analyze music in order to assign 450 musical attributes \citep{pandora_music_2020}.  These 450 "genes" allow the streaming company to classify or cluster musical pieces in order to make recommendations to its users.  It would be interesting to see if and how these additional parameters can improve the ability to classify performances and ultimately create better musical recommendation systems. 
+
+
+
+
+
+
+
+\newpage
+
+\appendix
+\appendixpage
+\addappheadtotoc
+
+\section{Estimates of Parameters for each Performance}
+\label{appendixa}
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE, fig.height=8.5}
+roundthetatable <- round(thetatable,2)
+rownames(roundthetatable) <- sub("_", " ", rownames(roundthetatable)) #Remove underscore
+rownames(roundthetatable) <- sub("\\.", "-", rownames(roundthetatable)) #Change . to -
+
+parameters1 <- roundthetatable[1:23,c(1,13,2:8)]
+parameters2 <- roundthetatable[24:46,c(1,13,2:8)]
+probabilities1 <- roundthetatable[1:23,9:12]
+probabilities2 <- roundthetatable[24:46,9:12]
+
+
+mysymbolsparam <- c("$\\mu_c$","$\\mu_e$","$\\sigma^2_\\epsilon$","$\\mu_0$","$\\mu_1$","$\\mu_2$","$\\sigma^2_0$","$\\sigma^2_1$","$\\sigma^2_2$")
+mysymbolsprobs <- c("$p_{21}$","$p_{23}$","$p_{24}$","$p_{41}$")
+
+kable(parameters1,booktabs=T, col.names = mysymbolsparam, escape=FALSE) %>%
+  kable_styling(latex_options = "striped")
+
+kable(parameters2,booktabs=T,col.names = mysymbolsparam, escape=FALSE) %>%
+  kable_styling(latex_options = "striped")
+
+
+
+
+fixroundthetatable <- roundthetatable[,c(1,13,2:12)]
+colnames(fixroundthetatable) <- c("mu[c]","mu[e]","sigma[epsilon]^2","mu[0]","mu[1]","mu[2]","sigma[0]^2","sigma[1]^2","sigma[2]^2",
+                                  "p[21]","p[23]","p[24]","p[41]")
+
+longthetatablemus <- fixroundthetatable[c(1,2,4,5,6)] %>%
+  pivot_longer(cols=`mu[c]`:`mu[2]`)
+longthetatablesigmas <- fixroundthetatable[c(3,7,8,9)] %>%
+  pivot_longer(cols=`sigma[epsilon]^2`:`sigma[2]^2`)
+
+combinethetatables <- rbind(longthetatablemus,longthetatablesigmas)
+
+paramdensitycom <- ggplot(combinethetatables, aes(x=value)) + 
+  geom_density(color="black",fill="lightblue") +
+  facet_wrap(name~.,nrow=5, scales="free", labeller=label_parsed)+
+  theme_cowplot()
+paramdensitycom
+
+```
+
+\newpage
+
+\section{Estimates of Probabilities for each Performance}
+\label{appendixb}
+
+```{r,echo=FALSE, message=FALSE, warning=FALSE}
+kable(probabilities1,booktabs=T,
+      col.names = mysymbolsprobs, escape=FALSE) %>%
+  kable_styling(latex_options = "striped")
+
+```
+
+\newpage
+
+```{r, echo=FALSE}
+kable(probabilities2,booktabs=T,
+      col.names = mysymbolsprobs, escape=FALSE) %>%
+  kable_styling(latex_options = "striped")
+
+longthetatableprobs <- fixroundthetatable[10:13] %>%
+  pivot_longer(cols=`p[21]`:`p[41]`)
+
+paramdensityprobs <- ggplot(longthetatableprobs, aes(x=value)) + 
+  geom_density(color="black",fill="lightblue") +
+  facet_wrap(name~.,nrow=2, scales="free", labeller=label_parsed)+
+  theme_cowplot()
+paramdensityprobs
+```
+
+\section{Plots for each Performance}
+\label{appendixd}
+
+```{r,fig.height=4,echo=FALSE,cache=TRUE}
+dynamicsdrop <- dynamics[4:49]
+dynamicssorted <- dynamicsdrop[,order(colnames(dynamicsdrop))]
+lt = diff(c(dynamics$note_onset, 61))
+for(performance in 1:46){
+  yt <- matrix(dynamicssorted[,performance], 1)
+  theta <- as.matrix(thetatable[performance,],1)
+  pmats = musicModeldynamics(lt, theta[1], theta[2], theta[3:5], theta[6:8], theta[9:12], theta[13],
+                           c(18,0,0), c(10,2,2)) 
+  beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0), dt, ct, Tt, Zt,
+                              HHt, GGt, yt, transMat, 500, samplemethod = 1))
+  states = beam$paths[which.max(beam$weights),] 
+  print(plotStates2(theta,states,yt,dynamics$note_onset,model="dynamics",
+              c(18,0,0), c(10,2,2),title=perftitle[performance]))
+  
+}
+```
 
 
