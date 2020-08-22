@@ -177,11 +177,13 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   int d = yt.size();
   P0.reshape(m,m);
   Tt.reshape(m,m);
+  //Rcout << "The value of Tt is:" << std::endl << Tt << std::endl;
   Zt.reshape(d,m);
   HHt.reshape(m,m); // State var (see fkf vs Durbin)
   GGt.reshape(d,d); // Obs var
   arma::mat Ptemp(m,m);
   arma::mat atemp(m,1);
+
 
   // KF
   // Update a_t-1|t-1 to a_t using CURRENT state
@@ -194,10 +196,12 @@ KFOUT kf1step(arma::mat a0, arma::mat P0, arma::mat dt,
   arma::mat Ft = GGt + Zt * Ptemp * Zt.t();
   arma::mat Ftinv = arma::inv(Ft);
   arma::mat Kt = Ptemp * Zt.t() * Ftinv;
+  //Rcout << "The value of Kt is:" << std::endl << Kt << std::endl;
   
   // Incorporate current information into a_t|t
   arma::mat a1 = atemp + Kt * vt;
   arma::mat P1 = Ptemp - Ptemp * Zt.t() * Kt.t();
+    
 
   // Calculate likelihood
   double ftdet = arma::det(Ftinv);
@@ -619,7 +623,7 @@ List musicModel(arma::vec lt, double sig2eps, arma::vec mus,
 //' @export    
 // [[Rcpp::export]]
 List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mus,
-                arma::vec sig2eta, arma::vec transprobs,
+                arma::vec sig2eta, arma::vec transprobs, double muerror,
                 arma::vec initialMean, arma::vec initialVariance){ 
   // States are: 1, 2, 3, 4
   int nstates = 4; 
@@ -637,15 +641,7 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   P0(0,0) += initialVariance(0);
   P0(4,0) += initialVariance(1);
   P0(8,0) += initialVariance(2);
-  P0(0,1) += initialVariance(0);
-  P0(4,1) += initialVariance(1);
-  P0(8,1) += initialVariance(2);
-  P0(0,2) += initialVariance(0);
-  P0(4,2) += initialVariance(1);
-  P0(8,2) += initialVariance(2);
-  P0(0,3) += initialVariance(0);
-  P0(4,3) += initialVariance(1);
-  P0(8,3) += initialVariance(2);
+
   
   arma::cube dt(m, nstates, n, arma::fill::zeros);
   dt.tube(0,0) += mus(0);
@@ -654,7 +650,7 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   
   arma::cube ct(d, nstates, 1, arma::fill::zeros);
   ct.tube(0,2) += mueps;
-  ct.tube(0,3) += -mueps;
+  ct.tube(0,3) += muerror;
   
   arma::cube Tt(mm, nstates, n, arma::fill::zeros);
   Tt.tube(0,1) += 1;
@@ -682,21 +678,22 @@ List musicModeldynamics(arma::vec lt, double mueps, double sig2eps, arma::vec mu
   HHt.tube(0,0) += sig2eta(0);
   HHt.tube(4,0) += sig2eta(1);
   HHt.tube(8,0) += sig2eta(2);
+  //HHt.tube(1,0) += sig2eta(3); //covariance between 0,1
+  //HHt.tube(3,0) += sig2eta(3); //covariance between 1,0
   
   arma::cube GGt(d, nstates, 1, arma::fill::ones);
   GGt *= sig2eps;
   
-  //Order: p21, p23, p24, p31, p41
+  //Order: p21, p23, p24, (REMOVED p31), p41
   arma::mat transMat(nstates, nstates, arma::fill::zeros);
   transMat(0,1) = 1;
   transMat(1,0) = transprobs(0);
   transMat(1,1) = 1 - transprobs(0) - transprobs(1) - transprobs(2);
   transMat(1,2) = transprobs(1);
   transMat(1,3) = transprobs(2);
-  transMat(2,0) = transprobs(3);
-  transMat(2,1) = 1 - transprobs(3);
-  transMat(3,0) = transprobs(4);
-  transMat(3,1) = 1 - transprobs(4);
+  transMat(2,1) = 1;
+  transMat(3,0) = transprobs(3);
+  transMat(3,1) = 1 - transprobs(3);
   
   return List::create(Named("a0") = a0, Named("P0") = P0,
                       Named("dt") = dt, Named("ct") = ct,
@@ -1017,10 +1014,10 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
   arma::uword s = path(0); // See comment above, replace 0 with appropriate initial s.
   arma::mat a00 =  a0.col(s);
   arma::mat P00 = reshape(P0.col(s), m, m);
-  
-  
-  // Kalman filtering
-  arma::uword iter=0;
+  //Rcout << "The value of P00 is:" << std::endl << P00 << std::endl;
+
+  //Kalman filtering
+  arma::uword iter=0; 
   while(iter < n){
     s = path(iter);
     KFOUT step = kf1step(a00, P00, 
@@ -1043,8 +1040,10 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
     iter++;
   }
   
+  
   // Kalman smoothing. Based on Durbin and Koopman (4.70)
   iter--;
+  //Rcout << "The value of iter is:" << std::endl << iter << std::endl;
   ahat.col(iter) = att.col(iter);
   while(iter > 0){
     arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
@@ -1056,9 +1055,9 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
     
     iter--; // This is important, need T after the increment rather than before.
     arma::mat Tmat = Tt.subcube(0,s,iter*Ttvar,arma::size(mm,1,1));
-    s = path(iter);
+    s = path(iter); //Shouldn't this be before the T is taken?
     Tmat.reshape(m,m);
-    ahat.col(iter) = att.col(iter) + Ptt.slice(iter) * Tmat * P00 * a00;
+    ahat.col(iter) = att.col(iter) + Ptt.slice(iter) * Tmat.t() * P00 * a00;
   }
   arma::mat cc = ct.subcube(0,s,iter*ctvar,arma::size(d,1,1));
   arma::mat zz = Zt.subcube(0,s,iter*Ztvar,arma::size(dm,1,1));
@@ -1070,3 +1069,4 @@ List kalman(List pmats, arma::uvec path, arma::mat y){
                             Named("att") = att, Named("Ptt") = Ptt,
                             Named("ests") = ests, Named("llik") = llik);
 }
+
