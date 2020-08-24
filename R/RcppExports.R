@@ -241,19 +241,15 @@ kalman <- function(pmats, path, y) {
     .Call('_dpf_kalman', PACKAGE = 'dpf', pmats, path, y)
 }
 
-egetloglike <- function(pmats, path, y) {
-    .Call('_dpf_egetloglike', PACKAGE = 'dpf', pmats, path, y)
+egetloglike <- function(lt, path, y, sig2eps, mus, sig2eta, a0, P0) {
+    .Call('_dpf_egetloglike', PACKAGE = 'dpf', lt, path, y, sig2eps, mus, sig2eta, a0, P0)
 }
 
-ebeamSearch <- function(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N) {
-    .Call('_dpf_ebeamSearch', PACKAGE = 'dpf', a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N)
+ebeamSearch <- function(lt, w0, sig2eps, mus, sig2eta, a0, P0, y, transProbs, N) {
+    .Call('_dpf_ebeamSearch', PACKAGE = 'dpf', lt, w0, sig2eps, mus, sig2eta, a0, P0, y, transProbs, N)
 }
 
-ekalman <- function(pmats, path, y) {
-    .Call('_dpf_ekalman', PACKAGE = 'dpf', pmats, path, y)
-}
-
-ekfMusicModel <- function(initialize, lt, state, t, xtminus1, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance) {
-    .Call('_dpf_ekfMusicModel', PACKAGE = 'dpf', initialize, lt, state, t, xtminus1, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
+ekalman <- function(lt, path, y, sig2eps, mus, sig2eta, a0, P0) {
+    .Call('_dpf_ekalman', PACKAGE = 'dpf', lt, path, y, sig2eps, mus, sig2eta, a0, P0)
 }
 

@@ -1,5 +1,4 @@
-#ifndef __SAMPLERS_H
-#define __SAMPLEERS_H
+#pragma once
 
 
 #include <RcppArmadillo.h>
@@ -121,5 +120,3 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   return NewW;
 }
 
-
-#endif
