@@ -71,12 +71,85 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// egetloglike
+double egetloglike(List pmats, arma::uvec path, arma::mat y);
+RcppExport SEXP _dpf_egetloglike(SEXP pmatsSEXP, SEXP pathSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type pmats(pmatsSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(egetloglike(pmats, path, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ebeamSearch
+List ebeamSearch(arma::mat a0, arma::mat P0, arma::vec w0, arma::cube dt, arma::cube ct, arma::cube Tt, arma::cube Zt, arma::cube HHt, arma::cube GGt, arma::mat yt, arma::mat transProbs, int N);
+RcppExport SEXP _dpf_ebeamSearch(SEXP a0SEXP, SEXP P0SEXP, SEXP w0SEXP, SEXP dtSEXP, SEXP ctSEXP, SEXP TtSEXP, SEXP ZtSEXP, SEXP HHtSEXP, SEXP GGtSEXP, SEXP ytSEXP, SEXP transProbsSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type P0(P0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type w0(w0SEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type dt(dtSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type ct(ctSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Tt(TtSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Zt(ZtSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type HHt(HHtSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type GGt(GGtSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type yt(ytSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type transProbs(transProbsSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(ebeamSearch(a0, P0, w0, dt, ct, Tt, Zt, HHt, GGt, yt, transProbs, N));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ekalman
+List ekalman(List pmats, arma::uvec path, arma::mat y);
+RcppExport SEXP _dpf_ekalman(SEXP pmatsSEXP, SEXP pathSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type pmats(pmatsSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(ekalman(pmats, path, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ekfMusicModel
+List ekfMusicModel(int initialize, arma::vec lt, int state, int t, double xtminus1, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec transprobs, double initialMean, double initialVariance);
+RcppExport SEXP _dpf_ekfMusicModel(SEXP initializeSEXP, SEXP ltSEXP, SEXP stateSEXP, SEXP tSEXP, SEXP xtminus1SEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP transprobsSEXP, SEXP initialMeanSEXP, SEXP initialVarianceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type initialize(initializeSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< int >::type state(stateSEXP);
+    Rcpp::traits::input_parameter< int >::type t(tSEXP);
+    Rcpp::traits::input_parameter< double >::type xtminus1(xtminus1SEXP);
+    Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type transprobs(transprobsSEXP);
+    Rcpp::traits::input_parameter< double >::type initialMean(initialMeanSEXP);
+    Rcpp::traits::input_parameter< double >::type initialVariance(initialVarianceSEXP);
+    rcpp_result_gen = Rcpp::wrap(ekfMusicModel(initialize, lt, state, t, xtminus1, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_musicModel", (DL_FUNC) &_dpf_musicModel, 7},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 12},
     {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
+    {"_dpf_egetloglike", (DL_FUNC) &_dpf_egetloglike, 3},
+    {"_dpf_ebeamSearch", (DL_FUNC) &_dpf_ebeamSearch, 12},
+    {"_dpf_ekalman", (DL_FUNC) &_dpf_ekalman, 3},
+    {"_dpf_ekfMusicModel", (DL_FUNC) &_dpf_ekfMusicModel, 11},
     {NULL, NULL, 0}
 };
 
