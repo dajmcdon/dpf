@@ -857,7 +857,7 @@ eKFOUT ekfmm1step(
 
 
 
-
+// [[Rcpp::export]]
 List edpf(arma::uvec currentStates, arma::colvec w, int N,
           arma::mat transProbs, arma::vec lt, int step,
           arma::vec a0, arma::vec P0,
@@ -876,8 +876,8 @@ List edpf(arma::uvec currentStates, arma::colvec w, int N,
                                  a0(part), P0(part));
       double atmp = ekfout.att;
       double Ptmp = ekfout.Ptt;
-      a11.col(k) = atmp;
-      P11.col(k) = Ptmp;
+      a11(k) = atmp;
+      P11(k) = Ptmp;
       lik(part,k) = ekfout.lik;
     }
     a1.col(part) = a11;
@@ -920,11 +920,11 @@ List edpf(arma::uvec currentStates, arma::colvec w, int N,
 
 
 // [[Rcpp::export]]
-double egetloglike(arma::vec lt, arma::uvec path, arma::mat y,
+double egetloglike(arma::vec lt, arma::uvec path, arma::vec y,
                    double sig2eps, arma::vec mus, arma::vec sig2eta,
                    arma::vec a0, arma::vec P0){
   
-  arma::uword n = y.n_cols;
+  arma::uword n = y.n_elem;
   
   double a0_ = a0(path(0));
   double P0_ = P0(path(0));
@@ -947,7 +947,7 @@ double egetloglike(arma::vec lt, arma::uvec path, arma::mat y,
 
 
 
-
+// [[Rcpp::export]]
 List einitializeParticles(arma::vec w0, int N,  arma::vec lt, arma::vec yt,
                           double sig2eps, arma::vec mus, arma::vec sig2eta,
                           arma::vec a0, arma::vec P0){
@@ -986,11 +986,11 @@ List einitializeParticles(arma::vec w0, int N,  arma::vec lt, arma::vec yt,
 // [[Rcpp::export]]
 List ebeamSearch(arma::vec lt, arma::vec w0,
                  double sig2eps, arma::vec mus, arma::vec sig2eta,
-                 arma::vec a0, arma::vec P0, arma::mat y,
+                 arma::vec a0, arma::vec P0, arma::vec yt,
                  arma::mat transProbs, int N){
   
-  arma::vec yt = y.row(0);
-  arma::uword n = y.n_cols;
+  arma::uword n = yt.n_elem;
+  
   arma::uword K = transProbs.n_cols;
   double maxpart = pow(K,n);
   if(maxpart > N) maxpart = N;
@@ -1003,23 +1003,25 @@ List ebeamSearch(arma::vec lt, arma::vec w0,
   arma::colvec weights(maxpart,arma::fill::zeros);
   List step = einitializeParticles(w0, N, lt, yt, sig2eps, mus, sig2eta, a0, P0);
   
+  
   int BP = step["BadPars"];
   if(BP) return List::create(Named("LastStep") = 1);
   arma::vec newW = step["newW"];
   arma::uword CurrentPartNum = newW.n_elem;
   weights.head(CurrentPartNum) = newW;
-  arma::mat a1tmp = step["a1"];
+  arma::vec a1tmp = step["a1"];
   a0.head(CurrentPartNum) = a1tmp;
-  arma::mat P1tmp = step["P1"];
+  arma::vec P1tmp = step["P1"];
   P0.head(CurrentPartNum) = P1tmp;
   arma::uvec newS = step["newstates"];
   particles.head(CurrentPartNum) = newS;
   paths(arma::span(0, CurrentPartNum - 1), 0) = newS;
   arma::uword iter = 1;
+  
   while(iter < n){
     step = edpf(particles.head(CurrentPartNum), weights.head(CurrentPartNum), 
                 maxpart, transProbs, lt, iter,
-                a0.head(CurrentPartNum), P0.head_cols(CurrentPartNum),
+                a0.head(CurrentPartNum), P0.head(CurrentPartNum),
                 sig2eps, mus, sig2eta, yt);
     int BP = step["BadPars"];
     if(BP) break;
@@ -1027,9 +1029,9 @@ List ebeamSearch(arma::vec lt, arma::vec w0,
     CurrentPartNum = newW.n_elem;
     weights.head(CurrentPartNum) = newW;
     if(CurrentPartNum < maxpart) weights.tail(maxpart-CurrentPartNum) *= 0; // fix decreasing CurrentPartNum
-    arma::mat a1tmp = step["a1"];
+    arma::vec a1tmp = step["a1"];
     a0.head(CurrentPartNum) = a1tmp;
-    arma::mat P1tmp = step["P1"];
+    arma::vec P1tmp = step["P1"];
     P0.head(CurrentPartNum) = P1tmp;
     arma::uvec newS = step["newstates"];
     particles.head(CurrentPartNum) = newS;
@@ -1044,6 +1046,7 @@ List ebeamSearch(arma::vec lt, arma::vec w0,
                       Named("LastStep") = iter++);
 }
 
+// [[Rcpp::export]]
 arma::mat ecreateTransMat(arma::vec transprobs){
   
   int nstates = 11;
@@ -1076,13 +1079,13 @@ arma::mat ecreateTransMat(arma::vec transprobs){
 
 
 // [[Rcpp::export]]
-List ekalman(arma::vec lt, arma::uvec path, arma::mat y,
+List ekalman(arma::vec lt, arma::uvec path, arma::vec y,
              double sig2eps, arma::vec mus, arma::vec sig2eta,
              double a0, double P0){
   // What if I want different initial state (instead of 0)?
   
   
-  arma::uword n = y.n_cols;
+  arma::uword n = y.n_elem;
   
   // output storage
   arma::vec llik = arma::zeros(n);

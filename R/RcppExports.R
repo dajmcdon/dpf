@@ -241,12 +241,24 @@ kalman <- function(pmats, path, y) {
     .Call('_dpf_kalman', PACKAGE = 'dpf', pmats, path, y)
 }
 
+edpf <- function(currentStates, w, N, transProbs, lt, step, a0, P0, sig2eps, mus, sig2eta, yt) {
+    .Call('_dpf_edpf', PACKAGE = 'dpf', currentStates, w, N, transProbs, lt, step, a0, P0, sig2eps, mus, sig2eta, yt)
+}
+
 egetloglike <- function(lt, path, y, sig2eps, mus, sig2eta, a0, P0) {
     .Call('_dpf_egetloglike', PACKAGE = 'dpf', lt, path, y, sig2eps, mus, sig2eta, a0, P0)
 }
 
-ebeamSearch <- function(lt, w0, sig2eps, mus, sig2eta, a0, P0, y, transProbs, N) {
-    .Call('_dpf_ebeamSearch', PACKAGE = 'dpf', lt, w0, sig2eps, mus, sig2eta, a0, P0, y, transProbs, N)
+einitializeParticles <- function(w0, N, lt, yt, sig2eps, mus, sig2eta, a0, P0) {
+    .Call('_dpf_einitializeParticles', PACKAGE = 'dpf', w0, N, lt, yt, sig2eps, mus, sig2eta, a0, P0)
+}
+
+ebeamSearch <- function(lt, w0, sig2eps, mus, sig2eta, a0, P0, yt, transProbs, N) {
+    .Call('_dpf_ebeamSearch', PACKAGE = 'dpf', lt, w0, sig2eps, mus, sig2eta, a0, P0, yt, transProbs, N)
+}
+
+ecreateTransMat <- function(transprobs) {
+    .Call('_dpf_ecreateTransMat', PACKAGE = 'dpf', transprobs)
 }
 
 ekalman <- function(lt, path, y, sig2eps, mus, sig2eta, a0, P0) {
