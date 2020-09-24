@@ -1,0 +1,81 @@
+
+
+R1 Major
+
+The most serious concern has to do with viewing changes in tempo as additive rather than multiplicative. There is a tradition to view tempo relations as proportional rather than additive (see, for example, Mead, A. (2007). On Tempo Relations. Perspectives of New Music, 64-108). This would suggest that the authors’ state-space model might be more appropriately applied to the log of tempo.
+
+I also had some concerns about the lack of checking the sensitivity to the prior distribution. The authors discuss in Section 3.6 the reasons for identifiability problems and the need for some of the prior distribution choices to address these problems, but it was difficult to understand how the particular distributional choices were likely to impact inferences. More is needed here. The decision to model variances as Gamma-distributed (as opposed to inverse-Gamma, or uniform as suggested by Gelman and others in similar settings) was a curious choice.
+
+The material on clustering could be improved. For clustering according to Mahalanobis distances, I was not clear why the authors did not choose to stan- dardize by the inverse of the posterior covariance matrix. Also, given the likely skewed distribution of the estimated variances across performers, it might have been more sensible to include the variance parameters in computing Maha- lanobis distances on the log scale. It was also unclear how the specific number of clusters was determined. Methods exist (e.g., Tibshirani’s gap statistic) to make this choice.
+
+minor
+
+The abstract is clear, but does not specify that the focus of the paper is on modeling tempo changes within music. The abstract should be revised accord- ingly.
+
+Page 7: It would be helpful to explain up front that in the switching state- space model, the continuous hidden states are functions of both the current and previous switch states. Some rationale should be provided early on for this choice of a second-order Markov model, i.e., that the states depend on both velocity (tempo) and acceleration.
+
+I think it would be helpful to discuss whether the switching model developed using four discrete states is more generally applicable beyond Chopin. The first three states seem reasonably generalizable, and perhaps single note stress is widely applicable in piano performance, but this is not entirely clear.
+
+Page 13: The Fernhead and Clifford citation should appear as “Fernhead and Clifford (2003)”. Several other similar instances of incorrectly displayed cita- tions should be fixed. (Did I get them all???)
+
+What are the differences between the model in the current manuscript and the generative model in Gu and Raphael (2012)? This question arises in the context of section 2.5.
+
+
+Karen minor
+
+Abstract, l.-5: "we learn a switching state space model ..."
+Seems to me that you have started with assuming a switching
+state model, and what you really do in the MS is "model a
+musician's tempo via a Markov-switching state-space model,
+and estimate its parameters using prior information, and
+then cluster musicians via hierarchical clustering of model
+parameters." Is that correct? (See p4, para 3, l.3-4.) If 
+so, then you can say so directly, more succinctly, and more 
+clearly.  (In my view, the verb "learn" has been grossly 
+overused - and often improperly used - in the stat literature.)
+
+"The resulting clusters suggest methods for informing music 
+instruction, discovering listening preferences, and analyzing 
+performances."  I hope you will say how the clusters do this.
+Perhaps a music student might identify more with musicians in
+Cluster A and hence study them more, is that what you have in
+mind?  
+
+p3, Fig 1: How desperately do you need color, here and in your
+subsequent figures? Color is very expensive to print, and AOAS,
+like many journals, ask authors to use it only when essential
+for accurate reader comprehension.  You may need it in Fig 9
+but perhaps gray scales and shadings will work for Fig 10-11.
+We appreciate your attention to this cost-saving measure.
+
+
+
+
+p6, l.-2: Do you "lose" anything with this smoother that "produces only 
+the unconditional expectations"?  Is it more realistic or useful to focus
+on only the unconditional, rather than conditional expectations? (It makes
+sense to me but perhaps a Bayesian might see it otherwise?)
+
+
+p9, para 2, l.-1: "small number of discrete states":
+"small" arises from the assumption on p8, l.-4: "performers generally
+maintain (or try to maintain) a steady tempo"? Or might one argue that
+this assumption might be reasonable for Chopin or 18-19thC composers?
+(Stravinsky doesn't seem very "steady" to me, but I'm not a musician!)
+
+p10, para 2, l.1: "data gives" : cf. p5, Sec 2, l.2: "data are", but 
+later on l.8: "data ... which includes".  Chose singular or plural
+and be consistent.
+
+
+p18, Table 4: Do we need SEs on these parameters?  Which parameters are
+most meaningful in characterizing a performer?  If you were able to narrow
+the number down from 12 to, say, 3 linear combinations of the 12 (say, via
+PC?), could you plot them, and show visually how much of an outlier Cortot is?
+
+p24, Sec 3.5: Any ideas how to modify the model to incorporate these
+limitations?  (The ideas can be left as "Future work.")
+
+
+
+
