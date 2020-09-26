@@ -815,8 +815,8 @@ eKFOUT ekfmm1step(
     HHt = sig2eta(0);
   }
   if(nonlin.find(state) != nonlin.end()){
-    dt = log(lt);
-    dt += acc.find(state) == acc.end() ? log(1+mus(1)) : log(1-mus(1));
+    dt = lt;
+    dt *= acc.find(state) == acc.end() ? log(1+mus(1)) : log(1-mus(1));
     HHt = sig2eta(1);
   }
   
