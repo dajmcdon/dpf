@@ -1,0 +1,139 @@
+
+Comments from Editor-in-Chief (Kafadar) on
+AOAS2002-013, "Mardov-switching state space models for uncovering
+musical interpretation,"
+Daniel J MacDonald, Michael McBride, Yupeng Gu, Christopher Raphael
+
+Abstract, l.-5: "we learn a switching state space model ..."
+Seems to me that you have started with assuming a switching
+state model, and what you really do in the MS is "model a
+musician's tempo via a Markov-switching state-space model,
+and estimate its parameters using prior information, and
+then cluster musicians via hierarchical clustering of model
+parameters." Is that correct? (See p4, para 3, l.3-4.) If 
+so, then you can say so directly, more succinctly, and more 
+clearly.  (In my view, the verb "learn" has been grossly 
+overused - and often improperly used - in the stat literature.)
+
+"The resulting clusters suggest methods for informing music 
+instruction, discovering listening preferences, and analyzing 
+performances."  I hope you will say how the clusters do this.
+Perhaps a music student might identify more with musicians in
+Cluster A and hence study them more, is that what you have in
+mind?  
+
+p3, Fig 1: How desperately do you need color, here and in your
+subsequent figures? Color is very expensive to print, and AOAS,
+like many journals, ask authors to use it only when essential
+for accurate reader comprehension.  You may need it in Fig 9
+but perhaps gray scales and shadings will work for Fig 10-11.
+We appreciate your attention to this cost-saving measure.
+
+p3, para 2, l.-2: "learn": "understand"? "characterize"?
+
+p4, l.-8: "learning" -> "estimating"?
+
+p5, l.5-6:
+   "There is an important modeling difference between these 
+    approaches and what we propose."
+->
+   "We emphasize an important modeling difference between these
+    approaches and our proposed model."
+
+p5, Sec 1.2, l.6: "learned" -> delete altogether? or
+"derived" or "estimated"?
+
+p5, Sec 1.2, para 2 l.3: "it's" (it is) -> "its" (possessive)
+also p6, l.1.  Please proofread carefully.
+
+p6, l.1 below (1): 
+"marginally independent and identically distributed as well as mutually independent"
+Per (2), $\epsilon_i$ and $\eta_i$ are NOT "identically distributed." Hence change to:
+"marginally and mutually independent and Gaussian distributed (see Eqn (2))"
+
+p6, l.-13: delete "," after "filter"
+
+p6, l.-9: "While" implies a time element.  Maybe you mean "Although"?
+
+p6, l.-9: "the the" Please proofread carefully.
+
+p6, l.-5: "There are many different smoother algorithms tailored"
+-> "Many different smoother algorithms have been tailored"
+
+p6, l.-2: Do you "lose" anything with this smoother that "produces only 
+the unconditional expectations"?  Is it more realistic or useful to focus
+on only the unconditional, rather than conditional expectations? (It makes
+sense to me but perhaps a Bayesian might see it otherwise?)
+
+p7, l.-15: "An excellent overview of the history, typography, and 
+algorithmic developments can be found in (Ghahramani and Hinton, 2000)."
+->
+"Ghahramani and Hinton (2000) provide an excellent overview of the history, 
+typography, and algorithmic developments."
+
+p7, l.-3: "parameter matrices" ? Do you refer to the covariance matrices?
+
+p9, para 2, l.-1: "small number of discrete states":
+"small" arises from the assumption on p8, l.-4: "performers generally
+maintain (or try to maintain) a steady tempo"? Or might one argue that
+this assumption might be reasonable for Chopin or 18-19thC composers?
+(Stravinsky doesn't seem very "steady" to me, but I'm not a musician!)
+
+p9, l.-6: "we only allow certain" -> "we allow only certain"
+("only" goes closest to the word it modifies; here, presumably,
+"certain transitions" not "allow").
+
+p10, para 2, l.1: "data gives" : cf. p5, Sec 2, l.2: "data are", but 
+later on l.8: "data ... which includes".  Chose singular or plural
+and be consistent.
+
+p10, l.-6 to -3: "We use ... notes." -> "Because each measure contains 
+three quarter notes, we use $\ell_i$ to denote ..., 1/6, etc."
+
+p11, l.-3: "want to be able" -> "wish"
+
+p12, l.-8: "learn"? Or "estimate from data"?  You have a model for these parameters.
+See your own use of "estimate" only 5 lines later (l.-3).
+
+p13, para 1, l.-3: "procedure of (Fearnhead and Clifford, 2003)"
+-> "procedure of Fearnhead and Clifford (2003)"
+
+p13, para 1, l.-2: "approximate to": delete "to"
+
+p14, l.-5: "learned from the model"? or "resulting from the model fitting"?
+
+p15, l.1: "The generative model in (Gu and Raphael, 2012)" ->
+  "The generative model in Gu and Raphael (2012)"
+
+p17, l.11: "performer ... on their own" -> "performer ... on her own"
+
+p17, l.13-14: "how our model learns interpretive decisions"
+ -> "interpretive decisions arising from our model" ??
+
+p17, last para, l.1: "In terms of our model," -> "Our model suggests that" ??
+
+p18, Table 4: Do we need SEs on these parameters?  Which parameters are
+most meaningful in characterizing a performer?  If you were able to narrow
+the number down from 12 to, say, 3 linear combinations of the 12 (say, via
+PC?), could you plot them, and show visually how much of an outlier Cortot is?
+
+p18, l.-14: "takeaways" -> "messages" (less colloquial)
+
+p18, l.-14: "It’s easy to see the increased variability ..." 
+May not be so "easy" for some to see, so perhaps:
+"The variability definitely increases ..."
+
+p24, Sec 3.5: Any ideas how to modify the model to incorporate these
+limitations?  (The ideas can be left as "Future work.")
+
+p24, l.-4: "an acceleration could be learned" -> "an acceleration
+parameter could be incorporated into the model and estimated"
+
+p24, l.-1: "Or course" ?? "Of course" ??  (Please proofread carefully.)
+
+p26, l.-6: "other had" -> "other hand" ?  (Please proofread carefully.)
+
+p26, l.-2: "On the other hand" again??  Maybe just "Or,"
+
+
+

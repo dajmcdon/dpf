@@ -28,7 +28,7 @@ library(tidyverse)
 library(cowplot)
 library(gplots)
 library(heatmaply)
-load("../extras/mazurkaResults.Rdata") 
+load("../extras/mazurkaResults-update.Rdata") 
 source("dirichlet_precision.R")
 
 pvec_ml = pvec_ml %>% select(-value,-fevals,-gevals,-convergence) %>%

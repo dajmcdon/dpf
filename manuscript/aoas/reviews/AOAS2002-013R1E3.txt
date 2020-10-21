@@ -1,0 +1,33 @@
+
+
+Report from Referee 3 on
+AOAS2002-013, "Mardov-switching state space models for uncovering
+musical interpretation,"
+Daniel J MacDonald, Michael McBride, Yupeng Gu, Christopher Raphael
+
+
+This article presents an application of Markov-switching state space 
+models to music data. In particular, the specific focus is on 
+characterizing variation among performers playing Chopin Mazurkas. 
+The models considered and statistical estimation algorithms are 
+quite old and standard at this point. In addition, there is 
+seemingly no formal consideration of modeling of variation among 
+performers - for example, in the clustering analysis the model 
+was fitted separately for each performer and then the estimated 
+parameters were fed into a clustering algorithm.
+
+More importantly, it is not at all clear that the results produced 
+are very interesting from a musical perspective. I consulted a 
+musician colleague in considering this paper and he/she thought that 
+there was nothing interesting produced by the output of this procedure. 
+Of course people vary in their performance - this may be due to a 
+shared instructor, influence by a previous famous recording etc. 
+My colleague didn't think it was clear that this approach was 
+actually a useful aid to musical education or interpretation of 
+how individual performers interpret a piece. He/she mentioned it 
+would be much more interesting to attempt to decide what variations 
+in interpretation and performances are more compelling to the 
+listener (among other possibilities). Indeed, to me the authors 
+do not demonstrate the utility of their approach in this 
+application - the paper is mostly descriptive.
+

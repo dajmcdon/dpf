@@ -71,12 +71,126 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// edpf
+List edpf(arma::uvec currentStates, arma::colvec w, int N, arma::mat transProbs, arma::vec lt, int step, arma::vec a0, arma::vec P0, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec yt);
+RcppExport SEXP _dpf_edpf(SEXP currentStatesSEXP, SEXP wSEXP, SEXP NSEXP, SEXP transProbsSEXP, SEXP ltSEXP, SEXP stepSEXP, SEXP a0SEXP, SEXP P0SEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP ytSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::uvec >::type currentStates(currentStatesSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type transProbs(transProbsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< int >::type step(stepSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type P0(P0SEXP);
+    Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type yt(ytSEXP);
+    rcpp_result_gen = Rcpp::wrap(edpf(currentStates, w, N, transProbs, lt, step, a0, P0, sig2eps, mus, sig2eta, yt));
+    return rcpp_result_gen;
+END_RCPP
+}
+// egetloglike
+double egetloglike(arma::vec lt, arma::uvec path, arma::vec y, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec a0, arma::vec P0);
+RcppExport SEXP _dpf_egetloglike(SEXP ltSEXP, SEXP pathSEXP, SEXP ySEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP a0SEXP, SEXP P0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type P0(P0SEXP);
+    rcpp_result_gen = Rcpp::wrap(egetloglike(lt, path, y, sig2eps, mus, sig2eta, a0, P0));
+    return rcpp_result_gen;
+END_RCPP
+}
+// einitializeParticles
+List einitializeParticles(arma::vec w0, int N, arma::vec lt, arma::vec yt, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec a0, arma::vec P0);
+RcppExport SEXP _dpf_einitializeParticles(SEXP w0SEXP, SEXP NSEXP, SEXP ltSEXP, SEXP ytSEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP a0SEXP, SEXP P0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type w0(w0SEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type yt(ytSEXP);
+    Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type P0(P0SEXP);
+    rcpp_result_gen = Rcpp::wrap(einitializeParticles(w0, N, lt, yt, sig2eps, mus, sig2eta, a0, P0));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ebeamSearch
+List ebeamSearch(arma::vec lt, arma::vec w0, double sig2eps, arma::vec mus, arma::vec sig2eta, arma::vec a0, arma::vec P0, arma::vec yt, arma::mat transProbs, int N);
+RcppExport SEXP _dpf_ebeamSearch(SEXP ltSEXP, SEXP w0SEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP a0SEXP, SEXP P0SEXP, SEXP ytSEXP, SEXP transProbsSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type w0(w0SEXP);
+    Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type P0(P0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type yt(ytSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type transProbs(transProbsSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(ebeamSearch(lt, w0, sig2eps, mus, sig2eta, a0, P0, yt, transProbs, N));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ecreateTransMat
+arma::mat ecreateTransMat(arma::vec transprobs);
+RcppExport SEXP _dpf_ecreateTransMat(SEXP transprobsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type transprobs(transprobsSEXP);
+    rcpp_result_gen = Rcpp::wrap(ecreateTransMat(transprobs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ekalman
+List ekalman(arma::vec lt, arma::uvec path, arma::vec y, double sig2eps, arma::vec mus, arma::vec sig2eta, double a0, double P0);
+RcppExport SEXP _dpf_ekalman(SEXP ltSEXP, SEXP pathSEXP, SEXP ySEXP, SEXP sig2epsSEXP, SEXP musSEXP, SEXP sig2etaSEXP, SEXP a0SEXP, SEXP P0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type sig2eps(sig2epsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mus(musSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type sig2eta(sig2etaSEXP);
+    Rcpp::traits::input_parameter< double >::type a0(a0SEXP);
+    Rcpp::traits::input_parameter< double >::type P0(P0SEXP);
+    rcpp_result_gen = Rcpp::wrap(ekalman(lt, path, y, sig2eps, mus, sig2eta, a0, P0));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_dpf_getloglike", (DL_FUNC) &_dpf_getloglike, 3},
     {"_dpf_musicModel", (DL_FUNC) &_dpf_musicModel, 7},
     {"_dpf_beamSearch", (DL_FUNC) &_dpf_beamSearch, 12},
     {"_dpf_kalman", (DL_FUNC) &_dpf_kalman, 3},
+    {"_dpf_edpf", (DL_FUNC) &_dpf_edpf, 12},
+    {"_dpf_egetloglike", (DL_FUNC) &_dpf_egetloglike, 8},
+    {"_dpf_einitializeParticles", (DL_FUNC) &_dpf_einitializeParticles, 9},
+    {"_dpf_ebeamSearch", (DL_FUNC) &_dpf_ebeamSearch, 10},
+    {"_dpf_ecreateTransMat", (DL_FUNC) &_dpf_ecreateTransMat, 1},
+    {"_dpf_ekalman", (DL_FUNC) &_dpf_ekalman, 8},
     {NULL, NULL, 0}
 };
 

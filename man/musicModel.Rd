@@ -4,8 +4,7 @@
 \alias{musicModel}
 \title{Parameter matrices for our music model}
 \usage{
-musicModel(lt, sig2eps, mus, sig2eta, transprobs, initialMean,
-  initialVariance)
+musicModel(lt, sig2eps, mus, sig2eta, transprobs, initialMean, initialVariance)
 }
 \arguments{
 \item{lt}{vector of durations between successive notes in the score}
