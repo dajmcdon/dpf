@@ -9,7 +9,7 @@ logprior <- function(theta, samp_mean=132){
   mu1 = dgamma(exp(theta[2]), samp_mean^2/100, 
                scale=100/samp_mean, log = TRUE) + theta[2]
   mu2 = dbeta(-theta[3], 15, 185, log = TRUE)
-  mu3 = dgamma(-theta[4], 20, scale=2, log = TRUE)
+  mu3 = dgamma(-theta[4], 20, scale=1, log = TRUE)
   sig2tempo = dgamma(theta[5], 3.6, rate=30, log=TRUE)
   sig2acc = 0 # dgamma(theta[6], shape=1, scale=1, log=TRUE)
   sig2stress = 0 # dgamma(theta[7], shape=1, scale=1, log=TRUE)
@@ -66,7 +66,8 @@ logStatesGivenParams <- function(states,transProbs){
   return(sum(log(transProbs[ind])))
 }
 
-toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
+toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, 
+                       badvals=Inf, priorfun=logprior){
   theta = c(theta[1:5], .05^2, 1, theta[6:12])
   trans_par = theta[8:14]
   transProbs = dpf:::ecreateTransMat(trans_par)
@@ -75,7 +76,7 @@ toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
   sig2eta = theta[5:7]
   a0 = c(log(samp_mean), 0)
   P0 = c(.12, 0)
-  logp = -1 * logprior(theta, samp_mean)
+  logp = -1 * priorfun(theta, samp_mean)
   if(logp > 1e8) return(badvals)
   if(mus[1] > 7) return(badvals)
   if(mus[1] < 0) return(badvals)
@@ -101,20 +102,21 @@ toOptimize <- function(theta, yt, lt, Npart, samp_mean = 132, badvals=Inf){
 
 # Cluster funs ------------------------------------------------------------
 
-optimizer <- function(perf, lt, Npart=200, ntries = 5, samp_mean=NULL, badvals=1e8){
+optimizer <- function(perf, lt, Npart=200, ntries = 5, samp_mean=NULL, badvals=1e8,
+                      priorfun=logprior){
   yt = as.vector(perf)
   if(is.null(samp_mean)) samp_mean = mean(yt)
   randos = NULL
   if(ntries > 1) randos = rprior(ntries-1, samp_mean)
   init_vals = rbind(prior_means(samp_mean), randos)
   out1 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
-                   badvals=badvals,samp_mean=samp_mean,
+                   badvals=badvals,samp_mean=samp_mean, priorfun=priorfun,
                    method='Nelder-Mead',
                    control=list(trace=0, maxit=5000, badval=badvals))
-  out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
-                    badvals=badvals,samp_mean=samp_mean,
-                    method='SANN',
-                    control=list(trace=0, maxit=5000,badval=badvals))
-  out = rbind.data.frame(out1, out2)
-  out
+  #out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
+  #                  badvals=badvals,samp_mean=samp_mean, priorfun=priorfun,
+  #                  method='SANN',
+  #                  control=list(trace=0, maxit=5000,badval=badvals))
+  #out = rbind.data.frame(out1, out2)
+  out1
 }

@@ -35,8 +35,7 @@ plotStates <- function(performance, params, y, onset,
       tempo = c(y), 
       inferred = c(kal$ests), 
       state = factor(
-        convert11to4(bestpath), 
-        labels=c('constant tempo', 'decelerating','accelerating','stress')
+        c('constant tempo', 'decelerating','accelerating','stress')[convert11to4(bestpath)]
         )
     )
     ggplot2::ggplot(df) + 

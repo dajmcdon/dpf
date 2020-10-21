@@ -20,10 +20,11 @@
 \renewcommand*{\subsectionautorefname}{Section}%
 \renewcommand*{\subsubsectionautorefname}{Section}%
 
+\usepackage{wasysym}
 
 
 \usepackage{xr}
-\externaldocument{aoas/musicManuscript}
+\externaldocument{aoas/musicManuscript-rev1}
 
 %% load any required packages here
 $preamble$
@@ -43,27 +44,22 @@ $endfor$
 \title{Supplement to Markov-Switching State Space Models for Uncovering Musical
   Interpretation}
 \runtitle{Supplement to Switching Models for Music}
-\author{%
-  \fnms{Daniel J.} \snm{McDonald}\corref{}\ead[label=e1]{dajmcdon@indiana.edu}\thanksref{t1}},
-\author{%
-  \fnms{Michael} \snm{McBride}\ead[label=e2]{michmcbr@iu.edu}},
-\author{%
-  \fnms{Yupeng} \snm{Gu}\ead[label=e3]{yupeng.gu@gmail.com}},
+\author[AA]{%
+  \fnms{Daniel J.} \snm{McDonald}\corref{}\ead[label=ee1]{daniel@stat.ubc.ca}},
+\author[BB]{%
+  \fnms{Michael} \snm{McBride}\ead[label=ee2,mark]{michmcbr@iu.edu}},
+\author[CC]{%
+  \fnms{Yupeng} \snm{Gu}\ead[label=ee3,mark]{yupeng.gu@gmail.com}},
 \and
-\author{\fnms{Christopher} \snm{Raphael}\ead[label=e4]{craphael@indiana.edu}\thanksref{t2}}
-\thankstext{t1}{DJM was partially supported by 
-  the National Science Foundation Grants DMS-1407439
-  and DMS-1753171.}
-\thankstext{t2}{CR was partially supported by the National Science
-  Foundation Grant IIS-1526473.}
-\affiliation{Indiana University, Bloomington}
+\author[CC]{\fnms{Christopher} \snm{Raphael}\ead[label=ee4,mark]{craphael@indiana.edu}}
+
 \runauthor{McDonald, McBride, Gu, and Raphael}
-\address{Daniel J.\ McDonald and\\Michael McBride\\Department of
-  Statistics\\ Myles Brand Hall\\ Bloomington, IN
-  47408\\ \printead{e1}\\ \phantom{E-mail:\ }\printead*{e2}}
-\address{Yupeng Gu and\\Christopher Raphael\\School of Informatics,
-  Computing,\\ and Engineering\\ Myles Brand Hall\\ Bloomington, IN
-  47408\\ \printead{e3}\\ \phantom{E-mail:\ }\printead*{e4}}
+\address[AA]{Department of
+  Statistics, University of British Columbia, \printead{ee1}}
+\address[BB]{Department of
+  Statistics, Indiana University, \printead{ee2}}
+\address[CC]{School of Informatics,
+  Computing, and Engineering, Indiana University, \printead{ee3,ee4}}
 
 \end{frontmatter}
 

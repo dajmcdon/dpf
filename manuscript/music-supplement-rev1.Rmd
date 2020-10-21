@@ -31,7 +31,8 @@ library(heatmaply)
 load("../extras/mazurkaResults-update.Rdata") 
 source("dirichlet_precision.R")
 
-pvec_ml = pvec_ml %>% select(-value,-fevals,-gevals,-convergence) %>%
+pvec_ml = pvec_ml %>% 
+  select(-value,-fevals,-gevals,-convergence) %>%
   data.matrix %>% data.frame
 # remove Block
 # bad = which(rownames(pvec_ml)=="Block_1995")
@@ -40,7 +41,7 @@ theme_set(theme_cowplot(12, "Times"))
 data(tempos)
 lt = diff(c(tempos$note_onset,61))
 library(RColorBrewer)
-fivecolors = viridis(7, option='plasma',begin=.2)[c(1,5,2,6,3,7,4)] #brewer.pal(5,'Set1')[c(2,1,3,5,4)]
+sevencolors = viridis(7, option='plasma',begin=.2)[c(1,5,2,6,3,7,4)]
 library(dendextend)
 ```
 
@@ -94,14 +95,14 @@ the type of switching models we discuss in the manuscript.
   \begin{algorithmic}
     \STATE {\bf Input:} $\varx$, $\widetilde{X}$, $P$, $\widetilde{P}$,
     $T,$ $c$, $Z$.
-    \STATE $t=n$,
+    \STATE $i=n$,
     \STATE $\hat{x}_{n}\leftarrow \widetilde{x}_n$, 
     \WHILE{$t>1$}
     \STATE $\hat{y}_i \leftarrow c + Z\hat{x}_i,$
     \COMMENT{Predict observation vector}
     \STATE $\begin{aligned} e &\leftarrow \hat{x}_i -
       \varx_i, & V &\leftarrow P_i^{-1}\end{aligned}$,
-    \STATE $t\leftarrow i-1$, \COMMENT{Increment}
+    \STATE $i\leftarrow i-1$, \COMMENT{Increment}
     \STATE $\hat{x}_i = \widetilde{x}_i + \widetilde{P}_i T Ve $ 
     \ENDWHILE
     \RETURN $\widehat{Y}=\{\hat{y}_i\}_{i=1}^n, \hat{X}=\{\hat{x}_i\}_{i=1}^n$
@@ -115,7 +116,7 @@ ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
   geom_line() + ylab('tempo (bpm)') + xlab('measure') +
   scale_x_continuous(breaks=1:4*2) +
   #geom_vline(xintercept = c(1,8.9,9)) +
-  coord_cartesian(xlim=c(1,9),expand = FALSE) +
+  coord_cartesian(xlim=c(1,9), expand = FALSE) +
   geom_hline(yintercept = 132, linetype='dashed')
 ```
 
@@ -124,9 +125,12 @@ ggplot(tempos, aes(x=note_onset, y=Rubinstein_1961)) +
 # Here we use the posterior covariance instead
 perfs = tempos[,-c(1:3)] %>% as.matrix %>% t
 row.names(pvec_ml) = sub('_',' ',row.names(pvec_ml))
-hc_parm = sweep(pvec_ml, 2, apply(pvec_ml,2,median)) %>% as.matrix
-SigInvHalf = chol(solve(crossprod(hc_parm)/nrow(pvec_ml)))
-hc_parm = dist(hc_parm %*% SigInvHalf) %>% as.matrix
+hc_parm = sweep(pvec_ml, 2, apply(pvec_ml,2,mean)) %>% 
+  as.matrix
+PostInvHalf = chol(solve(var(hc_parm)))
+PriorInvHalf = chol(prior_precision)
+hc_parm_raw = hc_parm 
+hc_parm = dist(hc_parm %*% PriorInvHalf) %>% as.matrix
 row.names(hc_parm) = row.names(pvec_ml)
 hc_perf = perfs %>% dist %>% percentize %>% hclust
 
@@ -136,68 +140,121 @@ dend_perf = hc_perf %>% as.dendrogram
 
 
 
-```{r parametric-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in"}
+
+```{r parametric-clusters,fig.width=8,fig.height=6,out.width="4in"}
 #hc_parm = hc_parm+diag(1e-12,nrow(hc_parm))
 #othercut = .4
 #subs = apply(hc_parm,1,quantile,probs=4/46) < othercut
-subs = TRUE
+subs = TRUE #rownames(pvec_ml) != "Cortot 1951"
 sDmat = hc_parm[subs,subs]
 nclusts = 7
-colorthem = TRUE
-heatmap.2(
+colorthem = FALSE
+hh = heatmap.2(
   hc_parm, Rowv = dend_parm, Colv = dend_parm, 
   symm=TRUE,
   density.info = 'none', trace='none',
           #labRow = TRUE,
   labCol = NA,
   key.title = NA,
-  col= viridis,#colorRampPalette(c('#0b61a4','white')),
+  col= grey.colors,#viridis,#colorRampPalette(c('#0b61a4','white')),
   key.xlab = NA, 
   margins = c(1,6),
   cexRow = .6,
   cexCol = .6,
-  lhei=c(1,15),
-  lwid=c(1,15),
+  lhei=c(1,8),
+  lwid=c(1,8),
   offsetCol = 0, offsetRow = 0,
   key=FALSE
 )
-sdends = sDmat %>% as.dist %>% hclust %>% as.dendrogram
-if(colorthem) sdends = sdends %>% 
-  set('labels_col', value=fivecolors, k=nclusts) %>%
-  set('branches_lty', 1) %>%
-  set('branches_k_color', value=fivecolors, k=nclusts)
-heatmap.2(sDmat,
-          Rowv = sdends, Colv = sdends,
-          symm=TRUE,
-          density.info = 'none', trace='none',
-          #labRow = TRUE,
-          labCol = NA,
-          key.title = NA,
-          col=viridis,#colorRampPalette(c('#0b61a4','white')),
-          key.xlab = NA, 
-          margins = c(1,6),
-          cexRow = .3,
-          cexCol = .6,
-          lhei=c(1,8),
-          lwid=c(1,8),
-          offsetCol = 0, offsetRow = 0,
-          key=FALSE
-)
+
+sdends = sDmat[rownames(pvec_ml) != "Cortot 1951",rownames(pvec_ml) != "Cortot 1951"] %>% 
+  as.dist %>% hclust %>% as.dendrogram
 
 clustered = data.frame(clust = as.factor(cutree(as.hclust(sdends), k = nclusts)),
-                 performer = row.names(sDmat))
+                 performer = row.names(sDmat[rownames(pvec_ml) != "Cortot 1951",]))
 pvec_all = pvec_ml %>% data.matrix %>% data.frame
 pvec_all$performer = row.names(pvec_ml)
 row.names(pvec_all) = NULL
 pvec_all = full_join(pvec_all, clustered) %>% 
-  mutate(clust = fct_explicit_na(clust, "other"))
+  mutate(clust = forcats::fct_explicit_na(clust, "Cortot"))
 ```
+
+```{r lin-principal-components, fig.width=8,fig.height=6,out.width="4in",out.height="3in"}
+library(ggrepel)
+lin_pcs = prcomp(hc_parm_raw %*% PriorInvHalf)
+lin_pcs$coords = hc_parm_raw %*% lin_pcs$rotation[,1:3]
+lin_pcs_tib = tibble(
+  pc1 = lin_pcs$coords[,1], pc2 = lin_pcs$coords[,2],
+  pc3 = lin_pcs$coords[,3], group = pvec_all$clust,
+  performer = rownames(hc_parm))
+lin_pcs_tib %>% ggplot(aes(pc1,pc2)) + 
+  xlab("first principal component") +
+  ylab("second principal component") +
+  geom_point(aes(shape=group),size=3) + 
+  scale_shape_manual(values = c(1,2,8,10,15:18)) +
+  geom_text_repel(aes(label=performer), family="Times")
+```
+
+# Principal components
+
+In \autoref{sec:clust-music-perf} of the main document, we plotted the first two principal components along with some notion of groups to gauge the similarities between performances. \autoref{tab:lin-pc-loadings} gives the loadings for the first three principal components. We see that the first component picks up information about the first two states, both through $\mu_{\textrm{tempo}}$ and $\mu_{\textrm{acc}}$ as well as loading onto the probabilities $p_{11}$, $p_{12}$, and $p_{31}$. The second component loads especially onto $\mu_{\textrm{stress}}$ but also $p_{11}$ and $p_{21}$. Finally, the third component loads mainly onto the observation error with smaller contributions from $p_{31}$.
+
+```{r lin-pc-loadings, include=TRUE}
+lab_lookup = c("sigma[epsilon]^2", "mu[tempo]",
+               "mu[acc]", "mu[stress]", "sigma[tempo]^2",
+               "p[1*','*1]", "p[1*','*2]", "p[3*','*1]","p[1*','*3]",
+               "p[2*','*1]","p[3*','*2]","p[2*','*2]")
+latex_lab_lookup = paste0("$",c("\\sigma_\\epsilon^2", "\\mu_{\\textrm{tempo}}",
+               "\\mu_{\\textrm{acc}}", "\\mu_{\\textrm{stress}}",
+               "\\sigma_{\\textrm{tempo}}^2",
+               "p_{11}", "p_{12}", "p_{31}","p_{13}",
+               "p_{21}","p_{32}","p_{22}"),"$")
+lin_fct_load = t(lin_pcs$rotation[,1:3])
+rownames(lin_fct_load) = paste0("PC", 1:3)
+colnames(lin_fct_load) = latex_lab_lookup
+  #mutate(across(starts_with("PC"), ~ (.x / sqrt(sum(.x^2)))))
+
+kableExtra::kbl(
+  lin_fct_load, digits=2, booktabs = TRUE, escape = FALSE, 
+  caption="The factor loadings for principal component analysis of the parameter estimates.",
+  centering=TRUE) %>% 
+  kableExtra::kable_styling(latex_options = "scale_down")
+#print(signif(sum(lin_pcs$sdev[1:2])/sum(lin_pcs$sdev)*100,2))
+```
+
+# Confidence intervals
+
+```{r confidence-intervals, include=TRUE, fig.height=15, fig.width=10, out.width="5.333in", out.height="8in", fig.cap="Confidence intervals for all parameters based on the observed Fisher information."}
+cis = readRDS("../extras/approx-cis.RDS")
+cis_tib_list = lapply(cis, function(x) x$confidence_intervals)
+cis_tib = bind_rows(cis_tib_list)
+repl = cis_tib %>% group_by(param) %>% 
+  summarise(big=max(se2,na.rm = TRUE)) 
+repl_list = split(repl$big,1:nrow(repl))
+names(repl_list) = repl$param
+repl_list = c("none",repl_list)
+badses = cis_tib %>% select(performer, param, se2) %>% 
+  pivot_wider(names_from = param, values_from=se2,id_cols=performer) 
+betterses = replace_na(badses, repl_list) %>% pivot_longer(-performer)
+cis_tib$se2 = betterses$value
+cis_tib %>% 
+  mutate(blci = pmax(ests-se2, lb), buci = pmin(ests+se2, ub),
+         performer=factor(performer, levels=rownames(hh$carpet))) %>%
+  ggplot(aes(ests, performer)) + 
+  facet_wrap(~param, scales="free_x", labeller = label_parsed) +
+  geom_linerange(aes(xmin=blci,xmax=buci), size=1, color="gray80") + 
+  geom_point(color="darkblue") + xlab("") + ylab("") + panel_border()
+```
+
+
+\autoref{sec:analys-chop-mazurka} of the manuscript includes parameter estimates for some of the recordings in our data set. In order to quantify uncertainty and compare the estimates, this section graphically displays all parameter estimates in \autoref{fig:confidence-intervals}. The recordings are sorted in the same order as in \autoref{fig:dmats} in the main document, so some of the conclusions about groupings are readily apparent. The bars indicating measures of uncertainty are derived form the observed Fisher information from the optimization routine. However, it's not entirely clear what these mean. For one, they ignore any uncertainty in the state sequence (see \autoref{fig:posterior-richter-plot} some notion of the scale of this uncertainty). They also depend on identifiability, the priors, and the approximation to the posterior. Producing the MAP depends on the approximation accuracy at the MAP, but producing the Hessian needs that as well as the accuracy of about $5p^2$ additional function evaluations. And because we need the inverse, any inaccuracies could explode. The length of the confidence interval for parameter $j$ is given by $4\sqrt{(\widehat{I})^{-1}_{jj}}$ and so these would have roughly 95% coverage. For any parameters that are unidentified, the width of the band is the maximum over all performances for the same parameter. However, short of performing a fully-Bayesian analysis, we would hesitate to attach much certainty to these metrics of uncertainty.
+
 
 # Distance matrix from raw data
 
-In \autoref{sec:clust-music-perf} of the manuscript, we present results for clustering performances using the low-dimensional vector of performance specific parameters learned for our model. An alternative approach is to simply use the raw data, in this case, 231 individual note-by-note instantaneous speeds measured in beats per minute. In \autoref{fig:raw-data-clusters} we show the result of this analysis. A comparison between this clustering and that given by our model is discussed in some detail in the manuscript.
+In \autoref{sec:clust-music-perf} of the manuscript, we present results for grouping performances using the low-dimensional vector of performance specific parameters learned for our model. An alternative approach is to simply use the raw data, in this case, 231 individual note-by-note instantaneous speeds measured in beats per minute. In \autoref{fig:raw-data-clusters} we show the result of this analysis. A comparison between this clustering and that given by our model is discussed in some detail in the manuscript.
 
-```{r raw-data-clusters,fig.width=4,fig.height=4,out.width="3in",out.height="3in",include=TRUE,fig.cap="This figure presents a heatmap and hierarchical clustering based only on the note-by-note onset timings for each of the 46 recordings.",fig.pos="b"}
+```{r raw-data-clusters,fig.width=8,fig.height=6,out.width="4in", include=TRUE,fig.cap="This figure presents a heatmap and hierarchical clustering based only on the note-by-note onset timings for each of the 46 recordings.",fig.pos="b"}
 heatmap.2(as.matrix(percentize(dist(perfs))),
           Rowv = dend_perf, Colv = dend_perf, 
           symm=TRUE,
@@ -218,14 +275,11 @@ heatmap.2(as.matrix(percentize(dist(perfs))),
 ```
 
 
-```{r clust-densities, fig.height=8,fig.width=6.5}
-lab_lookup = c("sigma[epsilon]^2", "mu[tempo]",
-               "mu[acc]", "mu[stress]", "sigma[tempo]^2",
-               "p[1*','*1]", "p[1*','*2]", "p[3*','*1]","p[1*','*3]",
-               "p[2*','*1]","p[3*','*2]","p[2*','*2]")
+```{r clust-densities, eval=FALSE, fig.height=8,fig.width=6.5}
                #sig2acc="sigma^2[acc]",sig2stress="sigma^2[stress]"
                #)
-ttt = pvec_all %>% gather(key='parameter',value='value',-clust,-performer)
+ttt = pvec_all %>%
+  gather(key='parameter',value='value',-clust,-performer)
 ttt$parameter = factor(ttt$parameter,levels=unique(ttt$parameter),
                        labels= lab_lookup)
 ttt %>%
@@ -233,13 +287,14 @@ ttt %>%
   geom_density(alpha=.75,adjust=1.75) +
   facet_wrap(~parameter,scales='free',
              labeller = label_parsed) +
-  scale_fill_manual(values=fivecolors) + xlab('') +
+  scale_fill_viridis_d(option = "A") + xlab('')
+  #scale_fill_manual(values=fivecolors) + xlab('') +
   theme(legend.title = element_blank(), legend.position = 'bottom',
         legend.key.width=unit(.75,"cm"))+
   guides(fill=guide_legend(nrow=1))
 ```
 
-```{r clust-densities-sub1, fig.height=3,fig.width=8}
+```{r clust-densities-sub1, eval=FALSE, fig.height=3,fig.width=8}
 ttt %>% filter(parameter %in% lab_lookup[1:5],
                clust != 'other') %>%
   ggplot(aes(x=value, fill=clust)) +
@@ -253,7 +308,7 @@ ttt %>% filter(parameter %in% lab_lookup[1:5],
 
 ```
 
-```{r clust-densities-sub2, fig.height=5,fig.width=8}
+```{r clust-densities-sub2, eval=FALSE, fig.height=5,fig.width=8}
 ttt %>% filter(parameter %in% lab_lookup[6:12],
                clust != 'other') %>%
   ggplot(aes(x=value, fill=clust)) +
@@ -269,7 +324,7 @@ ttt %>% filter(parameter %in% lab_lookup[6:12],
 
 # Plotting performances
 
-\autoref{sec:clust-music-perf} of the manuscript discusses 4 distinct clusters of the 46 performances as well as an "other" category of relatively unique interpretations. Figures \ref{fig:clust-1} to \ref{fig:clust-other} display the note-by-note tempos along with the inferred interpretive decisions for all performances by clustering. Here we include some of the discussion of these clusters from the main text to clarify the figures.
+\autoref{sec:clust-music-perf} of the manuscript discusses 7 groups of recordings. Figures \ref{fig:clust-1} to \ref{fig:clust-7} display the note-by-note tempos along with the inferred interpretive decisions for all performances based on this grouping. 
 
 ```{r all-perfs, fig.width=6.5,fig.height=9}
 plots = vector("list", 4)
@@ -284,15 +339,17 @@ for(i in 1:nrow(pvec_ml)){
                     pmats$HHt, pmats$GGt, y, pmats$transMat, 400)
   bestpath = beam$paths[which.max(beam$weights),]
   kal = kalman(pmats, bestpath, y)
-  plots[[i]] = data.frame(measure = tempos$note_onset, tempo = c(y), 
-                  inferred = c(kal$ests), state = convert11to4(bestpath))
+  plots[[i]] = tibble(
+    measure = tempos$note_onset, tempo = c(y), 
+    inferred = c(kal$ests), state = convert11to4(bestpath), 
+    performer = pvec_all$performer[i],
+    clust = pvec_all$clust[i])
 }
 plots = bind_rows(plots)
-plots$performer = rep(pvec_all$performer, each=length(y))
-plots$clust = rep(pvec_all$clust, each=length(y))
-plots$state = as.factor(plots$state) 
+#plots$performer = rep(pvec_all$performer, each=length(y))
+#plots$clust = rep(pvec_all$clust, each=length(y))
 plots = plots %>% mutate(
-  state=factor(state,labels=c('constant','decel','accel','stress'))
+  state=factor(c('constant','decel','accel','stress')[state])
   )
 perfcols = viridis_pal(begin=.2)(nlevels(plots$state))
 # plots$pointx = 10
@@ -300,115 +357,151 @@ perfcols = viridis_pal(begin=.2)(nlevels(plots$state))
 # deunderscore = function(x) gsub('_',' ',x)
 ```
 
-The first cluster (\autoref{fig:clust-1}) corresponds to performances which are reasonably
-staid. The emphasis state is rarely visited with the performer tending
-to stay in the constant tempo state with periods of slowing down at
-the ends of phrases. Acceleration is never used. Such state
-preferences are clearly inferred by the model as shown in, e.g., the
-top row of \autoref{fig:clust-density-tp}. Furthermore, these
-performances have relatively low average tempos, and not much
-difference between the A and B sections.
+The first group (\autoref{fig:clust-1} indicated as $\circ$ in \autoref{fig:pca}) corresponds to reasonably staid performances. This group is the largest and
+corresponds to the block from Cohen to Brailowsky in
+\autoref{fig:dmats}. In this group, the emphasis state is rarely visited
+with the performer tending to stay in the constant tempo state with
+periods of slowing down at the ends of phrases. Acceleration is almost never used. Furthermore, these
+performances have relatively slow average tempos, and not much
+difference between the A and B sections. Joyce Hatto's recording
+in \autoref{fig:archetypal} is typical of this group
 
-```{r clust-1, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the first cluster."}
-perfshapes = c(16,17,15,3)
+
+
+```{r clust-1, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the first group"}
+perfshapes = c(17,20,6,8)
 ggplot(filter(plots, clust=='1')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  scale_shape_manual(values=perfshapes) +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3) + panel_border()#+
 ```
-
-Recordings in the second
-cluster (\autoref{fig:clust-2}) tend to transition quickly between states, especially constant
+Recordings in the fourth group (\autoref{fig:clust-4}, $\oplus$ in \autoref{fig:pca}) are
+those in the upper right of \autoref{fig:dmats}, from Olejniczac to
+Richter. These recordings
+tend to transition quickly between states, especially constant
 tempo and slowing down accompanied by frequent transitory
-emphases. The probability of remaining in state 1 is the lowest for
-this cluster while the probability of entering state 2 from state 1 is
-the highest. The acceleration state is visited only rarely.
+emphases. The probability of remaining in state 1 is the lowest while
+the probability of entering state 2 from state 1 is 
+the highest. The acceleration state is rarely visited. Four of
+the most similar performances are in this group along with Richter's 1976 recording.
 
-```{r clust-2, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the second cluster."}
-ggplot(filter(plots, clust=='2')) + 
+```{r clust-4, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the fourth group."}
+ggplot(filter(plots, clust=='4')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols)+#[c(1,2,4)]) +
-  scale_shape_manual(values=perfshapes)+#[c(1,2,4)]) +
+  scale_color_manual(values=perfcols, drop=FALSE)+
+  scale_shape_manual(values=perfshapes, drop=FALSE)+
   theme(legend.position = 'bottom', 
         legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol = 3)+ panel_border() #+
 ```
 
-Cluster three (\autoref{fig:clust-3}) is somewhat like cluster one in that performers tend to
-stay in state 1 for long periods of time, but they transition more
-quickly from state 3 back to state 1. They also use state 4 frequently
-whereas cluster one
-did not. They also tend to have very large tempo
-contrasts between the A and B sections.
+The three performances in group six (\autoref{fig:clust-6}, $\bullet$ in \autoref{fig:pca}) are actually quite like others,
+but with small exceptions. Biret's 1990 performance is very much like
+those in group 1, but with a much larger contrast between tempos in
+the A and B sections. The recording by Rubinstein in 1952 is similar,
+though with a faster A section that has less contrast with the B
+section. Tomsic's 1995 performance is actually most
+similar to those in group three ($\mathrlap{+}\times$), but played much faster and
+with a large $\sigma^2_\epsilon$.
 
-```{r clust-3, fig.height=3, fig.width=5,include=TRUE, fig.cap="Performances in the third cluster.", eval=FALSE}
+```{r clust-6, eval=TRUE, fig.height=2.5, fig.width=5,include=TRUE, fig.cap="Performances in the sixth group."}
+ggplot(filter(plots, clust=='6')) + 
+  geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
+              aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
+  # scale_color_brewer(palette='Set1') +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0)) +
+  facet_wrap(~performer,ncol=3)+ panel_border() #+
+```
+
+
+
+The remaining performances are displayed in Figures \ref{fig:clust-2}--\ref{fig:clust-7}, with the exception of Cortot's performance in the manuscript.
+
+```{r clust-2, eval=TRUE, fig.height=2.5, fig.width=5,include=TRUE, fig.cap="Performances in the second group."}
+ggplot(filter(plots, clust=='2')) + 
+  geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
+              aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
+  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
+  # scale_color_brewer(palette='Set1') +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0)) +
+  facet_wrap(~performer,ncol=3)+ panel_border() #+
+```
+
+
+
+```{r clust-3, fig.height=4, fig.width=5,include=TRUE, fig.cap="Performances in the third cluster.", eval=TRUE}
 ggplot(filter(plots, clust=='3')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols[c(1,2,4)]) +
-  scale_shape_manual(values=perfshapes[c(1,2,4)]) +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
   theme(legend.position = 'bottom', 
         legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3) + panel_border()#+
 ```
 
-Cluster four (\autoref{fig:clust-4}) has both faster average tempos and more variability from one period of
-constant tempo to the next. State 4 is rare, with fast constant tempo
-changes that persist for small amounts of time tending to reflect note
-emphases.
 
 
-```{r clust-4, eval=FALSE, fig.height=6, fig.width=5,include=TRUE, fig.cap="Performances in the fourth cluster."}
-ggplot(filter(plots, clust=='4')) + 
+```{r clust-5, eval=TRUE, fig.height=2.5, fig.width=5,include=TRUE, fig.cap="Performances in the fifth group."}
+ggplot(filter(plots, clust=='5')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols[c(1,2,4)]) +
-  scale_shape_manual(values=perfshapes[c(1,2,4)]) +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
   facet_wrap(~performer,ncol=3)+ panel_border() #+
 ```
 
-The remaining performances are relatively different from all other performances (\autoref{fig:clust-other}). 
 
-```{r clust-other, fig.height=7, fig.width=5,include=TRUE, fig.cap="Performances in the ``other'' cluster.",eval=FALSE}
-ggplot(filter(plots, clust=='other')) + 
+```{r clust-7, eval=TRUE, fig.height=4, fig.width=5,include=TRUE, fig.cap="Performances in the seventh group."}
+ggplot(filter(plots, clust=='7')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
         strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,ncol=3) + panel_border()#+
+  facet_wrap(~performer,ncol=3)+ panel_border() #+
 ```
-
-
 
 
 
@@ -417,13 +510,14 @@ ggplot(filter(plots, clust=='other')) +
 ggplot(filter(plots, performer == 'Richter 1976')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
+  geom_point(aes(x=measure, y=inferred, color=state, shape=state), size=2) +
  # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  scale_color_grey(drop=FALSE)+
   theme(legend.position = 'bottom', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
   facet_wrap(~performer) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
@@ -433,15 +527,14 @@ ggplot(filter(plots, performer == 'Richter 1976')) +
 ggplot(filter(plots, performer == 'Hatto 1993')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
-  geom_point(aes(x=measure, y=inferred, color=state)) +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
+  geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols[c(1,2)]) +
-  scale_shape_manual(values=perfshapes[c(1,2)]) +
-  theme(legend.position = 'bottom', 
-        legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
+  scale_color_grey(drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
   facet_wrap(~performer) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
@@ -451,15 +544,14 @@ ggplot(filter(plots, performer == 'Hatto 1993')) +
 ggplot(filter(plots, performer == 'Cortot 1951')) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols[c(1,3,4)]) +
-  scale_shape_manual(values=perfshapes[c(1,3,4)]) +
-  theme(legend.position = 'bottom', 
-        legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
+  scale_color_grey(drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
   facet_wrap(~performer) #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
@@ -470,14 +562,15 @@ filter(plots, performer %in% c('Richter 1976','Hatto 1993')) %>%
   ggplot() + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
+  scale_color_grey(drop=FALSE)+
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow = 1) + panel_border()#+
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
+  facet_wrap(~performer) + panel_border() #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
@@ -511,15 +604,15 @@ filter(spline_music , performer %in% c('Richter 1976')) %>%
   ggplot() + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90', show.legend = FALSE) +
-  geom_point(aes(x=measure, y=tempo), color='gray40', show.legend = FALSE) +
-  geom_line(aes(x=measure, y=value, color=key)) + 
-  scale_color_viridis_d(
-    option = 'plasma',
-    labels=c('music model','musical spline','regression spline')) +
+              fill = 'gray95', color = 'gray95', show.legend = FALSE) +
+  geom_point(aes(x=measure, y=tempo), color='gray60', show.legend = FALSE, size=.6) +
+  geom_line(aes(x=measure, y=value, linetype=key))+#,color=key)) + 
+  #scale_color_grey(
+  # labels=c('music model','musical spline','regression spline')) +
+  scale_linetype_manual(values=c(1,3,5),labels=c('music model','musical spline','regression spline')) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow=2) + panel_border()#+
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
+  facet_wrap(~performer) + panel_border() #+
   # geom_rect(aes(xmin=pointx-2.5, xmax=pointx+2.5,
   #               ymin=pointy-2.5,ymax=pointy+2.5,fill=clust), 
   #           show.legend = FALSE,
@@ -532,18 +625,19 @@ filter(spline_music , performer %in% c('Richter 1976')) %>%
 
 
 ```{r similar-perfs,fig.height=4}
-similar = c('Olejniczac 1990','Shebanova 2002','Richter 1976','Milkina 1970')
+similar = c('Wasowski 1980','Shebanova 2002','Richter 1976','Milkina 1970')
 ggplot(filter(plots, performer %in% similar)) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
+  scale_color_grey(drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
   theme(legend.position = 'bottom', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow=2) + panel_border()#+
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
+  facet_wrap(~performer) + panel_border() #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
@@ -555,21 +649,22 @@ similar = c('Rubinstein 1939', 'Rubinstein 1952',
 ggplot(filter(plots, performer %in% similar)) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0)) +
-  facet_wrap(~performer,nrow=2) + panel_border()#+
+  scale_color_grey(drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
+  facet_wrap(~performer) + panel_border() #+
   # geom_point(aes(x=pointx,y=pointy,color=clust),alpha=.5, size=5, shape=15) + 
   # scale_color_manual(values = fivecolors)
 ```
 
 ```{r similar-rubin-parameters}
 kable(pvec_ml[c(
-  'Olejniczac 1990','Shebanova 2002','Richter 1976','Milkina 1970',
+  'Wasowski 1980','Shebanova 2002','Richter 1976','Milkina 1970',
   'Rubinstein 1939', 'Rubinstein 1952',
   'Rubinstein 1961','Rubinstein 1966'),],
       digits = 2, format = 'latex')
@@ -581,20 +676,21 @@ kable(pvec_ml[c(
 ggplot(filter(plots, performer %in% c('Barbosa 1983','Fou 1978'))) + 
   geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
               aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
-              fill = 'gray90', color = 'gray90') +
-  geom_line(aes(x=measure, y=tempo), color='gray40') +
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
   geom_point(aes(x=measure, y=inferred, color=state,shape=state)) +
   # scale_color_brewer(palette='Set1') +
-  scale_color_manual(values=perfcols) +
-  theme(legend.position = 'none', legend.title = element_blank(),
-        strip.text = element_text(hjust = 0), axis.line = element_line("black")) +
-  facet_wrap(~performer) + panel_border()
+  scale_color_grey(drop=FALSE) +
+  scale_shape_manual(values=perfshapes, drop=FALSE) +
+  theme(legend.position = 'bottom', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0), strip.background=element_blank()) +
+  facet_wrap(~performer) + panel_border() #+
 ```
 
 
 # Distribution over states
 
-To examine the stability of the \autoref{alg:dpf}, we examined all the potential paths for Richter's 1976 recording. Here, we saved the most likely 10,000 paths and their weights (rather than only the most likely path). \autoref{fig:posterior-richter-plot} shows the marginal (posterior) probability of being in a particular state for each note. While the paper uses the most likely _path_, this figure is marginal in the sense that a particular note/state combination may have high probability in that many paths visited that note/state. But, the most likely path may not have used that same note/state combination. Nonetheless, there appears to be consensus for many of the notes. The most obviously difficult notes are those near measures 10 and 50. In both cases, the most likely path (\autoref{fig:richter} in the main text) used the stress state, which exceeds 50% posterior probability here.
+To examine the stability of the \autoref{alg:dpf}, we examined all the potential paths for Richter's 1976 recording. Here, we saved the most likely 10,000 paths and their weights (rather than only the most likely path). \autoref{fig:posterior-richter-plot} shows the marginal (posterior) probability of being in a particular state for each note. While the paper uses the most likely _path_, this figure is marginal in the sense that a particular note/state combination will have high probability when many paths visited that note/state. But, the most likely path may not have used that same note/state combination. Nonetheless, there appears to be consensus for many of the notes. The most obviously difficult notes are those near measures 10 and 50. In both cases, the most likely path (\autoref{fig:richter} in the main text) used the stress state, which exceeds 50% posterior probability here.
 
 ```{r posterior-richter}
 richter = pvec_ml["Richter 1976",]
@@ -621,4 +717,223 @@ ggplot(tib, aes(x=x, y=w, fill=state)) + geom_col(width = 1) +
   xlab('measure') + scale_x_continuous(expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0), limits = c(0,1)) +
   theme(legend.position = "bottom")
+```
+
+# Multiplicative tempo changes
+
+
+```{r multiplicative-model, include=TRUE, out.width="5in", fig.cap="Additive and multiplicative models for Richter's 1976 performance. The multiplicative model fits quite well, but is less likely to visit the stress state."}
+additive = plots %>% filter(performer=="Richter 1976")
+all_richt = readRDS("../extras/richt_mult_par.RDS")
+pvec_mult_ml = all_richt[5,]
+richt_mult = unlist(pvec_mult_ml)[1:12]
+y = matrix(tempos$Richter_1976, nrow = 1)
+richt_mult = c(richt_mult[1:5], .05^2, 1, richt_mult[6:12])
+transProbs = dpf:::ecreateTransMat(richt_mult[8:14])
+beam = dpf:::ebeamSearch(
+    rep(1,length(y)), c(1,rep(0,10)), richt_mult[1],
+    richt_mult[2:4], richt_mult[5:7], 
+    c(log(mean(y)),0), c(.12,0), y, transProbs, 400)
+bestpath = beam$paths[which.max(beam$weights),]
+kal = dpf:::ekalman(rep(1,length(y)), bestpath, y, 
+                    richt_mult[1], richt_mult[2:4],
+                    richt_mult[5:7], log(mean(y)), .12)
+multiplicative = data.frame(measure = tempos$note_onset, tempo = c(y), 
+                  inferred = c(kal$ests), state = convert11to4(bestpath))
+multiplicative = multiplicative %>% 
+  mutate(state = factor(c('constant','decel','accel','stress')[state],
+               levels = c('constant','decel','accel','stress')),
+         performer = "Richter 1976", clust = additive$clust[1])
+bind_rows("additive"=additive, "multiplicative" = multiplicative, .id="model") %>%
+  ggplot() + 
+  geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
+              aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
+  geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
+  # scale_color_brewer(palette='Set1') +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  theme(legend.position = 'none', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0), 
+        axis.line = element_line("black")) +
+  facet_wrap(~model) + panel_border()
+```
+
+While an additive state space model is relatively easy to understand, some music theorists \citep[for example]{Mead2007} have argued that musicians make multiplicative tempo adjustments. That is, it is the ratio between the tempo of the current note and that of the previous note rather than their difference that is important. Such a conception is fundamental to musical notation (quarter notes, eighth notes, etc) and frequently used to specify tempo changes within a piece of music, such as with \halfnote\ =\ \quarternote\ to indicate that the next section should be played at half the previous tempo. 
+
+Rather than the linear switching model described in \autoref{sec:materials-methods}, we examined the following multiplicative version:
+\begin{equation}
+  \begin{aligned}
+    x_1 &\sim \textrm{lognormal}(x_0,\ P_0),\\
+    \frac{x_{i+1}}{x_i} &= (1-\mu(s_i)) \eta_i, 
+    & \eta_i &\sim \textrm{lognormal}(0,\ Q(s_i)),\\
+    y_i&= c(s_i) +x_i + \epsilon_i, & \epsilon_i &\sim N(0,\ G(s_i)).
+  \end{aligned}
+\end{equation}
+Here, $\mu(s_i)$ is 0 in the constant tempo or emphasis states and controls the magnitude of acceleration or deceleration in the other states. To complete the model, $G=\sigma^2_\epsilon + \sigma^2_{stress}I(s_i=4)$ while $Q = \sigma^2_{acc}$ in states 2 or 3 and 0 otherwise. To make this model easier to compute, we transform by examining the log of the transition equation and exponentiating the hidden continuous state in the measurement equation. Likelihood evaluation is then performed with the extended Kalman filter (EKF). The EKF is essentially the Kalman filter applied to the first-order Taylor series expansion of any non-linear components around our current predictions of them. For this model, we have
+\begin{equation}
+  \begin{aligned}
+    \log(x_1) &\sim N(x_0,\ P_0),\\
+    \log(x_{i+1}) &= \log(x_i) + \log(1-\mu(s_i)) + \log(\eta_i), 
+    & \log(\eta_i) &\sim N(0,\ Q(s_i)),\\
+    y_i&= c(s_i) +\exp(\varx_i) + \exp(\varx_i)x_i + \epsilon_i, & \epsilon_i &\sim N(0,\ G(s_i)),
+  \end{aligned}
+\end{equation}
+where $\varx_i$ is the estimate of $E\left[x_i \given y_1,\ldots y_{i-1}\right]$.
+
+
+
+We estimated this same model on the entire dataset and performed principal component analysis on the resulting parameters (see also \autoref{sec:clust-music-perf} of the manuscript). \autoref{fig:multiplicative-model} shows the inferred performance decisions for Richter's 1976 performance from both the linear and multiplicative models. Both seem to fit the data quite well. There are three slight differences between the inferences. First, in the B section, the multiplicative model uses the acceleration state more than the additive model does. Second, the multiplicative model avoids the stress state, and this behavior is reflected in a higher probability of remaining in the constant tempo state. Third, the perioods of slowing down at the ends of phrases are better explained by the multiplicative model.
+
+```{r mult-par-clusts, include=TRUE, fig.cap="The first two principal components based on parameter estimates from the multiplicative model. The groupings (color and point type) are the same as those from the linear model.", fig.width=8, fig.height=9, out.width="5in"}
+all_mult_par = readRDS("../extras/all_mult_par.RDS") %>% unlist %>%
+  matrix(ncol=16)
+all_mult_par = all_mult_par[,-c(13:16)]
+colnames(all_mult_par) = names(pvec_ml)
+mult_pcs = prcomp(all_mult_par)# %*% chol(mult_prior_precision))
+mult_pcs$coords = mult_pcs$x %*% mult_pcs$rotation[,1:2]
+multpc_df = tibble(
+  PC1 = mult_pcs$coords[,1], PC2 = mult_pcs$coords[,2],
+  perfs = rownames(hc_parm), cluster = pvec_all$clust
+)
+
+ggplot(multpc_df, aes(PC1,PC2)) + geom_text_repel(aes(label=perfs)) +
+  geom_point(aes(shape=cluster, color=cluster), size=4) + 
+  scale_color_viridis_d(drop=FALSE) +
+  scale_shape_manual(values=c(7,15:18,8,1,9), drop=FALSE) +
+  theme(legend.position = "bottom") +
+  guides(shape=guide_legend(nrow=1), color=guide_legend(nrow=1))
+```
+
+
+The percent of variance explained by the first two principal components is `r signif(sum(mult_pcs$sdev[1:2])/sum(mult_pcs$sdev)*100,2)`%.  The first factor loads completely on $\sigma^2_{\epsilon}$ while the second loads on $\mu_{\textrm{stress}}$. So, while this model can explain individual performances quite well, it is much less able to provide musically meaningful distinctions between performances. While the interpretation for Richter's performance seems quite reasonable under this model, other performances are much less reasonable.
+
+
+```{r factor-loadings, include=FALSE, fig.cap="Factor loadings for the multiplicative model parameter estimates."}
+mult_fct_load = tibble(
+  PC1 = mult_pcs$rotation[,1], PC2 = mult_pcs$rotation[,2],
+  pars = as.factor(lab_lookup)) %>% 
+  mutate(PC1 = PC1 / sqrt(sum(PC1^2)), PC2 = PC2/sqrt(sum(PC2^2)))
+
+kableExtra::kbl(mult_fct_load)
+```
+
+
+
+
+# Alternative prior distributions
+
+Following the recommendations of an anonymous referee, we reestimated the model under some alternative prior distributions. These distributions are shown in \autoref{tab:morepriors}. Returning to Richter's recording, we used inverse gamma and uniform distributions for the variance parameters to allow heavier tails. We also looked at uniform distributions on the transition probabilities and a prior which requires the observation variance, $\sigma^2_\epsilon$ to be smaller. 
+
+Apart from the "smaller observation variance" setting, these different specifications do not have a dramatic effect: the fit to the data remains similar both quantitatively (as measured by RMSE and negative loglikelihood, see \autoref{tab:prior-mses}) and qualitatively (as determined by examining the inferred performance in \autoref{fig:alternative-priors}). 
+
+The prior modes are important for some parameters to avoid non-identifiability, and occasionally, as described in the manuscript, to enforce more musically meaningful switching behaviors. On the other hand, the prior tail shape is not particularly important here because we're estimating posterior modes rather than performing a full Bayesian analysis with accompanying credible intervals.
+
+\begin{table}[t]
+    \caption{Informative prior distributions for the music model}
+  \label{tab:morepriors}
+  \centering
+  \begin{tabular}{@{}rcccc@{}}
+    \toprule
+    Parameter & \phantom{a} & Original & Inverse Gamma \\
+    \midrule
+    $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(40,\ 10)$ & IG$(42,16400)$\\
+    $\mu_{\textrm{tempo}}$ & $\sim$ & Gamma$\left(\frac{\overline{Y}^2}{100},\ \frac{100}{\overline{Y}}\right)$ & IG$\left(\frac{\overline{Y}^2}{100}+2, \overline{Y}(\frac{\overline{Y}^2}{100}+1)\right)$\\
+    $-\mu_{\textrm{acc}} $ & $\sim$ & Gamma$(15,\ 2/3)$ & IG(17, 160)\\
+    $-\mu_{\textrm{stress}} $ & $\sim$ & Gamma$(20,\ 2)$ & IG(22, 840\\
+    $\sigma^2_{\textrm{tempo}} $ & $\sim$ & Gamma$(40,\ 10)$ & IG$(42,16400)$\\
+    $\sigma^2_{\textrm{acc}} $ & $=$ & 1 &  1\\
+    $\sigma^2_{\textrm{stress}} $ & $=$ & 1 & 1\\
+    $p_{1,\cdot}$ & $\sim$ & Dirichlet$(85,\ 5,\ 2,\ 8)$& Dirichlet$(85,\ 5,\ 2,\ 8)$ \\
+    $p_{2,\cdot}$ & $\sim$ & Dirichlet$(4,\ 10,\ 1,\ 0)$& Dirichlet$(4,\ 10,\ 1,\ 0)$ \\
+    $p_{3,\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$& Dirichlet$(5,\ 3,\ 7,\ 0)$ \\
+    \midrule
+    Parameter & \phantom{a} & Smaller $\sigma^2_\epsilon$ &
+    Uniform Variances & Uniform Probabilities\\
+    \midrule
+    $\sigma^2_{\epsilon}$ & $\sim$ & Gamma$(20,\ 10)$ & 1 & Gamma$(20,\ 10)$ \\
+    $\mu_{\textrm{tempo}}$ & $\sim$ & Gamma$\left(\frac{\overline{Y}^2}{100},\ \frac{100}{\overline{Y}}\right)$ & Gamma$\left(\frac{\overline{Y}^2}{100},\ \frac{100}{\overline{Y}}\right)$ & Gamma$\left(\frac{\overline{Y}^2}{100},\ \frac{100}{\overline{Y}}\right)$ \\
+    $-\mu_{\textrm{acc}} $ & $\sim$ & Gamma$(15,\ 2/3)$ & Gamma$(15,\ 2/3)$ & Gamma$(15,\ 2/3)$\\
+    $-\mu_{\textrm{stress}} $ & $\sim$ & Gamma$(20,\ 1)$ & Gamma$(20,\ 2)$ & Gamma$(20,\ 2)$ \\
+    $\sigma^2_{\textrm{tempo}} $ & $\sim$ & Gamma$(40,\ 10)$ & 1 & Gamma$(40,\ 10)$\\
+    $\sigma^2_{\textrm{acc}} $ & $=$ & 1 &  1 & 1\\
+    $\sigma^2_{\textrm{stress}} $ & $=$ & 1 & 1 & 1\\
+    $p_{1,\cdot}$ & $\sim$ & Dirichlet$(85,\ 5,\ 2,\ 8)$& Dirichlet$(85,\ 5,\ 2,\ 8)$& 1 \\
+    $p_{2,\cdot}$ & $\sim$ & Dirichlet$(4,\ 10,\ 1,\ 0)$& Dirichlet$(4,\ 10,\ 1,\ 0)$& 1 \\
+    $p_{3,\cdot}$ & $\sim$ & Dirichlet$(5,\ 3,\ 7,\ 0)$& Dirichlet$(5,\ 3,\ 7,\ 0)$& 1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+```{r alternative-priors, fig.height=4, fig.cap="Inferred state sequence for Richter's 1976 recording under alternative prior specifications.", include=TRUE, out.width="5in"}
+prior_plots = vector("list")
+prior_checks = readRDS("../extras/prior-checks-res.RDS")
+prior_plots_pars = sapply(
+  prior_checks, function(x) x[which.min(x$value),1:12])
+prior_plots_pars[,1] = unlist(pvec_ml["Richter 1976",])
+for(i in 1:ncol(prior_plots_pars)){
+  params = unlist(prior_plots_pars[,i])
+  y = matrix(tempos$Richter_1976, nrow = 1)
+  pmats = musicModel(lt, params[1], params[2:4], c(params[5],1,1),
+                     params[6:12], c(132,0), c(400,10))
+  beam = with(pmats, beamSearch(a0, P0, c(1,0,0,0,0,0,0,0,0,0,0), 
+                    dt, ct, Tt, Zt,
+                    HHt, GGt, y, transMat, 400))
+  bestpath = beam$paths[which.max(beam$weights),]
+  kal = kalman(pmats, bestpath, y)
+  prior_plots[[i]] = data.frame(
+    measure = tempos$note_onset, tempo = c(y), 
+    inferred = c(kal$ests), state = convert11to4(bestpath),
+    llike = kal$llik
+    )
+}
+prior_plots = bind_rows(prior_plots)
+prior_plots$prior = rep(
+  c("original","smaller variances","inverse gamma variances", 
+    "uniform variances", "uniform probabilities"), 
+  each=length(y))
+prior_plots = prior_plots %>% mutate(
+  state=factor(c('constant','decel','accel','stress')[state])
+  )
+prior_mses = prior_plots %>% group_by(prior) %>%
+  summarise(rmse = sqrt(mean((y-inferred)^2)),
+            `negative log likelihood` = mean(llike)) 
+prior_mses$`$\\sigma_{\\epsilon}$` = sqrt(unlist(prior_plots_pars[1,]))
+
+ggplot(prior_plots) + 
+  geom_rect(data=data.frame(xmin = 33, xmax = 45, ymin = -Inf, ymax = Inf),
+              aes(xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax),
+              fill = 'gray95', color = 'gray95') +
+  geom_line(aes(x=measure, y=tempo), color='gray60') +
+  geom_point(aes(x=measure, y=inferred, color=state, shape=state)) +
+  # scale_color_brewer(palette='Set1') +
+  scale_color_manual(values=perfcols, drop=FALSE) +
+  theme(legend.position = 'none', legend.title = element_blank(),
+        strip.text = element_text(hjust = 0), 
+        axis.line = element_line("black")) +
+  facet_wrap(~prior) + panel_border()
+```
+
+```{r prior-mses, include=TRUE}
+kableExtra::kbl(
+  prior_mses, digits = 2, booktabs = TRUE, 
+  caption = "For each of the different prior distributions, we report the MSE between the estimated performer intentions from the model and the true performance as well as the negative log likelihood.",
+  escape = FALSE)
+```
+
+```{r posterior-ests, include=TRUE}
+prior_pars_tbl = matrix(unlist(prior_plots_pars),ncol = 5)
+row.names(prior_pars_tbl) = c("$\\sigma^2_{\\epsilon}$",
+                "$\\mu_{\\textrm{tempo}}$", "$\\mu_{\\textrm{acc}}$",
+                "$\\mu_{\\textrm{stress}}$", "$\\sigma^2_{\\textrm{tempo}}$",
+                "$p_{11}$", "$p_{12}$","$p_{22}$","$p_{31}$","$p_{13}$", 
+                "$p_{21}$", "$p_{32}$")
+kableExtra::kbl(
+  prior_pars_tbl, digits = 2, booktabs = TRUE, 
+  caption = "For each of the different prior distributions, we report the estimated parameter values.",
+  row.names = TRUE, linesep="",
+  col.names = c("original","smaller variances","inverse gamma variances", 
+  "uniform variances", "uniform probabilities"),
+  escape = FALSE) %>% kableExtra::kable_styling(latex_options = "scale_down")
 ```

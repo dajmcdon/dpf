@@ -15,6 +15,25 @@ dist_calc <- function(x, y, prec = diag(ncol(pvec))){
 
 full_multinom <- function(p) c(p, 1-sum(p))
 
+prior_precision = Matrix::bdiag(
+  1/4000,  1/100, 1/(15*(2/3)^2), 1/(20*4), 1/4000,
+  diag(7)
+)
+
+prior_precision[c(6,7,10),c(6,7,10)] = dirichlet_precision(
+  c(85,5,8,2))[c(1,2,4),c(1,2,4)]
+prior_precision[c(8,11),c(8,11)] = dirichlet_precision(
+  c(10,1,4))[c(1,3),c(1,3)]
+prior_precision[c(9,12),c(9,12)] = dirichlet_precision(
+  c(5,7,3))[c(1,3),c(1,3)]
+
+mult_prior_precision = prior_precision
+
+mult_prior_precision[2,2] = 1/trigamma(132^2/100)
+mult_prior_precision[3,3] = (200^2 * 201) / (15*185)
+mult_prior_precision[5,5] = 30^2/3.6
+
+
 Dmats <- function(pvec, precisions = list(
   1, 1, 1, 1, 1, 
   #1/4000, 1/100, 1/(15*(2/3)^2), 1/(20*4), 1/4000,
