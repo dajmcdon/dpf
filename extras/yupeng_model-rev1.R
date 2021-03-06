@@ -101,11 +101,11 @@ optimizer <- function(perf, lt, Npart=200, ntries = 5, samp_mean=132, badvals=1e
                    priorfun=priorfun,
                    method='Nelder-Mead',
                    control=list(trace=0, maxit=5000, badval=badvals))
-  out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart, 
-                    badvals=badvals,samp_mean=samp_mean,
-                    priorfun=priorfun,
-                    method='SANN',
-                    control=list(trace=0, maxit=5000,badval=badvals))
-  out = rbind.data.frame(out1, out2)
-  out
+  # out2 = multistart(init_vals, toOptimize, yt=yt, lt=lt, Npart=Npart,
+  #                   badvals=badvals,samp_mean=samp_mean,
+  #                   priorfun=priorfun,
+  #                   method='SANN',
+  #                   control=list(trace=0, maxit=5000,badval=badvals))
+  # out = rbind.data.frame(out1, out2)
+  out1
 }
