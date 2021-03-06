@@ -18,6 +18,6 @@ But not all states can be visited, so there are only 11.
 }
 \examples{
 path = sample(0:10, 25, replace=TRUE)
-npath = convert10to4(path)
+npath = convert11to4(path)
 
 }

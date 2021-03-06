@@ -9,7 +9,7 @@
 #' 
 #' @examples
 #' path = sample(0:10, 25, replace=TRUE)
-#' npath = convert10to4(path)
+#' npath = convert11to4(path)
 #' 
 #' @export
 convert11to4 <- function(path){
@@ -42,20 +42,20 @@ convert11to4 <- function(path){
 #     }
 #     return(path4)
 # }
-# 
-# #' Converts an 8 state 1-Markov path HMM to a 4 state 2-Markov path
-# #' 
-# #' This function is specific to the HMM given in Gu (2017)
-# #'
-# #' @param path a vector of length n containing the integers 0 to 7 (as output by BeamSearch when applied to the yupengMats parameterization)
-# #'
-# #' @return a vector of length n containing the integers 1 to 4
-# #' @export
-# convert8to4 <- function(path){
-#     t1 = c(1,2,4,2,3,1,3,1)
-#     path8 = t1[path+1]
-#     return(path8)
-# }
+
+#' Converts an 8 state 1-Markov path HMM to a 4 state 2-Markov path
+#'
+#' This function is specific to the HMM given in Gu (2017)
+#'
+#' @param path a vector of length n containing the integers 0 to 7 (as output by BeamSearch when applied to the yupengMats parameterization)
+#'
+#' @return a vector of length n containing the integers 1 to 4
+#' @export
+convert8to4 <- function(path){
+    t1 = c(1,2,4,2,3,1,3,1)
+    path8 = t1[path+1]
+    return(path8)
+}
 # 
 # 
 # 

@@ -2,6 +2,7 @@
 
 export(beamSearch)
 export(convert11to4)
+export(convert8to4)
 export(ddirichlet)
 export(getloglike)
 export(kalman)

@@ -14,7 +14,7 @@ License: GPL
 LazyData: TRUE
 Depends: R (>= 2.10)
 Imports: 
-    Rcpp (>= 0.12.10),
+    Rcpp,
     ggplot2,
     stats
 LinkingTo: Rcpp, RcppArmadillo

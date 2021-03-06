@@ -1,11 +1,9 @@
-#pragma once
+#ifndef __SAMPLERS_H
+#define __SAMPLERS_H
 
 
 #include <RcppArmadillo.h>
 using namespace Rcpp;
-
-
-// [[Rcpp::depends(RcppArmadillo)]]
 
 
 arma::uvec SampleNoReplace(arma::uvec x, int size) {
@@ -120,3 +118,4 @@ arma::colvec resampleOptimal(arma::colvec w, int N){
   return NewW;
 }
 
+#endif 
