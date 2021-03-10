@@ -17,5 +17,7 @@ example-articles/
 *.log
 *.aux
 extras/deprecated/
-manuscript/gfx
+manuscript/gfx/
 manuscript/jasa-reject
+manuscript/music-supplement*.tex
+manuscript/aoas/reviews/
