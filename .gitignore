@@ -17,4 +17,5 @@ example-articles/
 *.log
 *.aux
 extras/deprecated/
+manuscript/gfx/
 manuscript/jasa-reject

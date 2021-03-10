@@ -1,0 +1,106 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath,amssymb,amstext}
+\usepackage[margin=1in]{geometry}
+\usepackage[round,sort&compress]{natbib}
+\usepackage[letterpaper=true,colorlinks=true,pdfpagemode=none,urlcolor=red,linkcolor=red,citecolor=red,pdfstartview=FitH]{hyperref}
+
+\usepackage{xcolor}
+\definecolor{cobalt}{rgb}{0.0, 0.28, 0.67}
+
+\newenvironment{resp}{\color{cobalt}}{}
+\newcommand{\sresp}[1]{\textcolor{cobalt}{#1}}
+
+\usepackage{xr}
+\externaldocument{musicManuscript-rev1}
+\externaldocument[supp-]{../music-supplement-rev1}
+
+
+\title{AOAS2002-013, \emph{Markov-switching state space models for uncovering
+    musical interpretation} \\
+Author response - Revision 2}
+\author{Daniel J McDonald, Michael McBride, Yupeng Gu, Christopher Raphael}
+\date{\today}
+
+
+\begin{document}
+
+
+\maketitle
+
+
+We would again like to thank the editor and the reviewer for their careful
+comments. In this minor revision, we have implemented the main suggestions
+highlighted by the editor. The major change is an extra section in the
+Supplemental Material addressing the question of ``over smoothing'' (second
+bullet point below). We've made a handful of other minor adjustments discussed
+below. 
+
+\begin{itemize}
+\item ``Bayesian analysis'' - We added the following 2 sentences to Section 2.5
+  where we first describe their inclusion in our analysis:
+  \begin{quote}
+    Given the use of priors, one could interpret our procedure from a Bayesian
+    perspective. However, we do not estimate full posteriors, only the maximum
+    \emph{a posteriori} parameter value, so our prior specification choices are
+    not intended to reflect tail uncertainty.
+  \end{quote}
+  We would prefer to avoid characterizing our procedure as ``Bayesian''. We
+  feel that adding such language sets up expectations in the reader that
+  accounting for posterior uncertainty will form a component of the analysis. We
+  would rather not give this impression.
+
+\item We went ahead and fit the model of Gu and Raphael (2012). We give a few
+  results in the Supplement with additional discussion. Here are the highlights:
+  \begin{enumerate}
+  \item We show three performances and the fits from both models
+    side-by-side. Our model produces more reasonable inferences and also
+    smooths less. The GR 2012 model tends to get ``stuck'' in a state,
+    especially in the Luisada recording, eliminating much of the tempo
+    variability.
+  \item We examine the cumulative RMSE for both models for the same
+    3 performances. The GR 2012 model has larger RMSE in each case, approaching
+    the RMSE of the mean for the Luisada recording. It's fairly clear that it
+    smooths significantly more than our more expressive model.
+  \item We summarize these comparisons over all 46 recordings (lower RMSE on
+    35/46 recordings, smaller average RMSE overall).
+  \end{enumerate}
+
+  
+\item ``Mahalanobis distance'' Using the prosterior rather than the prior
+  doesn't change the results 
+  much, but they're not quite as good for the reasons previously discussed.
+  Perhaps the reviewer thinks we're using the covariance rather than the
+  precision? More likely, we suspect the reviewer's intuition is related to the
+  question of 
+  sampling from the 
+  posterior rather than maximizing. Here, (maximizing) parameters that are
+  poorly identified 
+  remain near their initial values. And since the same initial values are used
+  for all performances, poorly identified parameters have very low variance in
+  the posterior over the set of performances. So the inversion inflates their
+  importance. Had we sampled, one 
+  would imagine that poor identification would lead to a posterior that looks
+  like the prior, so it would no longer be an issue. We haven't altered our
+  analysis.
+
+\item We've taken the advice of the editor and added the color version to the
+  supplement along with a mention in the caption in the manuscript.
+
+\item As the editor remarks, we do conduct a sensitivity analysis in Section
+  3.6. There's very little 
+  difference in the results between our use of gamma and the more standard
+  inverse gamma. When 
+  calibrated to match means and variances (as we do), the bulk of the distribution is
+  nearly indistinguishable. The gamma prior allows for smaller variances while
+  the inverse gamma 
+  puts a bit more mass at very large values. Typical values of the objective
+  function (negative log likelihood plus + log prior) are on the order of 1000
+  while the absolute differences in log gamma relative to log inverse gamma over
+  the effective range of the variance parameters are on the order of 0.1.
+  
+\end{itemize}
+
+
+\end{document}
+
